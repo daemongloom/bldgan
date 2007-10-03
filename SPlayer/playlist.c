@@ -75,11 +75,11 @@ void DisableScroll(void)
 // Поднимаем громкость
 void VolumeUp()
 {
-//#ifdef NEWSGOLD
-//  if(SoundVolume<5)SoundVolume++;  //  Если не будут работать все уровни громкости, раскомментируйте...
-//#else
-  if(SoundVolume<13)SoundVolume++;
-//#endif
+#ifdef NEWSGOLD
+  if(SoundVolume<5)SoundVolume++;
+#else
+  if(SoundVolume<15)SoundVolume++;
+#endif
   if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
   REDRAW();
 }
