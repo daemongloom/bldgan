@@ -1,9 +1,9 @@
 #include "../inc/swilib.h"
+#include "../inc/playsound.h"
 #include "conf_loader.h"
 #include "main.h"
 #include "mainmenu.h"
 #include "playlist.h"
-#include "..\inc\playsound.h"
 
 #ifdef NEWSGOLD
 #define DEFAULT_DISK "4"
@@ -16,8 +16,6 @@ const int minus11=-11; // стремная константа =)
 unsigned short maincsm_name_body[140];
 unsigned int MAINCSM_ID = 0;
 unsigned int MAINGUI_ID = 0;
-
-int mode; // 1, если длинное нажатие боковой клавиши
 
 //--- Собственно, переменные координат AAA ---
 unsigned int VOLmy_x;
@@ -42,48 +40,21 @@ extern const char SKIN[];
 extern const char DEFAULT_PLAYLIST[];
 extern const unsigned int IDLE_X;
 extern const unsigned int IDLE_Y;
+//--- настройки из конфига ---
+
+//--- Переменные! --- Не путать с константами из конфига!
 extern short phandle;  // Для определения конца воспр.  AAA
 extern char GetAccessoryType();
-int playmode; // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
 extern char PlayingStatus;
-
-//--- настройки из конфига ---
+char Quit_Required = 0;     // Флаг необходимости завершить работу
+int playmode; // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
+int mode; // 1, если длинное нажатие боковой клавиши
+//--- Переменные! ---
 
 void load_skin();       // Из skin.cfg AAA
 void UpdateCSMname(WSHDR * tname);
 
 //--- Наши переменные ---
-char Quit_Required = 0;     // Флаг необходимости завершить работу
-
-/*
- Обрабатываем строки...
- Thanks to Rst7! But it not working... :(
-
-unsigned int char8to16(int c)
-{
-  if (c==0xA8) c=0x401;
-  if (c==0xAA) c=0x404;
-  if (c==0xAF) c=0x407;
-  if (c==0xB8) c=0x451;
-  if (c==0xBA) c=0x454;
-  if (c==0xBF) c=0x457;
-  if (c==0xB2) c=0x406;
-  if (c==0xB3) c=0x456;
-  if ((c==0xC0)&&(c==0x100)) c+=0x350;
-  return c;
-}
-
-void ascii2ws(char *s, WSHDR *ws)
-{
-  int c;
-  while ((c=*s++))
-  {
-    wsAppendChar(ws,char8to16(c));
-  }
-}
-
- Обрабатываем строки...
-*/
 
 // Играем MP3 файл
 void PlayMP3File(const char * fname)
@@ -135,8 +106,6 @@ void PlayMP3File(const char * fname)
 }
 
 // Грузим координаты из skin.cfg AAA
-// Modified by Blind007  // Thanks, DG! Я тоже думал, что неверно было написано... Blind007
-// Исчо раз бай AAA :)
 void load_skin(void)
 {
   char *data; 
@@ -359,8 +328,8 @@ int my_keyhook(int submsg,int msg)
   if (submsg==POC_BUTTON){
     switch (msg){
       case KEY_DOWN : return 2;
-      case LONG_PRESS:  if (mode==0) {StopAllPlayback(); mode=1;}  REDRAW; return 2;
-      case KEY_UP: if (mode==0) TogglePlayback(); else mode=0;  REDRAW; return 2;
+      case LONG_PRESS:  if (mode==0) {StopAllPlayback(); mode=1;  REDRAW(); return 2;}
+    case KEY_UP: if (mode==0) TogglePlayback(); else {mode=0;  REDRAW(); return 2;}
     }}
 #endif
   if (submsg==VOL_UP_BUTTON){
@@ -516,11 +485,18 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
       InitConfig();
     }
   }
-  // Если вход.звонок
-  if ((msg->msg==MSG_INCOMMING_CALL)&(PlayingStatus==2))
+  
+  // Если вход.звонок или звонок закончился Blind007
+  if (((msg->msg==MSG_INCOMMING_CALL)&&(PlayingStatus==2))||((msg->msg==MSG_END_CALL)||(PlayingStatus==1)))
   {
     TogglePlayback();
   }
+  /*
+  if (((msg->msg==MSG_INCOMMING_CALL)||(msg->msg==MSG_END_CALL))&((PlayingStatus==1)||(PlayingStatus==2)))
+  {
+    TogglePlayback();
+  }
+  */
        
   if (msg->msg==MSG_PLAYFILE_REPORT)   // Для определения конца воспр.  AAA
   {
@@ -631,10 +607,10 @@ int main(char *exename, char *fname)
       LoadingPlaylist(DEFAULT_PLAYLIST);
     }
   }
-  UpdateCSMname((WSHDR*)"");
+  UpdateCSMname(NULL); // Всего-то исправить :) Blind007
   LockSched();
   MAINCSM_ID = CreateCSM(&MAINCSM.maincsm,dummy,0);
-  AddKeybMsgHook((void *)my_keyhook);
+  AddKeybMsgHook((void *)my_keyhook); //Ни скока ебался прежде чем сделал... Итак! Кейхук! AAA :) DemonGloom
   UnlockSched();
   return 0;
 }
