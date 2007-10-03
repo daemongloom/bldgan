@@ -47,7 +47,7 @@ extern short phandle;  // Для определения конца воспр.  AAA
 extern char GetAccessoryType();
 extern char PlayingStatus;
 char Quit_Required = 0;     // Флаг необходимости завершить работу
-int playmode; // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
+extern int playmode; // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
 int mode; // 1, если длинное нажатие боковой клавиши
 //--- Переменные! ---
 
@@ -335,17 +335,24 @@ int my_keyhook(int submsg,int msg)
   if (submsg==VOL_UP_BUTTON){
     switch (msg){
       case KEY_DOWN : return 2;
-      case LONG_PRESS:  if (mode==0) {if (playmode==2) RandTrack(); else NextTrack(); mode=1; }  REDRAW(); return 2;
-      case KEY_UP: if (mode==0) VolumeUp(); else mode=0;  REDRAW(); return 2;
+      case LONG_PRESS:  if (mode==0) {if (playmode==2) RandTrack(); else NextTrack(); mode=1; }  REDRAW(); return 2;  // Следующий трек
+      case KEY_UP: if (mode==0) VolumeUp(); else mode=0;  REDRAW(); return 2; // Громкость выше
     }}
   if (submsg==VOL_DOWN_BUTTON){
     switch (msg){
       case KEY_DOWN : return 2;
-      case LONG_PRESS: if (mode==0) {PreviousTrack(); mode=1; }  REDRAW(); return 2;
-      case KEY_UP: if (mode==0) VolumeDown(); else mode=0;  REDRAW(); return 2;
+      case LONG_PRESS: if (mode==0) {PreviousTrack(); mode=1; }  REDRAW(); return 2;  // Предыдущий трек
+      case KEY_UP: if (mode==0) VolumeDown(); else mode=0;  REDRAW(); return 2;  // Громкость ниже
     }}
   
-  REDRAW();
+  if ((submsg==0x27)){//&& !(IsCalling())){  // Если кнопка гарнитуры и не звонок
+    switch (msg){
+    case (KEY_DOWN): return 2;
+    case (LONG_PRESS):  if (mode==0) {if (playmode==2) RandTrack(); else NextTrack(); mode=1; }  REDRAW(); return 2;  // Следующий трек
+    case (KEY_UP): if (mode==0) TogglePlayback(); else mode=0;  REDRAW(); return 2;  // Переключение pause/play 
+    }
+  }
+  
   return(0);
 }
 
@@ -487,16 +494,10 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
   }
   
   // Если вход.звонок или звонок закончился Blind007
-  if (((msg->msg==MSG_INCOMMING_CALL)&&(PlayingStatus==2))||((msg->msg==MSG_END_CALL)||(PlayingStatus==1)))
+  if (((msg->msg==MSG_INCOMMING_CALL)&&(PlayingStatus==2)) || ((msg->msg==MSG_END_CALL)&&(PlayingStatus==1)))  // У кого руки такие кривые??
   {
     TogglePlayback();
   }
-  /*
-  if (((msg->msg==MSG_INCOMMING_CALL)||(msg->msg==MSG_END_CALL))&((PlayingStatus==1)||(PlayingStatus==2)))
-  {
-    TogglePlayback();
-  }
-  */
        
   if (msg->msg==MSG_PLAYFILE_REPORT)   // Для определения конца воспр.  AAA
   {
@@ -529,16 +530,7 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
       }
     }
   }
-/*  if (msg->msg==MSG_INCOMMING_CALL)     // Идея хорошая но не пашет   AAA
-   {
-     TogglePlayback();
-   }
-  else
-  if (msg->msg==MSG_END_CALL)
-   {
-   TogglePlayback();
-   }
-*/  return(1);
+  return(1);
 }
 
 // Инициализация структуры MAINCSM
@@ -590,7 +582,6 @@ void UpdateCSMname(WSHDR * tname)
 int main(char *exename, char *fname)
 {
   char dummy[sizeof(MAIN_CSM)];
-  playmode=0; // Думаю, что по умолчанию должен быть выключен! Blind007
   InitConfig();
   load_skin();
   
@@ -610,7 +601,7 @@ int main(char *exename, char *fname)
   UpdateCSMname(NULL); // Всего-то исправить :) Blind007
   LockSched();
   MAINCSM_ID = CreateCSM(&MAINCSM.maincsm,dummy,0);
-  AddKeybMsgHook((void *)my_keyhook); //Ни скока ебался прежде чем сделал... Итак! Кейхук! AAA :) DemonGloom
+  AddKeybMsgHook((void *)my_keyhook);
   UnlockSched();
   return 0;
 }

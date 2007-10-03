@@ -6,8 +6,13 @@
 #define DEFAULT_DISK "0"
 #endif
 
+#ifdef NEWSGOLD
 __root const CFG_HDR cfghdr0={CFG_STR_UTF8,"Default playlist",3,127};
 __root const char DEFAULT_PLAYLIST[128] = DEFAULT_DISK ":\\Music\\Playlist.m3u";
+#else
+__root const CFG_HDR cfghdr0={CFG_STR_UTF8,"Default playlist",3,127};
+__root const char DEFAULT_PLAYLIST[128] = DEFAULT_DISK ":\\Sounds\\Playlist.m3u";
+#endif
 
 __root const CFG_HDR cfghdr01={CFG_COORDINATES,"Idle coordinates",0,0};
 __root const unsigned int IDLE_X = 5;
@@ -17,9 +22,9 @@ __root const CFG_HDR cfghdr02={CFG_CBOX,"Show full names",0,2};
 __root const int SHOW_FULLNAMES = 0;
 __root const CFG_CBOX_ITEM cfgcbox1[2]={"No","Yes"};
 
-//__root const CFG_HDR cfghdr03={CFG_CBOX,"Playmode",0,4};
-//__root const int playmode = 0;
-//__root const CFG_CBOX_ITEM cfgcbox2[4]={"Play all","Repeat all","Random","Repeat one"};
+__root const CFG_HDR cfghdr03={CFG_CBOX,"Playmode",0,4};  // Вернул на место
+__root const int playmode = 0;
+__root const CFG_CBOX_ITEM cfgcbox2[4]={"Play all","Repeat all","Random","Repeat one"};
 
 //Level 1
 __root const CFG_HDR cfghdr_m11={CFG_LEVEL,"Colors",1,0};
