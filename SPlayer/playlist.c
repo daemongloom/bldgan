@@ -78,7 +78,7 @@ void VolumeUp()
 #ifdef NEWSGOLD
   if(SoundVolume<5)SoundVolume++;
 #else
-  if(SoundVolume<15)SoundVolume++;
+  if(SoundVolume<14)SoundVolume++;
 #endif
   if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
   REDRAW();
