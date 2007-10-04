@@ -45,7 +45,7 @@ void Settings()   //Настройки  AAA
 
 void AboutDlg()
 {
-  ShowMSG(0,(int)"SPlayer v0.5.9\n(c) Anderstand, Blind007, DemonGloom");
+  ShowMSG(0,(int)"SPlayer v0.7.0\n(c) Anderstand, Blind007, DemonGloom");
 };
 
 void Exit_SPlayer()

@@ -17,6 +17,9 @@ unsigned short maincsm_name_body[140];
 unsigned int MAINCSM_ID = 0;
 unsigned int MAINGUI_ID = 0;
 
+int mode; // 1, если длинное нажатие боковой клавиши
+int KeyLock; // 1, если заблокирована;
+
 //--- Собственно, переменные координат AAA ---
 unsigned int VOLmy_x;
 unsigned int VOLmy_y;
@@ -29,32 +32,33 @@ unsigned int NUMmy_x;
 unsigned int NUMmy_y;
 unsigned int RANDmy_x;
 unsigned int RANDmy_y;
+unsigned int KeyLock_x;
+unsigned int KeyLock_y;
 //--- Собственно, переменные координат AAA ---
 
 //--- настройки из конфига ---
 extern const char COLOR_BG[];
 extern const char COLOR_TEXT[];
-extern const char PIC_DIR[];
 extern const char I_BACKGROUND[];
+extern const char PIC_DIR[];
 extern const char SKIN[];
+extern const char PLAYLISTS[];
 extern const char DEFAULT_PLAYLIST[];
 extern const unsigned int IDLE_X;
 extern const unsigned int IDLE_Y;
-//--- настройки из конфига ---
-
-//--- Переменные! --- Не путать с константами из конфига!
 extern short phandle;  // Для определения конца воспр.  AAA
-extern char GetAccessoryType();
-extern char PlayingStatus;
-char Quit_Required = 0;     // Флаг необходимости завершить работу
+extern char GetAccessoryType();   // Не пашет   AAA
 extern int playmode; // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
-int mode; // 1, если длинное нажатие боковой клавиши
-//--- Переменные! ---
+extern char PlayingStatus;
+
+//--- настройки из конфига ---
 
 void load_skin();       // Из skin.cfg AAA
 void UpdateCSMname(WSHDR * tname);
 
 //--- Наши переменные ---
+char Quit_Required = 0;     // Флаг необходимости завершить работу
+char list[256];
 
 // Играем MP3 файл
 void PlayMP3File(const char * fname)
@@ -114,10 +118,10 @@ void load_skin(void)
   handle=fopen(SKIN, A_ReadOnly, P_READ,&err); 
   if(handle!=-1)
   {
-    data=malloc(19);
+    data=malloc(22);
     if(data!=0)
       {
-        fread(handle,data,19,&err); // Экономим память! :)
+        fread(handle,data,22,&err); // Экономим память! :)
         
         VOLmy_x=data[2];
         VOLmy_y=data[3]+data[4];
@@ -130,6 +134,8 @@ void load_skin(void)
         NUMmy_y=data[13]+data[14];
         RANDmy_x=data[15];
         RANDmy_y=data[16]+data[17];
+        KeyLock_x=data[18];
+        KeyLock_y=data[19]+data[20];
   
         mfree(data);
       }
@@ -150,7 +156,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   int top = 0;
 #endif
 //  DrawRoundedFrame(left+1,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),color(COLOR_BG));  // А это зачем??? Если нужно - объясни!   AAA
-#ifdef USE_PNG_EXT
+//#ifdef USE_PNG_EXT                         // А это еще надо????
   // --- Делаем типа скин ---
   DrawImg(left,top,(int)I_BACKGROUND);  // Рисуем фон
   // Громкость
@@ -172,7 +178,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
     break;
   }
   DrawImg(STATmy_x,top+STATmy_y,(int)sfname);
-  // Режим воспроизв
+  // Режим воспроизв   AAA
   char pfname[256];
   switch(playmode)
   {
@@ -190,7 +196,11 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
     break;
   }
   DrawImg(RANDmy_x,RANDmy_y,(int)pfname);  // Позиционируем все что видим!   AAA
-#endif
+  if (KeyLock){
+    sprintf(pfname,"%s%s",PIC_DIR,"keylock.png");
+    DrawImg(KeyLock_x,KeyLock_y,(int)pfname);  // Если заблокировано DemonGloom
+  } 
+// #endif
 
     PL_Redraw();
   }
@@ -233,11 +243,22 @@ void QuitCallbackProc(int decision)
 int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
 {
   if(Quit_Required)return 1; //Происходит вызов GeneralFunc для тек. GUI -> закрытие GUI
+  if (KeyLock){
+    if ((msg->gbsmsg->msg==LONG_PRESS)&&(msg->gbsmsg->submess=='#')){
+     KeyLock=(KeyLock+1)%2;
+     ShowMSG(1,(int)"Клавиатура разблокирована");
+     REDRAW();}
+     return 0;
+     }
+  else{
   if (msg->gbsmsg->msg==KEY_DOWN)
   {
     switch(msg->gbsmsg->submess)
     {
     case RIGHT_SOFT:
+      MsgBoxYesNo(1,(int)"Закрыть SPlayer?",QuitCallbackProc);
+      break;
+    case RED_BUTTON:
       MsgBoxYesNo(1,(int)"Закрыть SPlayer?",QuitCallbackProc);
       break;
     case LEFT_SOFT:
@@ -256,12 +277,6 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     case DOWN_BUTTON:
       CTDown();
       break;
-//    case VOL_UP_BUTTON:
-//      VolumeUp();
-//      break;
-//    case VOL_DOWN_BUTTON:
-//      VolumeDown();
-//      break;
     case '0':           // Останавливаем воспроизведение
       StopAllPlayback();
       break;
@@ -305,19 +320,28 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
         CTDown();
       break;
       case '2':
-        PreviousTrack();
+        sprintf(list,"%s%s",PLAYLISTS,"playlist");
+        SavePlaylist(list);
       break;
       case '3':
         CTUpSix();
       break;
       case '8':
-        NextTrack();
       break;
       case '9':
         CTDovnSix();
       break;
+      case '#':
+        if (KeyLock==0){
+          playmode-=1;
+          if (playmode==-1) playmode=3;
+          ShowMSG(1,(int)"Клавиатура заблокирована");
+          KeyLock=1;
+        }
+      break;
     }
     REDRAW();
+  }
   }
   return(0);
 }
@@ -492,12 +516,18 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
       InitConfig();
     }
   }
-  
+#ifdef NEWSGOLD
   // Если вход.звонок или звонок закончился Blind007
   if (((msg->msg==MSG_INCOMMING_CALL)&&(PlayingStatus==2)) || ((msg->msg==MSG_END_CALL)&&(PlayingStatus==1)))  // У кого руки такие кривые??
   {
     TogglePlayback();
   }
+#else 
+  if (IsCalling()&&(PlayingStatus==2))
+  {
+    TogglePlayback();
+  }
+#endif
        
   if (msg->msg==MSG_PLAYFILE_REPORT)   // Для определения конца воспр.  AAA
   {
@@ -509,8 +539,7 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
         switch(playmode)
         {
           case 0:
-            NextTrack();
-            StopAllPlayback();    //Тупо, не спорю, если придумаете лучше...  AAA
+            NextTrackX();         //Тупо, не спорю, если придумаете лучше...  AAA
             break;
           case 1:
             NextTrack();

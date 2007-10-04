@@ -55,6 +55,9 @@ __root const CFG_HDR cfghdr_m21={CFG_LEVEL,"Paths",1,0};
 __root const CFG_HDR cfghdr22={CFG_STR_UTF8,"Picture folder",3,127};
 __root const char PIC_DIR[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\img\\";
 
+__root const CFG_HDR cfghdr23={CFG_STR_UTF8,"Playlist folder",3,127};
+__root const char PLAYLISTS[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\Playlists\\";
+
 __root const CFG_HDR cfghdr_m20={CFG_LEVEL,"",0,0};
 
 // Level 3
