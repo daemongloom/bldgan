@@ -19,6 +19,9 @@ void RandTrack();
 //Повторяющийся трек
 void RepeatTrack();
 
+// Для plamode==1
+void NextTrackX();
+
 // Следующий трек пл
 void NextTrack();
 
@@ -50,7 +53,7 @@ void CTUpSix();
 void PlayTrackUnderC();
 
 //Раскраска AAA
-//char * TextColor(int my_x,int my_y,int c,int w,int out_ws,int i);       Не вышла оптимизация, ибо некогда
+//int * TextColor(int my_x,int my_y,int c,int w,int out_ws,int i);       Не вышла оптимизация, ибо некогда
 
 // Выдаем текущий статус
 char GetPlayingStatus();
@@ -78,6 +81,9 @@ void FreePlaylist(void);
 
 // Загружаем пл!
 int LoadPlaylist(const char * fn);
+
+//Сохраняем пл!   AAA
+void SavePlaylist(char *fn);
 
 // Возвращется трек по номеру в пл
 char * GetCurrentTrack();

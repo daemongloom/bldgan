@@ -136,6 +136,21 @@ void RepeatTrack()
   PlayMP3File(GetPlayedTrack(PlayedTrack));
 }
 
+// Для plamode==1       Ничего умнее не придумал...  AAA
+void NextTrackX()
+{
+  if(phandle!=-1)PlayMelody_StopPlayback(phandle);
+  PlayedTrack++;
+  if(PlayedTrack>TC)
+  {
+    PlayedTrack=1;
+  }
+  else
+  {
+    PlayMP3File(GetPlayedTrack(PlayedTrack));
+  }
+}
+
 // Следующий трек пл AAA
 void NextTrack()
 {
@@ -430,6 +445,35 @@ void ascii2ws(char *s, WSHDR *ws)
     wsAppendChar(ws,char8to16(c));
   }
 }
+
+// Сохраняем пл!     Пока так оставлю :)   AAA
+void SavePlaylist(char *fn)
+{
+  int j=0;
+  int i;
+  int f;
+  char m[256];
+  char s[]={0x0D};     
+  char s2[]={0xA};                                // Сделал совместимость с m3u 
+  sprintf(m,"%s%s",fn,".m3u");                    // ----------- 
+  FSTATS fstats;
+  unsigned int err;
+  while (GetFileStats(m,&fstats,&err)!=-1)       // Проверка файла на существование
+  {
+    j++;
+    sprintf(m,"%s%i%s",fn,j,".m3u");
+  }
+  f=fopen(m,A_WriteOnly+A_MMCStream+A_Create,P_WRITE,&err);
+  for (i=0;i<TC+1;i++)
+  {
+  fwrite(f,playlist_lines[i],strlen(playlist_lines[i]),&err);
+  fwrite(f,s,1,&err);
+  fwrite(f,s2,1,&err);
+  }
+  fclose(f,&err);
+  ShowMSG(1,(int)"Playlist saved!");
+}
+
 // Возвращает имя файла по полному пути...
 void FullpathToFilename(char * fname, WSHDR * wsFName)
 {
@@ -471,7 +515,7 @@ char * Lighten(char * source)
 }
 /*
 //Раскраска  AAA             Не вышла оптимизация, ибо некогда
-char * TextColor(int my_x,int my_y,int c,int w,int out_ws,int i)
+int * TextColor(int my_x,int my_y,int c,int w,int out_ws,int i)
 {    
   if (PlayedTrack==i)
   {
