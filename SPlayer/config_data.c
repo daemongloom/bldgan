@@ -22,9 +22,13 @@ __root const CFG_HDR cfghdr02={CFG_CBOX,"Show full names",0,2};
 __root const int SHOW_FULLNAMES = 0;
 __root const CFG_CBOX_ITEM cfgcbox1[2]={"No","Yes"};
 
-__root const CFG_HDR cfghdr03={CFG_CBOX,"Playmode",0,4};  // Вернул на место
-__root const int playmode = 0;
+__root const CFG_HDR cfghdr03={CFG_CBOX,"Playmode",0,4};  // Временно убрал варинг Blind007
+__root const int PlayMode = 0;
 __root const CFG_CBOX_ITEM cfgcbox2[4]={"Play all","Repeat all","Random","Repeat one"};
+
+__root const CFG_HDR cfghdr04={CFG_CBOX,"Extension of playlist",0,2};
+__root const int EXT = 0;
+__root const CFG_CBOX_ITEM cfgcbox3[2]={"spl","m3u"};
 
 //Level 1
 __root const CFG_HDR cfghdr_m11={CFG_LEVEL,"Colors",1,0};
@@ -46,6 +50,12 @@ __root const char COLOR_TEXT_CURSOR[4] = {0x00,0xFF,0x00,0x64};
 
 __root const CFG_HDR cfghdr17={CFG_COLOR,"Text now play",0,0};
 __root const char COLOR_TEXT_PLAY[4] = {0x00,0x00,0xFF,0x64};
+
+__root const CFG_HDR cfghdr18={CFG_COLOR,"Band of the rolling",0,0};
+__root const char COLOR_BANDROLL[4] = {0x00,0x00,0xFF,0x64};
+
+__root const CFG_HDR cfghdr19={CFG_COLOR,"Band of the rolling1",0,0};
+__root const char COLOR_BANDROLL_C[4] = {0x00,0x00,0xFF,0x64};
 
 __root const CFG_HDR cfghdr0_m10={CFG_LEVEL,"",0,0};
 

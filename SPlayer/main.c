@@ -20,20 +20,22 @@ unsigned int MAINGUI_ID = 0;
 int mode; // 1, если длинное нажатие боковой клавиши
 int KeyLock; // 1, если заблокирована;
 
+unsigned short w;
+
 //--- Собственно, переменные координат AAA ---
-unsigned int VOLmy_x;
-unsigned int VOLmy_y;
-unsigned int STATmy_x;
-unsigned int STATmy_y;
-unsigned int CTmy_x;  // Координаты CurrentTrack
-unsigned int CTmy_y;
-unsigned int s;     // Смещение по вертикали
-unsigned int NUMmy_x;
-unsigned int NUMmy_y;
-unsigned int RANDmy_x;
-unsigned int RANDmy_y;
-unsigned int KeyLock_x;
-unsigned int KeyLock_y;
+unsigned short VOLmy_x;
+unsigned short VOLmy_y;
+unsigned short STATmy_x;
+unsigned short STATmy_y;
+unsigned short CTmy_x;  // Координаты CurrentTrack
+unsigned short CTmy_y;
+unsigned short s;     // Смещение по вертикали
+unsigned short NUMmy_x;
+unsigned short NUMmy_y;
+unsigned short RANDmy_x;
+unsigned short RANDmy_y;
+unsigned short KeyLock_x;
+unsigned short KeyLock_y;
 //--- Собственно, переменные координат AAA ---
 
 //--- настройки из конфига ---
@@ -46,22 +48,27 @@ extern const char PLAYLISTS[];
 extern const char DEFAULT_PLAYLIST[];
 extern const unsigned int IDLE_X;
 extern const unsigned int IDLE_Y;
+extern const int PlayMode; 
+//--- настройки из конфига ---
+
+//--- Переменные ---
 extern short phandle;  // Для определения конца воспр.  AAA
 extern char GetAccessoryType();   // Не пашет   AAA
-extern int playmode; // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
-extern char PlayingStatus;
-
-//--- настройки из конфига ---
+extern unsigned short PlayingStatus;
+extern unsigned int TC;
+char Quit_Required = 0;     // Флаг необходимости завершить работу
+char list[256];
+char sfname[256];
+int playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
+//--- Переменные ---
 
 void load_skin();       // Из skin.cfg AAA
 void UpdateCSMname(WSHDR * tname);
 
-//--- Наши переменные ---
-char Quit_Required = 0;     // Флаг необходимости завершить работу
-char list[256];
-
 // Играем MP3 файл
 void PlayMP3File(const char * fname)
+{
+if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
 {
   if (!IsCalling()) // Нет ли звонка
   {
@@ -108,6 +115,11 @@ void PlayMP3File(const char * fname)
     }
   }
 }
+else
+{
+  ShowMSG(1,(int)"Load a playlist, please!");
+}
+}
 
 // Грузим координаты из skin.cfg AAA
 void load_skin(void)
@@ -147,13 +159,13 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
 {
   if(IsGuiOnTop(MAINGUI_ID))
   {
-  int w = ScreenW();
-  int h = ScreenH();
-  int left = 0;
+  w = ScreenW();
+  unsigned short h = ScreenH();
+  unsigned short left = 0;
 #ifdef ELKA
-  int top = 24;
+  unsigned short top = 24;
 #else
-  int top = 0;
+  unsigned short top = 0;
 #endif
 //  DrawRoundedFrame(left+1,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),color(COLOR_BG));  // А это зачем??? Если нужно - объясни!   AAA
 //#ifdef USE_PNG_EXT                         // А это еще надо????
@@ -162,9 +174,8 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   // Громкость
   char vfname[256];
   sprintf(vfname,"%s%s%i%s",PIC_DIR,"volume",GetVolLevel(),".png");
-  DrawImg(VOLmy_x,top+VOLmy_y,(int)vfname);
+  DrawImg(VOLmy_x,VOLmy_y,(int)vfname);
   // Статус плеера
-  char sfname[256];
   switch(GetPlayingStatus())
   {
   case 0:
@@ -177,7 +188,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
     sprintf(sfname,"%s%s",PIC_DIR,"play.png");
     break;
   }
-  DrawImg(STATmy_x,top+STATmy_y,(int)sfname);
+  DrawImg(STATmy_x,STATmy_y,(int)sfname);
   // Режим воспроизв   AAA
   char pfname[256];
   switch(playmode)
@@ -231,6 +242,23 @@ void onUnfocus(MAIN_GUI *data, void (*mfree_adr)(void *)) //Unfocus
   DisableIDLETMR(); //Дабы не закрывался сам AAA
 }
 
+void KKK()
+{
+switch(GetPlayingStatus())
+      {
+      case 0:
+        sprintf(sfname,"%s%s",PIC_DIR,"stopdown.png");
+        break;
+      case 1:
+        sprintf(sfname,"%s%s",PIC_DIR,"pausedown.png");
+        break;
+      case 2:
+        sprintf(sfname,"%s%s",PIC_DIR,"playdown.png");
+        break;
+      }
+REDRAW();
+}
+
 void QuitCallbackProc(int decision)
 {
   if(decision==0)Quit_Required = 1;
@@ -251,6 +279,16 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
      return 0;
      }
   else{
+  if (msg->gbsmsg->msg==KEY_UP)
+  {
+    switch(msg->gbsmsg->submess)
+    {
+      case '5':           // Play/Pause
+        TogglePlayback();
+        break;
+    }
+    REDRAW();
+  }
   if (msg->gbsmsg->msg==KEY_DOWN)
   {
     switch(msg->gbsmsg->submess)
@@ -268,7 +306,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       CTandPTtoFirst();
       LoadingPlaylist(DEFAULT_PLAYLIST);
       break;
-    case ENTER_BUTTON:  // на будущее...
+    case ENTER_BUTTON:
       PlayTrackUnderC();
       break;
     case UP_BUTTON:
@@ -280,24 +318,28 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     case '0':           // Останавливаем воспроизведение
       StopAllPlayback();
       break;
-    case '5':           // Play/Pause
-      TogglePlayback();
-      break;
-    case '4':           // Переключение на предыдущий трек
-      PreviousTrack();
-      break;
-    case '7':           // Переключение на предыдущий трек6
-      CTUpSix();
-      break;
     case '1':           // Забиваем. Здесь будет перемотка :)
       break;
     case '3':           // Забиваем. Здесь будет перемотка :)
       break;
+    case '2':
+      CTUpSix();
+      break;
+    case '4':           // Переключение на предыдущий трек
+      PreviousTrack();
+      break;
+    case '5':           // Play/Pause
+      KKK();
+      break;
     case '6':           // Переключение на следующий трек
       if (playmode==2) RandTrack(); else NextTrack();
       break;
-    case '9':           // Переключение на предыдущий трек6
+    case '7':
+      break;
+    case '8':
       CTDovnSix();
+      break;
+    case '9':
       break;
     case '*':
       ToggleVolume();
@@ -483,7 +525,6 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
 	{
 	  void *canvasdata=((void **)idata)[DISPLACE_OF_IDLECANVAS/4];
 #endif
-        char sfname[256];
         switch(GetPlayingStatus())
 	{
         case 0:
@@ -613,6 +654,7 @@ int main(char *exename, char *fname)
   char dummy[sizeof(MAIN_CSM)];
   InitConfig();
   load_skin();
+  playmode = PlayMode;
   
   // Если что-то передали в параметре - загружаем...
   if (fname)

@@ -9,25 +9,29 @@ char **id3tags1_lines;  // Массив указателей на ID3v1-теги
 extern const char COLOR_TEXT[];
 extern const char COLOR_TEXT_CURSOR[]; //Еще добавил  AAA
 extern const char COLOR_TEXT_PLAY[];   //И еще AAA
+extern const char COLOR_BANDROLL[];      //Цвет полосы прокрутки
+extern const char COLOR_BANDROLL_C[];
 extern const int SHOW_FULLNAMES;
 extern const char PIC_DIR[];           // Для курсора AAA
+extern const int EXT;                  // Расширение по умолчанию
 
 // Мои переменные
-unsigned int SoundVolume = 2;         // Громкость
-unsigned int SVforToggle = 0;         // Прежняя громкость
-char PlayingStatus = 0;               // Статус плеера (0 - стоп, 1 - пауза, 2 - играем)
+unsigned short SoundVolume = 2;       // Громкость
+unsigned short SVforToggle = 0;       // Прежняя громкость
+unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 - играем)   // Было char стало unsigned short! :D   AAA
 short phandle = -1;                   // Что играем
-int CurrentTrack = 1;                 // Текущий трек
-int TC = 0;                           // Количество треков в пл 
+int CurrentTrack = 1;        // Текущий трек
+unsigned int TC = 0;                  // Количество треков в пл 
+unsigned int PlayedTrack = 0;      // Проигрываемый трек   AAA
 char * l_color_text;                  // Ослабленный цвет
-int PlayedTrack = 1;                  // Проигрываемый трек   AAA
 
-extern unsigned int CTmy_x;     // Координаты CurrentTrack
-extern unsigned int CTmy_y;
-extern unsigned int s;        // Смещение по вертикали
-extern unsigned int NUMmy_x;  // Номера
-extern unsigned int NUMmy_y;
+extern unsigned short CTmy_x;     // Координаты CurrentTrack
+extern unsigned short CTmy_y;
+extern unsigned short s;          // Смещение по вертикали
+extern unsigned short NUMmy_x;    // Номера
+extern unsigned short NUMmy_y;
 
+extern unsigned short w;
 extern int playmode;
 
 extern unsigned int MAINGUI_ID;
@@ -211,7 +215,7 @@ void StopAllPlayback()
 void CTandPTtoFirst()
 {
   if(CurrentTrack>1)CurrentTrack = 1;
-  if(PlayedTrack>1)PlayedTrack = 1;
+  if(PlayedTrack>0)PlayedTrack = 0;
 }
 
 //Пробуем листание вниз AAA
@@ -285,7 +289,7 @@ char GetPlayingStatus()
 }
 
 // Громкость
-unsigned int GetVolLevel()
+unsigned short GetVolLevel()
 {
   return SoundVolume;
 }
@@ -344,7 +348,8 @@ int GetMP3Tag_v1(const char * fname, MP3Tagv1 * tag)
 // Для загрузки пл из главного модуля
 void LoadingPlaylist(const char * fn)
 {
-  TC = LoadPlaylist(fn)-1;
+  if(LoadPlaylist(fn)-1>0) {TC = LoadPlaylist(fn)-1;}   // Экономим память + избавляемся от лишнего пикоффа   AAA
+  else {TC=0;}
 //  if (TC>0)   // А собственно нафиг? Если "Playlist loaded!", то мы слышим музыку => зачем писать лишнее?
 //  {
 //    LockSched();
@@ -453,15 +458,17 @@ void SavePlaylist(char *fn)
   int i;
   int f;
   char m[256];
-  char s[]={0x0D};     
-  char s2[]={0xA};                                // Сделал совместимость с m3u 
-  sprintf(m,"%s%s",fn,".m3u");                    // ----------- 
+  char s[]={0x0D}; 
+  char s2[]={0x0A};                                // Сделал совместимость с m3u 
+  if(EXT==0){sprintf(m,"%s%s",fn,".spl");}
+  else{sprintf(m,"%s%s",fn,".m3u");}                      // ----------- 
   FSTATS fstats;
   unsigned int err;
   while (GetFileStats(m,&fstats,&err)!=-1)       // Проверка файла на существование
   {
     j++;
-    sprintf(m,"%s%i%s",fn,j,".m3u");
+    if(EXT==0){sprintf(m,"%s%i%s",fn,j,".spl");}
+    else{sprintf(m,"%s%i%s",fn,j,".m3u");}
   }
   f=fopen(m,A_WriteOnly+A_MMCStream+A_Create,P_WRITE,&err);
   for (i=0;i<TC+1;i++)
@@ -513,29 +520,13 @@ char * Lighten(char * source)
   setColor(source[0],source[1],source[2],source[3],dest);
   return dest;
 }
-/*
-//Раскраска  AAA             Не вышла оптимизация, ибо некогда
-int * TextColor(int my_x,int my_y,int c,int w,int out_ws,int i)
-{    
-  if (PlayedTrack==i)
-  {
-    DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-               color(COLOR_TEXT_PLAY),0);
-  }
-  else
-  {
-    DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-               color(COLOR_TEXT_CURSOR),0);
-  }
-}  
-*/
+
 // Перерисовка
 void PL_Redraw()
 {
-  int w = ScreenW();
-  int c = 0;  // Координаты  AAA
-  int my_x;
-  int my_y;
+  unsigned short c = 0;  // Координаты  AAA
+  unsigned short my_x;
+  unsigned short my_y;
   
   // Имя файла...
   if (TC>0)
@@ -976,4 +967,17 @@ void PL_Redraw()
   DrawString(pl_c,NUMmy_x,NUMmy_y,NUMmy_x+50,NUMmy_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
            color(COLOR_TEXT),0);
   FreeWS(pl_c);
+  BandRoll();
+}
+
+// Полоса прокрутки. Доделаю   AAA
+void BandRoll()
+{
+  if(TC>6)
+  {
+    int l=140/TC;
+    int yy=CurrentTrack*140/TC;
+    DrawRoundedFrame(129,30,w-3,170,0,0,0,0,color(COLOR_BANDROLL));
+    DrawRoundedFrame(128,30+yy-l,w-3,30+yy,0,0,0,0,color(COLOR_BANDROLL_C));
+  }
 }
