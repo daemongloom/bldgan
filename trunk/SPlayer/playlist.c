@@ -20,9 +20,9 @@ unsigned short SoundVolume = 2;       // Громкость
 unsigned short SVforToggle = 0;       // Прежняя громкость
 unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 - играем)   // Было char стало unsigned short! :D   AAA
 short phandle = -1;                   // Что играем
-int CurrentTrack = 1;        // Текущий трек
+int CurrentTrack = 1;                 // Текущий трек
 unsigned int TC = 0;                  // Количество треков в пл 
-unsigned int PlayedTrack = 0;      // Проигрываемый трек   AAA
+unsigned int PlayedTrack = 0;         // Проигрываемый трек   AAA
 char * l_color_text;                  // Ослабленный цвет
 
 extern unsigned short CTmy_x;     // Координаты CurrentTrack
