@@ -62,7 +62,7 @@ char GetPlayingStatus();
 void SetPlayingStatus(char PS);
 
 // Громкость
-unsigned int GetVolLevel();
+unsigned short GetVolLevel();
 
 // Установим указатель на проигрываемую мелодию...
 void SetPHandle(short ph);
@@ -96,5 +96,8 @@ char * Lighten(char * source);
 
 // Перерисовка
 void PL_Redraw();
+
+// Полоса прокрутки   AAA
+void BandRoll();
 
 #endif

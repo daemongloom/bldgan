@@ -3178,9 +3178,6 @@
   <file>
     <name>$PROJ_DIR$\playlist.h</name>
   </file>
-  <file>
-    <name>$PROJ_DIR$\TODO.txt</name>
-  </file>
 </project>
 
 
