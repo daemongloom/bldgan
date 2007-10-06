@@ -19,6 +19,8 @@ unsigned int MAINGUI_ID = 0;
 
 int mode; // 1, если длинное нажатие боковой клавиши
 int KeyLock; // 1, если заблокирована;
+short Stat_keypressed = 0; // нажата ли клавиша изменени€ статуса?
+short Mode_keypressed = 0; // нажата ли клавиша изменени€ режима проигрывани€?
 
 unsigned short w;
 
@@ -176,35 +178,70 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   sprintf(vfname,"%s%s%i%s",PIC_DIR,"volume",GetVolLevel(),".png");
   DrawImg(VOLmy_x,VOLmy_y,(int)vfname);
   // —татус плеера
-  switch(GetPlayingStatus())
+  if (Stat_keypressed==1)
   {
-  case 0:
-    sprintf(sfname,"%s%s",PIC_DIR,"stop.png");
-    break;
-  case 1:
-    sprintf(sfname,"%s%s",PIC_DIR,"pause.png");
-    break;
-  case 2:
-    sprintf(sfname,"%s%s",PIC_DIR,"play.png");
-    break;
+    switch(GetPlayingStatus())
+    {
+    case 0:
+      sprintf(sfname,"%s%s",PIC_DIR,"stop_down.png");
+      break;
+    case 1:
+      sprintf(sfname,"%s%s",PIC_DIR,"pause_down.png");
+      break;
+    case 2:
+      sprintf(sfname,"%s%s",PIC_DIR,"play_down.png");
+      break;
+    }
+  } else {
+    switch(GetPlayingStatus())
+    {
+    case 0:
+      sprintf(sfname,"%s%s",PIC_DIR,"stop.png");
+      break;
+    case 1:
+      sprintf(sfname,"%s%s",PIC_DIR,"pause.png");
+      break;
+    case 2:
+      sprintf(sfname,"%s%s",PIC_DIR,"play.png");
+      break;
+    }
   }
   DrawImg(STATmy_x,STATmy_y,(int)sfname);
   // –ежим воспроизв   AAA
   char pfname[256];
-  switch(playmode)
+  if (Mode_keypressed==1)
   {
-  case 0:
-    sprintf(pfname,"%s%s",PIC_DIR,"playall.png");
-    break;
-  case 1:
-    sprintf(pfname,"%s%s",PIC_DIR,"repeat.png");
-    break;
-  case 2:
-    sprintf(pfname,"%s%s",PIC_DIR,"random.png");
-    break;
-  case 3:
-    sprintf(pfname,"%s%s",PIC_DIR,"repeatone.png");
-    break;
+    switch(playmode)
+    {
+    case 0:
+      sprintf(pfname,"%s%s",PIC_DIR,"playall_down.png");
+      break;
+    case 1:
+      sprintf(pfname,"%s%s",PIC_DIR,"repeat_down.png");
+      break;
+    case 2:
+      sprintf(pfname,"%s%s",PIC_DIR,"random_down.png");
+      break;
+    case 3:
+      sprintf(pfname,"%s%s",PIC_DIR,"repeatone_down.png");
+      break;
+    }
+  } else {
+    switch(playmode)
+    {
+    case 0:
+      sprintf(pfname,"%s%s",PIC_DIR,"playall.png");
+      break;
+    case 1:
+      sprintf(pfname,"%s%s",PIC_DIR,"repeat.png");
+      break;
+    case 2:
+      sprintf(pfname,"%s%s",PIC_DIR,"random.png");
+      break;
+    case 3:
+      sprintf(pfname,"%s%s",PIC_DIR,"repeatone.png");
+      break;
+    }
   }
   DrawImg(RANDmy_x,RANDmy_y,(int)pfname);  // ѕозиционируем все что видим!   AAA
   if (KeyLock){
@@ -242,23 +279,6 @@ void onUnfocus(MAIN_GUI *data, void (*mfree_adr)(void *)) //Unfocus
   DisableIDLETMR(); //ƒабы не закрывалс€ сам AAA
 }
 
-void KKK()
-{
-switch(GetPlayingStatus())
-      {
-      case 0:
-        sprintf(sfname,"%s%s",PIC_DIR,"stopdown.png");
-        break;
-      case 1:
-        sprintf(sfname,"%s%s",PIC_DIR,"pausedown.png");
-        break;
-      case 2:
-        sprintf(sfname,"%s%s",PIC_DIR,"playdown.png");
-        break;
-      }
-REDRAW();
-}
-
 void QuitCallbackProc(int decision)
 {
   if(decision==0)Quit_Required = 1;
@@ -283,9 +303,15 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
   {
     switch(msg->gbsmsg->submess)
     {
-      case '5':           // Play/Pause
-        TogglePlayback();
-        break;
+    case '0':           // Stop
+      Stat_keypressed = 0;
+      break;
+    case '5':           // Play/Pause
+      Stat_keypressed = 0;
+      break;
+    case '#':           // Mode
+      Mode_keypressed = 0;
+      break;
     }
     REDRAW();
   }
@@ -316,6 +342,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       CTDown();
       break;
     case '0':           // ќстанавливаем воспроизведение
+      Stat_keypressed = 1;
       StopAllPlayback();
       break;
     case '1':           // «абиваем. «десь будет перемотка :)
@@ -329,7 +356,8 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       PreviousTrack();
       break;
     case '5':           // Play/Pause
-      KKK();
+      Stat_keypressed = 1;
+      TogglePlayback();
       break;
     case '6':           // ѕереключение на следующий трек
       if (playmode==2) RandTrack(); else NextTrack();
@@ -345,6 +373,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       ToggleVolume();
       break;
     case '#':
+      Mode_keypressed = 1;
       playmode+=1;
       if (playmode==4) playmode=0;
       break;
