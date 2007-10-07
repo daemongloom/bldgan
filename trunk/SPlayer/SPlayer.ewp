@@ -3178,6 +3178,9 @@
   <file>
     <name>$PROJ_DIR$\playlist.h</name>
   </file>
+  <file>
+    <name>$PROJ_DIR$\ReadMe(skin.cfg).txt</name>
+  </file>
 </project>
 
 
