@@ -44,6 +44,14 @@ unsigned short Next_x;
 unsigned short Next_y;
 unsigned short Prev_x;
 unsigned short Prev_y;
+// Полоса прокрутки
+extern unsigned short BR_x;
+extern unsigned short BR1_y;
+extern unsigned short BR2_y;
+extern unsigned short BR_w;
+extern unsigned short BRC_x;
+extern unsigned short BRC_w;
+// Полоса прокрутки
 //--- Собственно, переменные координат AAA ---
 
 //--- настройки из конфига ---
@@ -145,10 +153,10 @@ void load_skin(void)
   handle=fopen(SKIN, A_ReadOnly, P_READ,&err); 
   if(handle!=-1)
   {
-    data=malloc(28);
+    data=malloc(36);
     if(data!=0)
       {
-        fread(handle,data,28,&err); // Экономим память! :)
+        fread(handle,data,36,&err); // Экономим память! :)
         
         VOLmy_x=data[2];
         VOLmy_y=data[3]+data[4];
@@ -167,7 +175,15 @@ void load_skin(void)
         Next_y=data[22]+data[23];
         Prev_x=data[24];
         Prev_y=data[25]+data[26];
-  
+        // Полоса прокрутки
+        BR_x=data[27];
+        BR1_y=data[28]+data[29];
+        BR2_y=data[30]+data[31];
+        BR_w=data[32];
+        BRC_x=data[33];
+        BRC_w=data[34];
+        // Полоса прокрутки
+        
         mfree(data);
       }
     fclose(handle,&err);
@@ -286,7 +302,8 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   if (KeyLock){
     sprintf(pfname,"%s%s",PIC_DIR,"keylock.png");
     DrawImg(KeyLock_x,KeyLock_y,(int)pfname);
-  } 
+  }
+  
 // #endif
 
     PL_Redraw();

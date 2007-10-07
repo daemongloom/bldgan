@@ -31,6 +31,14 @@ extern unsigned short CTmy_y;
 extern unsigned short s;          // Смещение по вертикали
 extern unsigned short NUMmy_x;    // Номера
 extern unsigned short NUMmy_y;
+// Полоса прокрутки
+unsigned short BR_x;  //=129;
+unsigned short BR1_y;  //=50;
+unsigned short BR2_y;  //=152;
+unsigned short BR_w;  //=1;
+unsigned short BRC_x;  //=128;
+unsigned short BRC_w;  //=2;
+// Полоса прокрутки
 
 extern unsigned short w;
 extern int playmode;
@@ -578,7 +586,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //               color(COLOR_TEXT_PLAY),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
     }
     else
@@ -586,7 +594,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_CURSOR),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
     }
     }
@@ -612,7 +620,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //               color(COLOR_TEXT_PLAY),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
     }
     else
@@ -620,7 +628,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_CURSOR),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
     }
     }
@@ -647,7 +655,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //               color(COLOR_TEXT_PLAY),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
     }
     else
@@ -655,7 +663,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_CURSOR),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
     }
     }
@@ -681,7 +689,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //               color(COLOR_TEXT_PLAY),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
     }
     else
@@ -689,7 +697,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_CURSOR),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
     }
     }
@@ -715,7 +723,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_PLAY),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
     }
     else
@@ -723,7 +731,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_CURSOR),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
     }
     }
@@ -731,7 +739,7 @@ void PL_Redraw()
     // Текущий 0
     char sfname[256];
     sprintf(sfname,"%s%s",PIC_DIR,"cursor.png");
-    DrawImg(my_x-1,my_y-2,(int)sfname);
+    DrawImg(my_x-1,my_y-3,(int)sfname);
     
     if (SHOW_FULLNAMES)
     {
@@ -746,7 +754,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y,w,my_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_PLAY),0);
       int i=Get_WS_width(out_ws,FONT_SMALL);  //Определяет кол-во пикселей при этом шрифте (или что то вроде того...)
-	  i-=(w-7);   //До куда докручивать
+	  i-=(w-9);   //До куда докручивать
 	  if (i<0)
 	  {
 	    DisableScroll();
@@ -759,7 +767,7 @@ void PL_Redraw()
 	    }
 	    max_scroll_disp=i;
 	  }
-      DrawScrollString(out_ws,my_x,my_y,w-5,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y,w-7,my_y+GetFontYSIZE(FONT_SMALL),
                    scroll_disp+1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
     }
     else
@@ -768,7 +776,7 @@ void PL_Redraw()
 //               color(COLOR_TEXT),0);
 
 	  int i=Get_WS_width(out_ws,FONT_SMALL);
-	  i-=(w-7);
+	  i-=(w-9);
 	  if (i<0)
 	  {
 	    DisableScroll();
@@ -781,7 +789,7 @@ void PL_Redraw()
 	    }
 	    max_scroll_disp=i;
 	  }
-      DrawScrollString(out_ws,my_x,my_y,w-5,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y,w-7,my_y+GetFontYSIZE(FONT_SMALL),
                    scroll_disp+1,FONT_SMALL,0,color(COLOR_TEXT),0);
     }
     
@@ -805,7 +813,7 @@ void PL_Redraw()
     {
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_PLAY),0);
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+c+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
       
     }
@@ -814,7 +822,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_CURSOR),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+c+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
     }
     }
@@ -840,7 +848,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_PLAY),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+c+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0); 
     }
     else
@@ -848,7 +856,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_CURSOR),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+c+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
     }
     }
@@ -874,7 +882,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_PLAY),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+c+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
     }
     else
@@ -882,7 +890,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_CURSOR),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+c+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
     }
     }
@@ -908,7 +916,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_PLAY),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+c+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
     }
     else
@@ -916,7 +924,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_CURSOR),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+c+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
     }
     }
@@ -942,7 +950,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_PLAY),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+c+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
     }
     else
@@ -950,7 +958,7 @@ void PL_Redraw()
 //      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_CURSOR),0);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-5,my_y+c+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
                    1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
     }
     }
@@ -971,13 +979,52 @@ void PL_Redraw()
   BandRoll();
 }
 
-// Полоса прокрутки. Доделаю   AAA
+// Полоса прокрутки   AAA
 void BandRoll()
 {
   if(TC>6)
   {
-    int yy=CurrentTrack*102/TC;
-    DrawRoundedFrame(129,50,w-3,152,0,0,0,0,color(COLOR_BANDROLL));
-    DrawRoundedFrame(128,50+yy-102/TC,w-3,50+yy,0,0,0,0,color(COLOR_BANDROLL_C));
+    int yy=CurrentTrack*(BR2_y-BR1_y)/TC;
+    DrawRoundedFrame(BR_x,BR1_y,BR_x+BR_w-1,BR2_y,0,0,0,0,color(COLOR_BANDROLL));
+    DrawRoundedFrame(BRC_x,BR1_y+yy-(BR2_y-BR1_y)/TC,BRC_x+BRC_w-1,BR1_y+yy,0,0,0,0,color(COLOR_BANDROLL_C));
   }
 }
+
+/*
+void DrawPlayTime(char* fname)
+{
+  PlayTime = GetWavLen(fname);
+  WSHDR * t = AllocWS(64);
+  wsprintf(t,"%i",PlayTime);
+  DrawString(t,NUMmy_x,NUMmy_y+10,NUMmy_x+50,NUMmy_y+GetFontYSIZE(FONT_SMALL)+10,FONT_SMALL,0,
+           color(COLOR_TEXT),0);
+  FreeWS(t);
+}*/
+/*
+double GetWavkaLength(char *fpath,char *fname) //тиков
+{
+  int f;
+  unsigned int ul;
+  
+  int DataLength;//4
+  int BytePerSec;//28  
+  
+  char ffn[128];
+  strcpy(ffn, fpath);
+  strcat(ffn, fname);
+  if ((f=fopen(ffn,A_ReadOnly+A_BIN,P_READ,&ul))!=-1)
+  {
+    lseek(f,4,S_SET,&ul,&ul);
+    fread(f,&DataLength,sizeof(DataLength),&ul);
+    
+    lseek(f,28,S_SET,&ul,&ul);
+    fread(f,&BytePerSec,sizeof(BytePerSec),&ul);
+    
+    fclose(f,&ul);
+    
+    return (((((double)DataLength/(double)BytePerSec)*(double)1000)*0.216)+dop_delay);
+  }
+    else
+      return 0;
+}
+*/
