@@ -265,21 +265,21 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   char nextfname[256];
   if (N_keypressed==1)
   {
-    sprintf(nextfname,"%s%s",PIC_DIR,"next.png");
+    sprintf(nextfname,"%s%s",PIC_DIR,"next_down.png");
   }
   else
   {
-    sprintf(nextfname,"%s%s",PIC_DIR,"next_down.png");
+    sprintf(nextfname,"%s%s",PIC_DIR,"next.png");
   }
   DrawImg(Next_x,Next_y,(int)nextfname);
   char prevfname[256];
   if (P_keypressed==1)
   {
-    sprintf(prevfname,"%s%s",PIC_DIR,"prev.png");
+    sprintf(prevfname,"%s%s",PIC_DIR,"prev_down.png");
   }
   else
   {
-    sprintf(prevfname,"%s%s",PIC_DIR,"prev_down.png");
+    sprintf(prevfname,"%s%s",PIC_DIR,"prev.png");
   }
   DrawImg(Prev_x,Prev_y,(int)prevfname);
   // Если заблокировано DemonGloom

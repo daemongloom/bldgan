@@ -100,7 +100,7 @@ void PL_Redraw();
 // Полоса прокрутки   AAA
 void BandRoll();
 
-double GetWavkaLength(char *fpath,char *fname);
+//double GetWavkaLength(char *fpath,char *fname);
 
 /*
 void DrawPlayTime(char* fname);
