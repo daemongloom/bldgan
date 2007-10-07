@@ -21,6 +21,8 @@ int mode; // 1, если длинное нажатие боковой клавиши
 int KeyLock; // 1, если заблокирована;
 short Stat_keypressed = 0; // нажата ли клавиша изменения статуса?
 short Mode_keypressed = 0; // нажата ли клавиша изменения режима проигрывания?
+short N_keypressed = 0;
+short P_keypressed = 0;
 
 unsigned short w;
 
@@ -38,6 +40,10 @@ unsigned short RANDmy_x;
 unsigned short RANDmy_y;
 unsigned short KeyLock_x;
 unsigned short KeyLock_y;
+unsigned short Next_x;
+unsigned short Next_y;
+unsigned short Prev_x;
+unsigned short Prev_y;
 //--- Собственно, переменные координат AAA ---
 
 //--- настройки из конфига ---
@@ -111,6 +117,13 @@ if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
       UpdateCSMname(sndFName); // Покажем что играем XTask Blind007
       FreeWS(sndPath);
       FreeWS(sndFName);
+ /*     int PlayTime = GetWavkaLength((char*)sndPath,(char*)sndFName);
+  WSHDR * t = AllocWS(64);
+  wsprintf(t,"%i",PlayTime);
+  DrawString(t,NUMmy_x,NUMmy_y+10,NUMmy_x+50,NUMmy_y+GetFontYSIZE(FONT_SMALL)+10,FONT_SMALL,0,
+           color(COLOR_TEXT),0);
+  FreeWS(t);
+  REDRAW();*/
     } else {
       // Если нет такого файла!
       ShowMSG(1,(int)"Can't find file!");
@@ -135,7 +148,7 @@ void load_skin(void)
     data=malloc(22);
     if(data!=0)
       {
-        fread(handle,data,22,&err); // Экономим память! :)
+        fread(handle,data,28,&err); // Экономим память! :)
         
         VOLmy_x=data[2];
         VOLmy_y=data[3]+data[4];
@@ -150,6 +163,10 @@ void load_skin(void)
         RANDmy_y=data[16]+data[17];
         KeyLock_x=data[18];
         KeyLock_y=data[19]+data[20];
+        Next_x=data[21];
+        Next_y=data[22]+data[23];
+        Prev_x=data[24];
+        Prev_y=data[25]+data[26];
   
         mfree(data);
       }
@@ -244,9 +261,31 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
     }
   }
   DrawImg(RANDmy_x,RANDmy_y,(int)pfname);  // Позиционируем все что видим!   AAA
+  // Иконка пред/след трек   AAA
+  char nextfname[256];
+  if (N_keypressed==1)
+  {
+    sprintf(nextfname,"%s%s",PIC_DIR,"next.png");
+  }
+  else
+  {
+    sprintf(nextfname,"%s%s",PIC_DIR,"next_down.png");
+  }
+  DrawImg(Next_x,Next_y,(int)nextfname);
+  char prevfname[256];
+  if (P_keypressed==1)
+  {
+    sprintf(prevfname,"%s%s",PIC_DIR,"prev.png");
+  }
+  else
+  {
+    sprintf(prevfname,"%s%s",PIC_DIR,"prev_down.png");
+  }
+  DrawImg(Prev_x,Prev_y,(int)prevfname);
+  // Если заблокировано DemonGloom
   if (KeyLock){
     sprintf(pfname,"%s%s",PIC_DIR,"keylock.png");
-    DrawImg(KeyLock_x,KeyLock_y,(int)pfname);  // Если заблокировано DemonGloom
+    DrawImg(KeyLock_x,KeyLock_y,(int)pfname);
   } 
 // #endif
 
@@ -303,11 +342,20 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
   {
     switch(msg->gbsmsg->submess)
     {
+    case ENTER_BUTTON:  // Play
+      Stat_keypressed = 0;
+      break;
     case '0':           // Stop
       Stat_keypressed = 0;
       break;
+    case '4':           // Переключение на предыдущий трек
+      P_keypressed = 0;
+      break;
     case '5':           // Play/Pause
       Stat_keypressed = 0;
+      break;
+    case '6':           // Переключение на следующий трек
+      N_keypressed = 0;
       break;
     case '#':           // Mode
       Mode_keypressed = 0;
@@ -333,6 +381,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       LoadingPlaylist(DEFAULT_PLAYLIST);
       break;
     case ENTER_BUTTON:
+      Stat_keypressed = 1;
       PlayTrackUnderC();
       break;
     case UP_BUTTON:
@@ -353,6 +402,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       CTUpSix();
       break;
     case '4':           // Переключение на предыдущий трек
+      P_keypressed = 1;
       PreviousTrack();
       break;
     case '5':           // Play/Pause
@@ -360,6 +410,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       TogglePlayback();
       break;
     case '6':           // Переключение на следующий трек
+      N_keypressed = 1;
       if (playmode==2) RandTrack(); else NextTrack();
       break;
     case '7':
@@ -373,9 +424,9 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       ToggleVolume();
       break;
     case '#':
-      Mode_keypressed = 1;
-      playmode+=1;
-      if (playmode==4) playmode=0;
+        Mode_keypressed = 1;
+        playmode+=1;
+        if (playmode==4) playmode=0;
       break;
     }
     REDRAW();
@@ -403,12 +454,13 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
         CTDovnSix();
       break;
       case '#':
-        if (KeyLock==0){
+       if (KeyLock==0){
+          Mode_keypressed = 0;
           playmode-=1;
           if (playmode==-1) playmode=3;
           ShowMSG(1,(int)"Клавиатура заблокирована");
           KeyLock=1;
-        }
+       }
       break;
     }
     REDRAW();
@@ -430,21 +482,21 @@ int my_keyhook(int submsg,int msg)
   if (submsg==VOL_UP_BUTTON){
     switch (msg){
       case KEY_DOWN : return 2;
-      case LONG_PRESS:  if (mode==0) {if (playmode==2) RandTrack(); else NextTrack(); mode=1; }  REDRAW(); return 2;  // Следующий трек
-      case KEY_UP: if (mode==0) VolumeUp(); else mode=0;  REDRAW(); return 2; // Громкость выше
+      case LONG_PRESS:  if (mode==0) {if (playmode==2) RandTrack(); else NextTrack(); mode=1; }  N_keypressed = 1; REDRAW(); return 2;  // Следующий трек
+      case KEY_UP: if (mode==0) VolumeUp(); else mode=0;  N_keypressed = 0; REDRAW(); return 2; // Громкость выше
     }}
   if (submsg==VOL_DOWN_BUTTON){
     switch (msg){
       case KEY_DOWN : return 2;
-      case LONG_PRESS: if (mode==0) {PreviousTrack(); mode=1; }  REDRAW(); return 2;  // Предыдущий трек
-      case KEY_UP: if (mode==0) VolumeDown(); else mode=0;  REDRAW(); return 2;  // Громкость ниже
+      case LONG_PRESS: if (mode==0) {PreviousTrack(); mode=1; }  P_keypressed = 1; REDRAW(); return 2;  // Предыдущий трек
+      case KEY_UP: if (mode==0) VolumeDown(); else mode=0;  P_keypressed = 0; REDRAW(); return 2;  // Громкость ниже
     }}
   
   if ((submsg==0x27)){//&& !(IsCalling())){  // Если кнопка гарнитуры и не звонок
     switch (msg){
     case (KEY_DOWN): return 2;
-    case (LONG_PRESS):  if (mode==0) {if (playmode==2) RandTrack(); else NextTrack(); mode=1; }  REDRAW(); return 2;  // Следующий трек
-    case (KEY_UP): if (mode==0) TogglePlayback(); else mode=0;  REDRAW(); return 2;  // Переключение pause/play 
+    case (LONG_PRESS):  if (mode==0) {if (playmode==2) RandTrack(); else NextTrack(); mode=1; }  N_keypressed = 1; REDRAW(); return 2;  // Следующий трек
+    case (KEY_UP): if (mode==0) TogglePlayback(); else mode=0; N_keypressed = 0; REDRAW(); return 2;  // Переключение pause/play 
     }
   }
   
