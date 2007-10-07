@@ -145,7 +145,7 @@ void load_skin(void)
   handle=fopen(SKIN, A_ReadOnly, P_READ,&err); 
   if(handle!=-1)
   {
-    data=malloc(22);
+    data=malloc(28);
     if(data!=0)
       {
         fread(handle,data,28,&err); // Ёкономим пам€ть! :)
