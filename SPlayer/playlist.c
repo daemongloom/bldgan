@@ -24,6 +24,7 @@ int CurrentTrack = 1;                 // Текущий трек
 unsigned int TC = 0;                  // Количество треков в пл 
 unsigned int PlayedTrack = 0;         // Проигрываемый трек   AAA
 char * l_color_text;                  // Ослабленный цвет
+int PlayTime;
 
 extern unsigned short CTmy_x;     // Координаты CurrentTrack
 extern unsigned short CTmy_y;
@@ -975,9 +976,44 @@ void BandRoll()
 {
   if(TC>6)
   {
-    int l=140/TC;
-    int yy=CurrentTrack*140/TC;
-    DrawRoundedFrame(129,30,w-3,170,0,0,0,0,color(COLOR_BANDROLL));
-    DrawRoundedFrame(128,30+yy-l,w-3,30+yy,0,0,0,0,color(COLOR_BANDROLL_C));
+    int yy=CurrentTrack*102/TC;
+    DrawRoundedFrame(129,50,w-3,152,0,0,0,0,color(COLOR_BANDROLL));
+    DrawRoundedFrame(128,50+yy-102/TC,w-3,50+yy,0,0,0,0,color(COLOR_BANDROLL_C));
   }
+}
+/*
+void DrawPlayTime(char* fname)
+{
+  PlayTime = GetWavLen(fname);
+  WSHDR * t = AllocWS(64);
+  wsprintf(t,"%i",PlayTime);
+  DrawString(t,NUMmy_x,NUMmy_y+10,NUMmy_x+50,NUMmy_y+GetFontYSIZE(FONT_SMALL)+10,FONT_SMALL,0,
+           color(COLOR_TEXT),0);
+  FreeWS(t);
+}*/
+double GetWavkaLength(char *fpath,char *fname) //тиков
+{
+  int f;
+  unsigned int ul;
+  
+  int DataLength;//4
+  int BytePerSec;//28  
+  
+  char ffn[128];
+  strcpy(ffn, fpath);
+  strcat(ffn, fname);
+  if ((f=fopen(ffn,A_ReadOnly+A_BIN,P_READ,&ul))!=-1)
+  {
+    lseek(f,4,S_SET,&ul,&ul);
+    fread(f,&DataLength,sizeof(DataLength),&ul);
+    
+    lseek(f,28,S_SET,&ul,&ul);
+    fread(f,&BytePerSec,sizeof(BytePerSec),&ul);
+    
+    fclose(f,&ul);
+    
+    return (((((double)DataLength/(double)BytePerSec)*(double)1000)*0.216)/*+dop_delay*/);
+  }
+    else
+      return 0;
 }

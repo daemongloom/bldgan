@@ -82,7 +82,7 @@ void FreePlaylist(void);
 // Загружаем пл!
 int LoadPlaylist(const char * fn);
 
-//Сохраняем пл!   AAA
+// Сохраняем пл!   AAA
 void SavePlaylist(char *fn);
 
 // Возвращется трек по номеру в пл
@@ -100,4 +100,9 @@ void PL_Redraw();
 // Полоса прокрутки   AAA
 void BandRoll();
 
+double GetWavkaLength(char *fpath,char *fname);
+
+/*
+void DrawPlayTime(char* fname);
+*/
 #endif
