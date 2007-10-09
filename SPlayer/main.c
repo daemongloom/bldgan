@@ -52,6 +52,10 @@ extern unsigned short BR_w;
 extern unsigned short BRC_x;
 extern unsigned short BRC_w;
 // Полоса прокрутки
+// Время
+unsigned short time_x;
+unsigned short time_y;
+// Время
 //--- Собственно, переменные координат AAA ---
 
 //--- настройки из конфига ---
@@ -78,10 +82,86 @@ char list[256];
 char sfname[256];
 extern unsigned short SoundVolume;
 int playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
+  // Сделаем время! Blind007
+TTime BeginTime;  // Когда начали играть
+TTime PauseTime;  // Во сколько поставили паузу?
+short PT_min;     // Сколько времени играет песня (минуты)
+short PT_sec;     // (секунды)
+unsigned short ispaused = 0;  // Поставлена ли пауза?
+  // Сделаем время!
 //--- Переменные ---
 
 void load_skin();       // Из skin.cfg AAA
 void UpdateCSMname(WSHDR * tname);
+
+// Время начала игры файла Blind007
+TTime SetBeginTime()
+{
+  TDate date;
+  TTime time;
+  GetDateTime(&date,&time);
+  PauseTime.min = 0;
+  PauseTime.sec = 0;
+  return time;
+}
+
+// Пауза  Blind007
+void PausingTime(unsigned short action)
+{
+  // action == 0 - поставили паузу
+  // action == 1 - сняли паузу
+  TDate date;
+  TTime time;
+  GetDateTime(&date,&time);
+  if (action==0)
+  {
+    PauseTime = time;
+    ispaused = 1;
+  } else {
+    BeginTime.min += time.min-PauseTime.min;
+    BeginTime.sec += time.sec-PauseTime.sec;
+    ispaused = 0;
+  }
+}
+
+// Отрисовка времени игры Blind007
+void TimeRedraw()
+{
+  WSHDR * time_disp = AllocWS(32);
+  if (ispaused==0) {
+    TDate date;
+    TTime time;
+    GetDateTime(&date,&time);
+    PT_min = time.min - BeginTime.min;
+    PT_sec = time.sec - BeginTime.sec;
+    if (PT_sec<0)
+    {
+      PT_sec=60+PT_sec;
+      PT_min--;
+    }
+    if (PT_min<0)
+    {
+      PT_min=60+PT_min;
+    }
+    if (PT_sec>=10)
+    {
+      wsprintf(time_disp,"%i:%i",PT_min,PT_sec);
+    } else {
+      wsprintf(time_disp,"%i:0%i",PT_min,PT_sec);
+    }
+  } else 
+  {
+    if (PT_sec>=10)
+    {
+      wsprintf(time_disp,"%i:%i",PT_min,PT_sec);
+    } else {
+      wsprintf(time_disp,"%i:0%i",PT_min,PT_sec);
+    }
+  }
+  DrawString(time_disp,time_x,time_y,240,time_y+GetFontYSIZE(FONT_SMALL),
+             FONT_SMALL,0,color(COLOR_TEXT),0);
+  FreeWS(time_disp);
+}
 
 // Играем MP3 файл
 void PlayMP3File(const char * fname)
@@ -125,6 +205,7 @@ if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
       
 #endif
       UpdateCSMname(sndFName); // Покажем что играем XTask Blind007
+      BeginTime = SetBeginTime(); // Время начала играния файла Blind007
       FreeWS(sndPath);
       FreeWS(sndFName);
  /*     int PlayTime = GetWavkaLength((char*)sndPath,(char*)sndFName);
@@ -185,6 +266,10 @@ void load_skin(void)
         BRC_x=data[33];
         BRC_w=data[34];
         // Полоса прокрутки
+        // Время
+        time_x=data[35];
+        time_y=data[36]+data[37];
+        // Время
         
         mfree(data);
       }
@@ -309,6 +394,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
 // #endif
 
     PL_Redraw();
+    TimeRedraw();
   }
 }
 
@@ -659,7 +745,9 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
   }
 #ifdef NEWSGOLD
   // Если вход.звонок или звонок закончился Blind007
-  if (((msg->msg==MSG_INCOMMING_CALL)&&(PlayingStatus==2)) || ((msg->msg==MSG_END_CALL)&&(PlayingStatus==1)))  // У кого руки такие кривые??
+  // У кого руки такие кривые??
+  // Blind007: А что не так?
+  if (((msg->msg==MSG_INCOMMING_CALL)&&(PlayingStatus==2)) || ((msg->msg==MSG_END_CALL)&&(PlayingStatus==1)))  
   {
     TogglePlayback();
   }
@@ -770,7 +858,7 @@ int main(char *exename, char *fname)
       LoadingPlaylist(DEFAULT_PLAYLIST);
     }
   }
-  UpdateCSMname(NULL); // Всего-то исправить :) Blind007
+  UpdateCSMname(NULL);
   LockSched();
   MAINCSM_ID = CreateCSM(&MAINCSM.maincsm,dummy,0);
   AddKeybMsgHook((void *)my_keyhook);

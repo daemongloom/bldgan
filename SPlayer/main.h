@@ -57,5 +57,7 @@ typedef struct
 
 void PlayMP3File(const char * fname);
 
+void PausingTime(unsigned short action);
+
 void QuitCallbackProc(int decision);
 #endif

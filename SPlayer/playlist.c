@@ -17,7 +17,7 @@ extern const int EXT;                  // Расширение по умолчанию
 extern const int soundvolume;          // Громкость
 
 // Мои переменные
-short SoundVolume;         // Громкость
+unsigned short SoundVolume;         // Громкость
 unsigned short SVforToggle = 0;       // Прежняя громкость
 unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 - играем)   // Было char стало unsigned short! :D   AAA
 short phandle = -1;                   // Что играем
@@ -84,7 +84,6 @@ void DisableScroll(void)
 }
 
 // --- Скроллинг ---
-
 
 // Поднимаем громкость
 void VolumeUp()
@@ -197,6 +196,7 @@ void TogglePlayback()
     if (phandle!=-1)
     {
       PlayMelody_ResumePlayBack(phandle);
+      PausingTime(1);
       PlayingStatus = 2;
     }
     break;
@@ -205,6 +205,7 @@ void TogglePlayback()
     if (phandle!=-1)
     {
       PlayMelody_PausePlayback(phandle);
+      PausingTime(0);
       PlayingStatus = 1;
     }
     break;
@@ -360,12 +361,6 @@ void LoadingPlaylist(const char * fn)
 {
   if(LoadPlaylist(fn)-1>0) {TC = LoadPlaylist(fn)-1;}   // Экономим память + избавляемся от лишнего пикоффа   AAA
   else {TC=0;}
-//  if (TC>0)   // А собственно нафиг? Если "Playlist loaded!", то мы слышим музыку => зачем писать лишнее?
-//  {
-//    LockSched();
-//    ShowMSG(1,(int)"Playlist loaded!");
-//    UnlockSched();
-//  }
 }
 
 // Свобода пл!

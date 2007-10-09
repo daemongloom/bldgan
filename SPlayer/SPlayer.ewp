@@ -3158,9 +3158,6 @@
     <name>$PROJ_DIR$\func.asm</name>
   </file>
   <file>
-    <name>$PROJ_DIR$\history.txt</name>
-  </file>
-  <file>
     <name>$PROJ_DIR$\main.c</name>
   </file>
   <file>
@@ -3177,9 +3174,6 @@
   </file>
   <file>
     <name>$PROJ_DIR$\playlist.h</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\ReadMe(skin.cfg).txt</name>
   </file>
 </project>
 
