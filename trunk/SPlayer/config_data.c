@@ -30,6 +30,14 @@ __root const CFG_HDR cfghdr04={CFG_CBOX,"Extension of playlist",0,2};
 __root const int EXT = 0;
 __root const CFG_CBOX_ITEM cfgcbox3[2]={"spl","m3u"};
 
+#ifdef NEWSGOLD
+__root const CFG_HDR cfghdr05={CFG_INT,"Default volume",0,5};
+__root const int soundvolume=2;
+#else
+__root const CFG_HDR cfghdr05={CFG_INT,"Default volume",0,14};
+__root const int soundvolume=6;
+#endif
+
 //Level 1
 __root const CFG_HDR cfghdr_m11={CFG_LEVEL,"Colors",1,0};
 

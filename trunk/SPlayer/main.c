@@ -65,6 +65,7 @@ extern const char DEFAULT_PLAYLIST[];
 extern const unsigned int IDLE_X;
 extern const unsigned int IDLE_Y;
 extern const int PlayMode; 
+extern const int soundvolume; 
 //--- настройки из конфига ---
 
 //--- Переменные ---
@@ -75,6 +76,7 @@ extern unsigned int TC;
 char Quit_Required = 0;     // Флаг необходимости завершить работу
 char list[256];
 char sfname[256];
+extern unsigned short SoundVolume;
 int playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
 //--- Переменные ---
 
@@ -753,6 +755,7 @@ int main(char *exename, char *fname)
   InitConfig();
   load_skin();
   playmode = PlayMode;
+  SoundVolume = soundvolume;
   
   // Если что-то передали в параметре - загружаем...
   if (fname)

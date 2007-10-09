@@ -9,14 +9,15 @@ char **id3tags1_lines;  // Массив указателей на ID3v1-теги
 extern const char COLOR_TEXT[];
 extern const char COLOR_TEXT_CURSOR[]; //Еще добавил  AAA
 extern const char COLOR_TEXT_PLAY[];   //И еще AAA
-extern const char COLOR_BANDROLL[];      //Цвет полосы прокрутки
+extern const char COLOR_BANDROLL[];    //Цвет полосы прокрутки
 extern const char COLOR_BANDROLL_C[];
 extern const int SHOW_FULLNAMES;
 extern const char PIC_DIR[];           // Для курсора AAA
 extern const int EXT;                  // Расширение по умолчанию
+extern const int soundvolume;          // Громкость
 
 // Мои переменные
-unsigned short SoundVolume = 2;       // Громкость
+short SoundVolume;         // Громкость
 unsigned short SVforToggle = 0;       // Прежняя громкость
 unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 - играем)   // Было char стало unsigned short! :D   AAA
 short phandle = -1;                   // Что играем
