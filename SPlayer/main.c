@@ -82,66 +82,178 @@ char list[256];
 char sfname[256];
 extern unsigned short SoundVolume;
 int playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
+
+// Переписываем время... DemonGloom
+GBSTMR mytmr;
+int sh; // Начальные
+int sm;
+int ss;
+int nh; // Новые
+int nm;
+int ns;
+int ph; // Сдвиг для паузы
+int pm;
+int ps;
+
   // Сделаем время! Blind007
-short PT_min=0;   // Сколько времени играет песня (минуты)
-short PT_sec=0;   // (секунды)
-extern unsigned short PlayingStatus;
-GBSTMR time_timer;
-#define TMR_SEC 300 // Вот это наверное надо будет изменить? Как у вас на sgold и newsgold незнаю, но у меня на ELKA нормально и так!
+/*TTime BeginTime;  // Когда начали играть
+TTime PauseTime;  // Во сколько поставили паузу?
+short PT_min;     // Сколько времени играет песня (минуты)
+short PT_sec;     // (секунды)
+unsigned short ispaused = 0;  // Поставлена ли пауза?
   // Сделаем время!
+*/
 //--- Переменные ---
 
 void load_skin();       // Из skin.cfg AAA
-
-//--- Время --- Blind007
-// Стоп-таймер
-void StopTimeTimer()
+void UpdateCSMname(WSHDR * tname);
+/*
+// Время начала игры файла Blind007
+TTime SetBeginTime()
 {
-  PT_min=0;
-  PT_sec=0;
-  GBS_DelTimer(&time_timer);
+  TDate date;
+  TTime time;
+  GetDateTime(&date,&time);
+  PauseTime.min = 0;
+  PauseTime.sec = 0;
+  return time;
 }
 
-// Таймер для отрисовки
-void time_timer_proc()
+
+// Пауза  Blind007
+void PausingTime(unsigned short action)
 {
-  if (IsGuiOnTop(MAINGUI_ID))
+  // action == 0 - поставили паузу
+  // action == 1 - сняли паузу
+  TDate date;
+  TTime time;
+  GetDateTime(&date,&time);
+  if (action==0)
   {
-    if (PlayingStatus==2)
-    {
-      // если не пауза
-      PT_sec++;
-      if (PT_sec>=60)
-      {
-        PT_sec=0;
-        PT_min++;
-      }
-      GBS_StartTimerProc(&time_timer,TMR_SEC,time_timer_proc);
-    }
-    else
-    {
-      if (PlayingStatus==0) {StopTimeTimer();}
-    }
-    REDRAW();
+    PauseTime = time;
+    ispaused = 1;
+  } else {
+    BeginTime.min += time.min-PauseTime.min;
+    BeginTime.sec += time.sec-PauseTime.sec;
+    ispaused = 0;
   }
 }
 
-// Собственно отрисовка
+// Отрисовка времени игры Blind007
 void TimeRedraw()
 {
   WSHDR * time_disp = AllocWS(32);
-  if (PT_sec>=10)
+  if (ispaused==0) {
+    TDate date;
+    TTime time;
+    GetDateTime(&date,&time);
+    PT_min = time.min - BeginTime.min;
+    PT_sec = time.sec - BeginTime.sec;
+    if (PT_sec<0)
+    {
+      PT_sec=60+PT_sec;
+      PT_min--;
+    }
+    if (PT_min<0)
+    {
+      PT_min=60+PT_min;
+    }
+    if (PT_sec>=10)
+    {
+      wsprintf(time_disp,"%i:%i",PT_min,PT_sec);
+    } else {
+      wsprintf(time_disp,"%i:0%i",PT_min,PT_sec);
+    }
+  } else 
   {
-    wsprintf(time_disp,"%i:%i",PT_min,PT_sec);
-  } else {
-    wsprintf(time_disp,"%i:0%i",PT_min,PT_sec);
+    if (PT_sec>=10)
+    {
+      wsprintf(time_disp,"%i:%i",PT_min,PT_sec);
+    } else {
+      wsprintf(time_disp,"%i:0%i",PT_min,PT_sec);
+    }
   }
   DrawString(time_disp,time_x,time_y,240,time_y+GetFontYSIZE(FONT_SMALL),
              FONT_SMALL,0,color(COLOR_TEXT),0);
   FreeWS(time_disp);
-}
-//--- Время --- Blind007
+}*/
 
+void TimeRedraw();
+
+// Пауза счетчика DemonGloom
+void PausingTime(unsigned short action)
+{
+  // action == 0 - поставили паузу
+  // action == 1 - сняли паузу
+  TDate date;
+  TTime time;
+  GetDateTime(&date,&time);
+  ns=time.sec-ss;
+  if (ns<0){
+    ns=60+ns;
+    time.min--;
+  }
+  if (ns>60){
+    ns=ns-60;
+    time.min++;
+  }
+  nm=time.min-sm;
+  if (nm<0){
+    nm=60+nm;
+    time.hour--;
+  }
+  if (nm>60){
+    nm=nm-60;
+    time.hour++;
+  }
+  nh=time.hour-sh;
+  if (nh<0){
+    nh=24+nh;
+  }
+  if (action==0)
+  {
+    ph=nh;
+    pm=nm;
+    ps=ns;
+  } else 
+  {
+    GetDateTime(&date,&time);
+    ss=time.sec-ps;
+    sh=time.hour-ph;
+    sm=time.min-pm;
+    TimeRedraw();
+  }
+}
+// Отрисовка времени DemonGloom
+void EXT_REDRAW(){REDRAW();}
+
+void TimeRedraw()
+{
+  WSHDR * time_disp = AllocWS(32);
+  if (PlayingStatus==2){
+  TDate date;
+  TTime time; 
+  GetDateTime(&date,&time);
+  ns=time.sec-ss;
+  if (ns<0){
+    ns=60+ns;
+    time.min--;
+  }
+  nm=time.min-sm;
+  if (nm<0){
+    nm=60+nm;
+    time.hour--;
+  }
+  nh=time.hour-sh;
+  if (nh<0){
+    nh=24+nh;
+  }
+  }
+  wsprintf(time_disp,"%02i:%02i",nm,ns);
+  DrawString(time_disp,time_x,time_y,time_x+Get_WS_width(time_disp,FONT_SMALL),time_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
+  FreeWS(time_disp);
+  if(IsGuiOnTop(MAINGUI_ID)) GBS_StartTimerProc(&mytmr,216,EXT_REDRAW);
+}
 // Играем MP3 файл
 void PlayMP3File(const char * fname)
 {
@@ -151,6 +263,20 @@ if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
   {
     FSTATS fstats;
     unsigned int err;
+    
+    ph=0;
+    pm=0;
+    ps=0;
+    nh=0;
+    nm=0;
+    ns=0;
+    TDate date;
+    TTime time; 
+    GetDateTime(&date,&time);
+    ss=time.sec;
+    sh=time.hour;
+    sm=time.min;
+
     if (GetFileStats(fname,&fstats,&err)!=-1) // Проверка файла на существование
     {
       PLAYFILE_OPT pfopt;
@@ -184,8 +310,7 @@ if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
       
 #endif
       UpdateCSMname(sndFName); // Покажем что играем XTask Blind007
-      StopTimeTimer();                                         // Останавливаем предыдущие таймеры
-      GBS_StartTimerProc(&time_timer,TMR_SEC,time_timer_proc); // Запускаем таймер времени игры Blind007
+//      BeginTime = SetBeginTime(); // Время начала играния файла Blind007
       FreeWS(sndPath);
       FreeWS(sndFName);
  /*     int PlayTime = GetWavkaLength((char*)sndPath,(char*)sndFName);
@@ -219,7 +344,7 @@ void load_skin(void)
     data=malloc(0xFF);
     if(data!=0)
       {
-        fread(handle,data,0xFF,&err); // Нефиг!!! DG
+        fread(handle,data,0xFF,&err); // Экономим память! :)  Пошли вы куда подальше... Сами же забываете добавлять!!! DG
         
         VOLmy_x=data[2];
         VOLmy_y=data[3]+data[4];
@@ -563,6 +688,13 @@ int my_keyhook(int submsg,int msg)
       case LONG_PRESS:  if (mode==0) {StopAllPlayback(); mode=1;  REDRAW(); return 2;}
     case KEY_UP: if (mode==0) TogglePlayback(); else {mode=0;  REDRAW(); return 2;}
     }}
+#else
+  if (submsg==GREEN_BUTTON){
+    switch (msg){
+      case KEY_DOWN : return 2;
+      case LONG_PRESS:  if (mode==0) {StopAllPlayback(); mode=1;  REDRAW(); return 2;}
+    case KEY_UP: if (mode==0) TogglePlayback(); else {mode=0;  REDRAW(); return 2;}
+    }}
 #endif
   if (submsg==VOL_UP_BUTTON){
     switch (msg){
@@ -658,6 +790,7 @@ void maincsm_oncreate(CSM_RAM *data)
 // Вызывается при закрытии главного CSM. Тут и вызывается киллер
 void maincsm_onclose(CSM_RAM *csm)
 {
+  GBS_DelTimer(&mytmr);
   DisableScroll();       // Оказалось его перед закрытием еще и останавливать надо... А то такое начинается! :D
   StopAllPlayback();
   SUBPROC((void *)ElfKiller);

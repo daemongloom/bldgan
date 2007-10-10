@@ -33,10 +33,10 @@ extern unsigned short s;          // Смещение по вертикали
 extern unsigned short NUMmy_x;    // Номера
 extern unsigned short NUMmy_y;
 // Полоса прокрутки
-unsigned short BR_x;   //=129;
+unsigned short BR_x;  //=129;
 unsigned short BR1_y;  //=50;
 unsigned short BR2_y;  //=152;
-unsigned short BR_w;   //=1;
+unsigned short BR_w;  //=1;
 unsigned short BRC_x;  //=128;
 unsigned short BRC_w;  //=2;
 // Полоса прокрутки
@@ -203,8 +203,8 @@ void TogglePlayback()
     if (phandle!=-1)
     {
       PlayMelody_ResumePlayBack(phandle);
+      PausingTime(1);
       PlayingStatus = 2;
-      time_timer_proc();
     }
     break;
   case 2:
@@ -212,6 +212,7 @@ void TogglePlayback()
     if (phandle!=-1)
     {
       PlayMelody_PausePlayback(phandle);
+      PausingTime(0);
       PlayingStatus = 1;
     }
     break;
@@ -226,7 +227,6 @@ void StopAllPlayback()
     PlayMelody_StopPlayback(phandle);
     PlayingStatus = 0;
   }
-  StopTimeTimer();
 }
 
 // Потребовалось для исправления глюка AAA
