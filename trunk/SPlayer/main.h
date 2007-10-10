@@ -55,13 +55,9 @@ typedef struct
   short genre;
 }MP3Tagv1;
 
-void StopTimeTimer();
-
-void time_timer_proc();
-
 void PlayMP3File(const char * fname);
 
-void UpdateCSMname(WSHDR * tname);
+void PausingTime(unsigned short action);
 
 void QuitCallbackProc(int decision);
 #endif
