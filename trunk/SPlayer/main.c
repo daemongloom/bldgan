@@ -216,10 +216,10 @@ void load_skin(void)
   handle=fopen(SKIN, A_ReadOnly, P_READ,&err); 
   if(handle!=-1)
   {
-    data=malloc(36);
+    data=malloc(0xFF);
     if(data!=0)
       {
-        fread(handle,data,36,&err); // Экономим память! :)
+        fread(handle,data,0xFF,&err); // Нефиг!!! DG
         
         VOLmy_x=data[2];
         VOLmy_y=data[3]+data[4];
