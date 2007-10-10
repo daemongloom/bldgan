@@ -82,18 +82,32 @@ char list[256];
 char sfname[256];
 extern unsigned short SoundVolume;
 int playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
+
+// Переписываем время... DemonGloom
+GBSTMR mytmr;
+int sh; // Начальные
+int sm;
+int ss;
+int nh; // Новые
+int nm;
+int ns;
+int ph; // Сдвиг для паузы
+int pm;
+int ps;
+
   // Сделаем время! Blind007
-TTime BeginTime;  // Когда начали играть
+/*TTime BeginTime;  // Когда начали играть
 TTime PauseTime;  // Во сколько поставили паузу?
 short PT_min;     // Сколько времени играет песня (минуты)
 short PT_sec;     // (секунды)
 unsigned short ispaused = 0;  // Поставлена ли пауза?
   // Сделаем время!
+*/
 //--- Переменные ---
 
 void load_skin();       // Из skin.cfg AAA
 void UpdateCSMname(WSHDR * tname);
-
+/*
 // Время начала игры файла Blind007
 TTime SetBeginTime()
 {
@@ -104,6 +118,7 @@ TTime SetBeginTime()
   PauseTime.sec = 0;
   return time;
 }
+
 
 // Пауза  Blind007
 void PausingTime(unsigned short action)
@@ -161,8 +176,83 @@ void TimeRedraw()
   DrawString(time_disp,time_x,time_y,240,time_y+GetFontYSIZE(FONT_SMALL),
              FONT_SMALL,0,color(COLOR_TEXT),0);
   FreeWS(time_disp);
-}
+}*/
 
+void TimeRedraw();
+
+// Пауза счетчика DemonGloom
+void PausingTime(unsigned short action)
+{
+  // action == 0 - поставили паузу
+  // action == 1 - сняли паузу
+  TDate date;
+  TTime time;
+  GetDateTime(&date,&time);
+  ns=time.sec-ss;
+  if (ns<0){
+    ns=60+ns;
+    time.min--;
+  }
+  if (ns>60){
+    ns=ns-60;
+    time.min++;
+  }
+  nm=time.min-sm;
+  if (nm<0){
+    nm=60+nm;
+    time.hour--;
+  }
+  if (nm>60){
+    nm=nm-60;
+    time.hour++;
+  }
+  nh=time.hour-sh;
+  if (nh<0){
+    nh=24+nh;
+  }
+  if (action==0)
+  {
+    ph=nh;
+    pm=nm;
+    ps=ns;
+  } else 
+  {
+    GetDateTime(&date,&time);
+    ss=time.sec-ps;
+    sh=time.hour-ph;
+    sm=time.min-pm;
+    TimeRedraw();
+  }
+}
+// Отрисовка времени DemonGloom
+void TimeRedraw()
+{
+  WSHDR * time_disp = AllocWS(32);
+  if (PlayingStatus==2){
+  TDate date;
+  TTime time;
+  GetDateTime(&date,&time);
+  ns=time.sec-ss;
+  if (ns<0){
+    ns=60+ns;
+    time.min--;
+  }
+  nm=time.min-sm;
+  if (nm<0){
+    nm=60+nm;
+    time.hour--;
+  }
+  nh=time.hour-sh;
+  if (nh<0){
+    nh=24+nh;
+  }
+  }
+  REDRAW();
+  wsprintf(time_disp,"%02i:%02i",nm,ns);
+  DrawString(time_disp,time_x,time_y,time_x+Get_WS_width(time_disp,FONT_SMALL),time_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
+  FreeWS(time_disp);
+  if(IsGuiOnTop(MAINGUI_ID)) GBS_StartTimerProc(&mytmr,216,TimeRedraw);
+}
 // Играем MP3 файл
 void PlayMP3File(const char * fname)
 {
@@ -172,6 +262,20 @@ if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
   {
     FSTATS fstats;
     unsigned int err;
+    
+    ph=0;
+    pm=0;
+    ps=0;
+    nh=0;
+    nm=0;
+    ns=0;
+    TDate date;
+    TTime time; 
+    GetDateTime(&date,&time);
+    ss=time.sec;
+    sh=time.hour;
+    sm=time.min;
+
     if (GetFileStats(fname,&fstats,&err)!=-1) // Проверка файла на существование
     {
       PLAYFILE_OPT pfopt;
@@ -205,7 +309,7 @@ if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
       
 #endif
       UpdateCSMname(sndFName); // Покажем что играем XTask Blind007
-      BeginTime = SetBeginTime(); // Время начала играния файла Blind007
+//      BeginTime = SetBeginTime(); // Время начала играния файла Blind007
       FreeWS(sndPath);
       FreeWS(sndFName);
  /*     int PlayTime = GetWavkaLength((char*)sndPath,(char*)sndFName);
@@ -236,10 +340,10 @@ void load_skin(void)
   handle=fopen(SKIN, A_ReadOnly, P_READ,&err); 
   if(handle!=-1)
   {
-    data=malloc(36);
+    data=malloc(0xFF);
     if(data!=0)
       {
-        fread(handle,data,36,&err); // Экономим память! :)
+        fread(handle,data,0xFF,&err); // Экономим память! :)  Пошли вы куда подальше... Сами же забываете добавлять!!! DG
         
         VOLmy_x=data[2];
         VOLmy_y=data[3]+data[4];
@@ -678,6 +782,7 @@ void maincsm_oncreate(CSM_RAM *data)
 // Вызывается при закрытии главного CSM. Тут и вызывается киллер
 void maincsm_onclose(CSM_RAM *csm)
 {
+  GBS_DelTimer(&mytmr);
   DisableScroll();       // Оказалось его перед закрытием еще и останавливать надо... А то такое начинается! :D
   StopAllPlayback();
   SUBPROC((void *)ElfKiller);
