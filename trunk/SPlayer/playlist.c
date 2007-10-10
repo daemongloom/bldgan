@@ -17,7 +17,7 @@ extern const int EXT;                  // Расширение по умолчанию
 extern const int soundvolume;          // Громкость
 
 // Мои переменные
-unsigned short SoundVolume;         // Громкость
+unsigned short SoundVolume;           // Громкость
 unsigned short SVforToggle = 0;       // Прежняя громкость
 unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 - играем)   // Было char стало unsigned short! :D   AAA
 short phandle = -1;                   // Что играем
@@ -139,6 +139,9 @@ void RandTrack()
     PlayedTrack=random(TC);
   }
   if(PlayedTrack>TC)PlayedTrack=1;
+  if (CurrentTrack==prevtrack){  // Перенос курсора на следующую песню
+    CurrentTrack=PlayedTrack;
+    }
   PlayMP3File(GetPlayedTrack(PlayedTrack));
 }
 
@@ -149,7 +152,7 @@ void RepeatTrack()
   PlayMP3File(GetPlayedTrack(PlayedTrack));
 }
 
-// Для plamode==1       Ничего умнее не придумал...  AAA
+// Для plamode==1       Ничего умнее не придумал...  AAA // Не понял я этого режима... DG
 void NextTrackX()
 {
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
@@ -169,6 +172,10 @@ void NextTrack()
 {
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
   PlayedTrack++;
+  if (CurrentTrack==(PlayedTrack-1)){  // Перенос курсора на следующую песню
+    CurrentTrack=PlayedTrack;
+    if(PlayedTrack>TC) CurrentTrack=1;
+    }
   if(PlayedTrack>TC)PlayedTrack=1;
   PlayMP3File(GetPlayedTrack(PlayedTrack));
 }
