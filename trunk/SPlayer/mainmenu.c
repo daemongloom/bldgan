@@ -2,6 +2,12 @@
 #include "main.h"
 #include "mainmenu.h"
 
+#ifdef NEWSGOLD
+#define DEFAULT_DISK "4"
+#else
+#define DEFAULT_DISK "0"
+#endif
+
 /*
  Тут делаю главное меню...
  Все работает норм! И графика пашет. Так что здесь пока можно ничего не трогать,
@@ -27,10 +33,19 @@ void patch_input(INPUTDIA_DESC* inp)
   inp->rc.y2=ScreenH()-SoftkeyH()-1;
 }
 //==============================================================================
+char exename[]=DEFAULT_DISK":\\ZBin\\SPlayer\\SPlayer cfg editor.elf";
 
-#define N_ITEMS 3
+#define N_ITEMS 4
 
 int MainMenu_ID;
+
+void Coordinates()
+{
+  WSHDR *ws=AllocWS(256);
+  str_2ws(ws,exename,strlen(exename)+1);
+  ExecuteFile(ws,0,0);
+  FreeWS(ws);
+}
 
 void Settings()   //Настройки  AAA
 {
@@ -61,12 +76,14 @@ int icon_array[2];
 
 MENUITEM_DESC menuitems[N_ITEMS]=
 {
+  {0,(int)"Позиционирование",LGP_NULL,0,NULL,MENU_FLAG3,MENU_FLAG2},
   {0,(int)"Настройки",LGP_NULL,0,NULL,MENU_FLAG3,MENU_FLAG2},
   {0,(int)"Об эльфе...",LGP_NULL,0,NULL,MENU_FLAG3,MENU_FLAG2},
   {0,(int)"Выход",LGP_NULL,0,NULL,MENU_FLAG3,MENU_FLAG2}
 };
 
 void *menuprocs[N_ITEMS]={
+                          (void *)Coordinates,
                           (void *)Settings,
                           (void *)AboutDlg,
                           (void *)Exit_SPlayer
@@ -116,6 +133,7 @@ MENU_DESC tmenu=
 
 extern const char PIC_DIR[128];
 int S_ICONS[N_ITEMS];
+char coordinatespic[128];
 char settingspic[128];
 char aboutpic[128];
 char exitpic[128];
@@ -124,20 +142,25 @@ void MM_Show()
 {
 #ifdef USE_PNG_EXT
   // Картинка Настройки
+  strcpy(coordinatespic,PIC_DIR);
+  strcat(coordinatespic,"coordinates.png");
+  S_ICONS[0] = (int)coordinatespic;
+  menuitems[0].icon = S_ICONS;
+  // Картинка Настройки
   strcpy(settingspic,PIC_DIR);
   strcat(settingspic,"settings.png");
-  S_ICONS[0] = (int)settingspic;
-  menuitems[0].icon = S_ICONS;
+  S_ICONS[1] = (int)settingspic;
+  menuitems[1].icon = S_ICONS+1;
   // Картинка Об эльфе...
   strcpy(aboutpic,PIC_DIR);
   strcat(aboutpic,"about.png");
-  S_ICONS[1] = (int)aboutpic;
-  menuitems[1].icon = S_ICONS+1;
+  S_ICONS[2] = (int)aboutpic;
+  menuitems[2].icon = S_ICONS+2;
   // Картинка Выход
   strcpy(exitpic,PIC_DIR);
   strcat(exitpic,"exit.png");
-  S_ICONS[2] = (int)exitpic;
-  menuitems[2].icon = S_ICONS+2;
+  S_ICONS[3] = (int)exitpic;
+  menuitems[3].icon = S_ICONS+3;
 #endif  
   
   patch_header(&menuhdr);
