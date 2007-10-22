@@ -6,11 +6,11 @@ char **playlist_lines;  // Массив указателей на имена файлов в пл
 char **id3tags1_lines;  // Массив указателей на ID3v1-теги
 
 // Из конфига
-extern const char COLOR_TEXT[];
-extern const char COLOR_TEXT_CURSOR[]; //Еще добавил  AAA
-extern const char COLOR_TEXT_PLAY[];   //И еще AAA
-extern const char COLOR_BANDROLL[];    //Цвет полосы прокрутки
-extern const char COLOR_BANDROLL_C[];
+extern char COLOR_TEXT[];
+extern char COLOR_TEXT_CURSOR[]; //Еще добавил  AAA
+extern char COLOR_TEXT_PLAY[];   //И еще AAA
+extern char COLOR_BANDROLL[];    //Цвет полосы прокрутки
+extern char COLOR_BANDROLL_C[];
 extern const int SHOW_FULLNAMES;
 extern const char PIC_DIR[];           // Для курсора AAA
 extern const int EXT;                  // Расширение по умолчанию
@@ -23,7 +23,7 @@ unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 -
 short phandle = -1;                   // Что играем
 int CurrentTrack = 1;                 // Текущий трек
 unsigned int TC = 0;                  // Количество треков в пл 
-unsigned int PlayedTrack = 0;         // Проигрываемый трек   AAA
+int PlayedTrack = 0;         // Проигрываемый трек   AAA
 char * l_color_text;                  // Ослабленный цвет
 int PlayTime;
 
@@ -172,10 +172,10 @@ void NextTrack()
 {
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
   PlayedTrack++;
-  if (CurrentTrack==(PlayedTrack-1)){  // Перенос курсора на следующую песню
-    CurrentTrack=PlayedTrack;
-    if(PlayedTrack>TC) CurrentTrack=1;
-    }
+//  if (CurrentTrack==(PlayedTrack-1)){// Перенос курсора на следующую песню  // И зачем? То пытаемся не повторять ошибок
+//    CurrentTrack=PlayedTrack;        // встроенного плеера, а тут... И Где логика если у следующей функции нет аналогичного свойства??  AAA
+//    if(PlayedTrack>TC) CurrentTrack=1;
+//    }
   if(PlayedTrack>TC)PlayedTrack=1;
   PlayMP3File(GetPlayedTrack(PlayedTrack));
 }
@@ -185,7 +185,7 @@ void PreviousTrack()
 {
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
   PlayedTrack--;
-  if(PlayedTrack==0)PlayedTrack=TC;
+  if(PlayedTrack<0)PlayedTrack=TC;
   PlayMP3File(GetPlayedTrack(PlayedTrack));
 }
 

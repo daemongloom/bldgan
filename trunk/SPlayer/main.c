@@ -58,12 +58,24 @@ unsigned short time_y;
 // Время
 //--- Собственно, переменные координат AAA ---
 
+//--- Цвета AAA ---
+char COLOR_TEXT[4];
+char LINE_COLOR[4];
+char COLOR_BG[4];
+char COLOR_BG_CURSOR[4];
+char COLOR_TEXT_CURSOR[4];
+char COLOR_TEXT_PLAY[4];
+char COLOR_BANDROLL[4];
+char COLOR_BANDROLL_C[4];
+//--- Цвета AAA ---
+
 //--- настройки из конфига ---
-extern const char COLOR_BG[];
-extern const char COLOR_TEXT[];
+//extern const char COLOR_BG[];
+//extern const char COLOR_TEXT[];
 extern const char I_BACKGROUND[];
 extern const char PIC_DIR[];
-extern const char SKIN[];
+extern const char COORD[];
+extern const char COLOR[];
 extern const char PLAYLISTS[];
 extern const char DEFAULT_PLAYLIST[];
 extern const unsigned int IDLE_X;
@@ -333,49 +345,85 @@ else
 }
 
 // Грузим координаты из skin.cfg AAA
-void load_skin(void)
+void load_skin(char const* cfgname)
 {
   char *data; 
   unsigned int err; 
   int handle; 
-  handle=fopen(SKIN, A_ReadOnly, P_READ,&err); 
+  handle=fopen(cfgname, A_ReadOnly, P_READ,&err); 
   if(handle!=-1)
   {
     data=malloc(0xFF);
     if(data!=0)
       {
         fread(handle,data,0xFF,&err); // Экономим память! :)  Пошли вы куда подальше... Сами же забываете добавлять!!! DG
-        
-        VOLmy_x=data[2];
-        VOLmy_y=data[3]+data[4];
-        STATmy_x=data[5];
-        STATmy_y=data[6]+data[7];
-        CTmy_x=data[8];
-        CTmy_y=data[9]+data[10];
+        if(data[2]==0x01)
+        {
+        // Полоса прокрутки
+        BR_x=data[3];
+        BR1_y=data[4]+data[5];
+        BR2_y=data[6]+data[7];
+        BR_w=data[8];
+        BRC_x=data[9];
+        BRC_w=data[10];
+        // Полоса прокрутки
         s=data[11];
-        NUMmy_x=data[12];
-        NUMmy_y=data[13]+data[14];
-        RANDmy_x=data[15];
-        RANDmy_y=data[16]+data[17];
-        KeyLock_x=data[18];
-        KeyLock_y=data[19]+data[20];
-        Next_x=data[21];
-        Next_y=data[22]+data[23];
-        Prev_x=data[24];
-        Prev_y=data[25]+data[26];
-        // Полоса прокрутки
-        BR_x=data[27];
-        BR1_y=data[28]+data[29];
-        BR2_y=data[30]+data[31];
-        BR_w=data[32];
-        BRC_x=data[33];
-        BRC_w=data[34];
-        // Полоса прокрутки
+        CTmy_x=data[12];
+        CTmy_y=data[13]+data[14];
+        VOLmy_x=data[15];
+        VOLmy_y=data[16]+data[17];
+        STATmy_x=data[18];
+        STATmy_y=data[19]+data[20];
+        NUMmy_x=data[21];
+        NUMmy_y=data[22]+data[23];
+        RANDmy_x=data[24];
+        RANDmy_y=data[25]+data[26];
+        KeyLock_x=data[27];
+        KeyLock_y=data[28]+data[29];
+        Next_x=data[30];
+        Next_y=data[31]+data[32];
+        Prev_x=data[33];
+        Prev_y=data[34]+data[35];
         // Время
-        time_x=data[35];
-        time_y=data[36]+data[37];
+        time_x=data[36];
+        time_y=data[37]+data[38];
         // Время
-        
+        }
+        else
+        {
+          COLOR_TEXT[0]=data[3];
+          COLOR_TEXT[1]=data[4];
+          COLOR_TEXT[2]=data[5];
+          COLOR_TEXT[3]=data[6];
+          LINE_COLOR[0]=data[7];
+          LINE_COLOR[1]=data[8];
+          LINE_COLOR[2]=data[9];
+          LINE_COLOR[3]=data[10];
+          COLOR_BG[0]=data[11];
+          COLOR_BG[1]=data[12];
+          COLOR_BG[2]=data[13];
+          COLOR_BG[3]=data[14];
+          COLOR_BG_CURSOR[0]=data[15];
+          COLOR_BG_CURSOR[1]=data[16];
+          COLOR_BG_CURSOR[2]=data[17];
+          COLOR_BG_CURSOR[3]=data[18];
+          COLOR_TEXT_CURSOR[0]=data[19];
+          COLOR_TEXT_CURSOR[1]=data[20];
+          COLOR_TEXT_CURSOR[2]=data[21];
+          COLOR_TEXT_CURSOR[3]=data[22];
+          COLOR_TEXT_PLAY[0]=data[23];
+          COLOR_TEXT_PLAY[1]=data[24];
+          COLOR_TEXT_PLAY[2]=data[25];
+          COLOR_TEXT_PLAY[3]=data[26];
+          COLOR_BANDROLL[0]=data[27];
+          COLOR_BANDROLL[1]=data[28];
+          COLOR_BANDROLL[2]=data[29];
+          COLOR_BANDROLL[3]=data[30];
+          COLOR_BANDROLL_C[0]=data[31];
+          COLOR_BANDROLL_C[1]=data[32];
+          COLOR_BANDROLL_C[2]=data[33];
+          COLOR_BANDROLL_C[3]=data[34];
+        }
         mfree(data);
       }
     fclose(handle,&err);
@@ -553,21 +601,26 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     switch(msg->gbsmsg->submess)
     {
     case ENTER_BUTTON:  // Play
+      PlayTrackUnderC();
       Stat_keypressed = 0;
       break;
     case '0':           // Stop
+      StopAllPlayback();
       Stat_keypressed = 0;
       break;
     case '4':           // Переключение на предыдущий трек
       P_keypressed = 0;
       break;
     case '5':           // Play/Pause
+      TogglePlayback();
       Stat_keypressed = 0;
       break;
     case '6':           // Переключение на следующий трек
       N_keypressed = 0;
       break;
     case '#':           // Mode
+      playmode+=1;
+      if (playmode==4) playmode=0;
       Mode_keypressed = 0;
       break;
     }
@@ -592,7 +645,6 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       break;
     case ENTER_BUTTON:
       Stat_keypressed = 1;
-      PlayTrackUnderC();
       break;
     case UP_BUTTON:
       CTUp();
@@ -602,7 +654,6 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       break;
     case '0':           // Останавливаем воспроизведение
       Stat_keypressed = 1;
-      StopAllPlayback();
       break;
     case '1':           // Забиваем. Здесь будет перемотка :)
       break;
@@ -617,7 +668,6 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       break;
     case '5':           // Play/Pause
       Stat_keypressed = 1;
-      TogglePlayback();
       break;
     case '6':           // Переключение на следующий трек
       N_keypressed = 1;
@@ -629,15 +679,12 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       CTDovnSix();
       break;
     case '9':
-      
       break;
     case '*':
       ToggleVolume();
       break;
     case '#':
         Mode_keypressed = 1;
-        playmode+=1;
-        if (playmode==4) playmode=0;
       break;
     }
     REDRAW();
@@ -653,16 +700,16 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
         CTDown();
       break;
       case '2':
+        CTUpSix();
+      break;
+      case '3':
         sprintf(list,"%s%s",PLAYLISTS,"playlist");
         SavePlaylist(list);
       break;
-      case '3':
-        CTUpSix();
-      break;
       case '8':
+        CTDovnSix();
       break;
       case '9':
-        CTDovnSix();
       break;
       case '#':
        if (KeyLock==0){
@@ -689,13 +736,14 @@ int my_keyhook(int submsg,int msg)
       case LONG_PRESS:  if (mode==0) {StopAllPlayback(); mode=1;  REDRAW(); return 2;}
     case KEY_UP: if (mode==0) TogglePlayback(); else {mode=0;  REDRAW(); return 2;}
     }}
-#else
+  // А чем пл загружать?? AAA
+/*#else
   if (submsg==GREEN_BUTTON){
     switch (msg){
       case KEY_DOWN : return 2;
       case LONG_PRESS:  if (mode==0) {StopAllPlayback(); mode=1;  REDRAW(); return 2;}
     case KEY_UP: if (mode==0) TogglePlayback(); else {mode=0;  REDRAW(); return 2;}
-    }}
+    }}*/
 #endif
   if (submsg==VOL_UP_BUTTON){
     switch (msg){
@@ -861,6 +909,7 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
   // Если вход.звонок или звонок закончился Blind007
   // У кого руки такие кривые??
   // Blind007: А что не так?
+  // Ы! В самом начале писал, что не пашет, так не пашет и теперь... AAA
   if (((msg->msg==MSG_INCOMMING_CALL)&&(PlayingStatus==2)) || ((msg->msg==MSG_END_CALL)&&(PlayingStatus==1)))  
   {
     TogglePlayback();
@@ -955,7 +1004,8 @@ int main(char *exename, char *fname)
 {
   char dummy[sizeof(MAIN_CSM)];
   InitConfig();
-  load_skin();
+  load_skin(COORD);
+  load_skin(COLOR);
   playmode = PlayMode;
   SoundVolume = soundvolume;
   
