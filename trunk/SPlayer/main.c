@@ -74,8 +74,8 @@ char COLOR_BANDROLL_C[4];
 //extern const char COLOR_TEXT[];
 extern const char I_BACKGROUND[];
 extern const char PIC_DIR[];
-extern const char COORD[];
-extern const char COLOR[];
+//extern const char COORD[];
+//extern const char COLOR[];
 extern const char PLAYLISTS[];
 extern const char DEFAULT_PLAYLIST[];
 extern const unsigned int IDLE_X;
@@ -345,7 +345,7 @@ else
 }
 
 // Грузим координаты из skin.cfg AAA
-void load_skin(char const* cfgname)
+void load_skin(char const* cfgname)              // Извращенец... Такое создать... DG
 {
   char *data; 
   unsigned int err; 
@@ -1004,8 +1004,10 @@ int main(char *exename, char *fname)
 {
   char dummy[sizeof(MAIN_CSM)];
   InitConfig();
-  load_skin(COORD);
-  load_skin(COLOR);
+  sprintf(sfname,"%s%s",PIC_DIR,"skin.cfg");
+  load_skin(sfname);
+  sprintf(sfname,"%s%s",PIC_DIR,"colour.cfg");
+  load_skin(sfname);
   playmode = PlayMode;
   SoundVolume = soundvolume;
   
@@ -1014,9 +1016,8 @@ int main(char *exename, char *fname)
   {
     LoadingPlaylist(fname);
   }
-  else
-  {
-    // Если нет - грузим DEFAULT плейлист
+  
+  if(TC==0){ // если плейлист из параметра пустой или нет параметров-> грузим стандарт
     if (DEFAULT_PLAYLIST!="")
     {
       LoadingPlaylist(DEFAULT_PLAYLIST);
@@ -1024,6 +1025,7 @@ int main(char *exename, char *fname)
   }
   UpdateCSMname(NULL);
   LockSched();
+  phandle=-1;
   MAINCSM_ID = CreateCSM(&MAINCSM.maincsm,dummy,0);
   AddKeybMsgHook((void *)my_keyhook);
   UnlockSched();

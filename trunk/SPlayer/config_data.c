@@ -57,13 +57,13 @@ __root const char I_BACKGROUND[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\img\\backg
 
 __root const CFG_HDR cfghdr23={CFG_STR_UTF8,"Progressbar",3,127};
 __root const char I_PROGRESSBAR[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\img\\progressbar.png";
-
+/*
 __root const CFG_HDR cfghdr24={CFG_STR_UTF8,"Coordinates",3,127};
 __root const char COORD[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\Skin\\skin.cfg";
 
 __root const CFG_HDR cfghdr25={CFG_STR_UTF8,"Colours",3,127};
 __root const char COLOR[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\Skin\\colour.cfg";
-
+*/
 __root const CFG_HDR cfghdr_m20={CFG_LEVEL,"",0,0};
 
 
