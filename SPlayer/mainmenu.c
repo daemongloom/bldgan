@@ -34,7 +34,7 @@ void patch_input(INPUTDIA_DESC* inp)
 }
 //==============================================================================
 char exename[]=DEFAULT_DISK":\\ZBin\\SPlayer\\SPlayer cfg editor.elf";
-extern const char COORD[];
+//extern const char COORD[];
 
 #define N_ITEMS 4
 
@@ -43,8 +43,11 @@ int MainMenu_ID;
 void Coordinates()
 {
   WSHDR *ws=AllocWS(256);
+  extern const char PIC_DIR[];
+  char sfname[256];
   str_2ws(ws,exename,strlen(exename)+1);
-  ExecuteFile(ws,0,(char*)COORD);
+  sprintf(sfname,"%s%s",PIC_DIR,"skin.cfg");
+  ExecuteFile(ws,0,(char*)sfname);
   FreeWS(ws);
 }
 
@@ -61,7 +64,7 @@ void Settings()   //Настройки  AAA
 
 void AboutDlg()
 {
-  ShowMSG(0,(int)"SPlayer v0.7.4\n(c) Anderstand, Blind007, DemonGloom");
+  ShowMSG(0,(int)"SPlayer v0.7.4.1\n(c) Anderstand, Blind007, DemonGloom");
 };
 
 void Exit_SPlayer()
