@@ -2180,7 +2180,7 @@
       <name>BUILDACTION</name>
       <archiveVersion>1</archiveVersion>
       <data>
-        <prebuild></prebuild>
+        <prebuild>obexdel "Config\Misc\Data inbox\SPlayer.elf"</prebuild>
         <postbuild>obexcopy $TARGET_PATH$ "Config\Misc\Data inbox\SPlayer.elf"</postbuild>
       </data>
     </settings>
