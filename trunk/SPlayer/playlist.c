@@ -66,7 +66,7 @@ void scroll_timer_proc(void)
     else
     {
       scroll_disp=scroll_disp+5; //scroll_disp++;
-      GBS_StartTimerProc(&tmr_scroll,scroll_disp!=i?TMR_SEC>>4:TMR_SEC,scroll_timer_proc);  //scroll_disp!=i?TMR_SEC>>5:TMR_SEC
+     if(IsGuiOnTop(MAINGUI_ID)) GBS_StartTimerProc(&tmr_scroll,scroll_disp!=i?TMR_SEC>>4:TMR_SEC,scroll_timer_proc);  //scroll_disp!=i?TMR_SEC>>5:TMR_SEC
     }
     REDRAW();
   }
@@ -140,6 +140,9 @@ void RandTrack()
   }
   if(PlayedTrack>TC)PlayedTrack=1;
   if (CurrentTrack==prevtrack){  // Перенос курсора на следующую песню
+    CurrentTrack=PlayedTrack;
+    }
+  if (0==prevtrack){  // Перенос курсора на следующую песню
     CurrentTrack=PlayedTrack;
     }
   PlayMP3File(GetPlayedTrack(PlayedTrack));
@@ -992,42 +995,3 @@ void BandRoll()
     DrawRoundedFrame(BRC_x,BR1_y+yy-(BR2_y-BR1_y)/TC,BRC_x+BRC_w-1,BR1_y+yy,0,0,0,0,color(COLOR_BANDROLL_C));
   }
 }
-
-/*
-void DrawPlayTime(char* fname)
-{
-  PlayTime = GetWavLen(fname);
-  WSHDR * t = AllocWS(64);
-  wsprintf(t,"%i",PlayTime);
-  DrawString(t,NUMmy_x,NUMmy_y+10,NUMmy_x+50,NUMmy_y+GetFontYSIZE(FONT_SMALL)+10,FONT_SMALL,0,
-           color(COLOR_TEXT),0);
-  FreeWS(t);
-}*/
-/*
-double GetWavkaLength(char *fpath,char *fname) //тиков
-{
-  int f;
-  unsigned int ul;
-  
-  int DataLength;//4
-  int BytePerSec;//28  
-  
-  char ffn[128];
-  strcpy(ffn, fpath);
-  strcat(ffn, fname);
-  if ((f=fopen(ffn,A_ReadOnly+A_BIN,P_READ,&ul))!=-1)
-  {
-    lseek(f,4,S_SET,&ul,&ul);
-    fread(f,&DataLength,sizeof(DataLength),&ul);
-    
-    lseek(f,28,S_SET,&ul,&ul);
-    fread(f,&BytePerSec,sizeof(BytePerSec),&ul);
-    
-    fclose(f,&ul);
-    
-    return (((((double)DataLength/(double)BytePerSec)*(double)1000)*0.216)+dop_delay);
-  }
-    else
-      return 0;
-}
-*/

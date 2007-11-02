@@ -5,11 +5,41 @@
 #include "mainmenu.h"
 #include "playlist.h"
 
+typedef struct {
+ unsigned short type; //00 
+ WSHDR *wfilename; //04 
+ int unk_08 ; //08 
+ int unk_0C; //0C 
+ int unk_10 ; //10 
+ int unk_14 ; //14 
+ long length; //18 <-- return 
+ int unk_1C; //1C 
+ int unk_20 ; //20 
+} TWavLen;
+
+#pragma swi_number=0x45 
+#ifdef NEWSGOLD 
+__swi __arm int GetWavLen(char *filename); 
+#else 
+__swi __arm int GetWavLen(TWavLen *wl);
+#endif
+
 #ifdef NEWSGOLD
 #define DEFAULT_DISK "4"
 #else
 #define DEFAULT_DISK "0"
 #endif
+
+void Log(int dummy, char *txt)
+{
+  unsigned int ul;
+  int f=fopen("0:\\SPlayer.log",A_ReadWrite+A_Create+A_Append+A_BIN,P_READ+P_WRITE,&ul);
+  if (f!=-1)
+  {
+    fwrite(f,txt,strlen(txt),&ul);
+    fclose(f,&ul);
+  }
+}
 
 const int minus11=-11; // стремная константа =)
 
@@ -51,11 +81,18 @@ extern unsigned short BR2_y;
 extern unsigned short BR_w;
 extern unsigned short BRC_x;
 extern unsigned short BRC_w;
-// Полоса прокрутки
 // Время
 unsigned short time_x;
 unsigned short time_y;
-// Время
+// Длительность
+unsigned short length_x;
+unsigned short length_y;
+// Прогрессбар
+unsigned short progress_x;
+unsigned short progress_y;
+unsigned short progress_x2;
+unsigned short progress_y2;
+
 //--- Собственно, переменные координат AAA ---
 
 //--- Цвета AAA ---
@@ -67,6 +104,10 @@ char COLOR_TEXT_CURSOR[4];
 char COLOR_TEXT_PLAY[4];
 char COLOR_BANDROLL[4];
 char COLOR_BANDROLL_C[4];
+char COLOR_PROG_BG[4];               // Фон прогрессбара
+char COLOR_PROG_BG_FRAME[4];               // Ободок
+char COLOR_PROG_MAIN[4];             // Сам прогресс
+char COLOR_PROG_MAIN_FRAME[4];             // Ободок
 //--- Цвета AAA ---
 
 //--- настройки из конфига ---
@@ -96,7 +137,10 @@ extern unsigned short SoundVolume;
 int playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
 
 // Переписываем время... DemonGloom
+TWavLen wl;
 GBSTMR mytmr;
+int fm; // Длительность
+int fs;
 int sh; // Начальные
 int sm;
 int ss;
@@ -107,88 +151,10 @@ int ph; // Сдвиг для паузы
 int pm;
 int ps;
 
-  // Сделаем время! Blind007
-/*TTime BeginTime;  // Когда начали играть
-TTime PauseTime;  // Во сколько поставили паузу?
-short PT_min;     // Сколько времени играет песня (минуты)
-short PT_sec;     // (секунды)
-unsigned short ispaused = 0;  // Поставлена ли пауза?
-  // Сделаем время!
-*/
 //--- Переменные ---
 
 void load_skin();       // Из skin.cfg AAA
 void UpdateCSMname(WSHDR * tname);
-/*
-// Время начала игры файла Blind007
-TTime SetBeginTime()
-{
-  TDate date;
-  TTime time;
-  GetDateTime(&date,&time);
-  PauseTime.min = 0;
-  PauseTime.sec = 0;
-  return time;
-}
-
-
-// Пауза  Blind007
-void PausingTime(unsigned short action)
-{
-  // action == 0 - поставили паузу
-  // action == 1 - сняли паузу
-  TDate date;
-  TTime time;
-  GetDateTime(&date,&time);
-  if (action==0)
-  {
-    PauseTime = time;
-    ispaused = 1;
-  } else {
-    BeginTime.min += time.min-PauseTime.min;
-    BeginTime.sec += time.sec-PauseTime.sec;
-    ispaused = 0;
-  }
-}
-
-// Отрисовка времени игры Blind007
-void TimeRedraw()
-{
-  WSHDR * time_disp = AllocWS(32);
-  if (ispaused==0) {
-    TDate date;
-    TTime time;
-    GetDateTime(&date,&time);
-    PT_min = time.min - BeginTime.min;
-    PT_sec = time.sec - BeginTime.sec;
-    if (PT_sec<0)
-    {
-      PT_sec=60+PT_sec;
-      PT_min--;
-    }
-    if (PT_min<0)
-    {
-      PT_min=60+PT_min;
-    }
-    if (PT_sec>=10)
-    {
-      wsprintf(time_disp,"%i:%i",PT_min,PT_sec);
-    } else {
-      wsprintf(time_disp,"%i:0%i",PT_min,PT_sec);
-    }
-  } else 
-  {
-    if (PT_sec>=10)
-    {
-      wsprintf(time_disp,"%i:%i",PT_min,PT_sec);
-    } else {
-      wsprintf(time_disp,"%i:0%i",PT_min,PT_sec);
-    }
-  }
-  DrawString(time_disp,time_x,time_y,240,time_y+GetFontYSIZE(FONT_SMALL),
-             FONT_SMALL,0,color(COLOR_TEXT),0);
-  FreeWS(time_disp);
-}*/
 
 void TimeRedraw();
 
@@ -263,10 +229,28 @@ void TimeRedraw()
   }
   wsprintf(time_disp,"%02i:%02i",nm,ns);
   DrawString(time_disp,time_x,time_y,time_x+Get_WS_width(time_disp,FONT_SMALL),time_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
+  wsprintf(time_disp,"%02i:%02i",fm,fs);
+  DrawString(time_disp,length_x,length_y,length_x+Get_WS_width(time_disp,FONT_SMALL),length_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
   FreeWS(time_disp);
-  if(IsGuiOnTop(MAINGUI_ID)) GBS_StartTimerProc(&mytmr,216,EXT_REDRAW);
-}
+  if(IsGuiOnTop(MAINGUI_ID)) GBS_StartTimerProc(&mytmr,216,EXT_REDRAW);}
+
 // Играем MP3 файл
+
+int findmp3length(char *playy) { 
+  #ifdef NEWSGOLD 
+  return(GetWavLen(filename)); 
+  #else
+  TWavLen wl;
+  zeromem(&wl, sizeof(wl));
+  wl.type=0x2000;
+  wl.wfilename=AllocWS(128);
+  str_2ws(wl.wfilename,playy,128); 
+  GetWavLen(&wl); 
+  #endif 
+  return (wl.length/1000);
+
+}
+
 void PlayMP3File(const char * fname)
 {
 if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
@@ -296,7 +280,7 @@ if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
       WSHDR* sndFName=AllocWS(128);
       char s[128];
       
-      const char *p=strrchr(fname,'\\')+1; // Переписал этот блок нахрен... (c) Rst7  // DemonGloom :) 
+      const char *p=strrchr(fname,'\\')+1; 
       str_2ws(sndFName,p,128);
       strncpy(s,fname,p-fname);
       s[p-fname]='\0';
@@ -306,6 +290,10 @@ if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
       pfopt.time_between_play=0;
       pfopt.play_first=0;
       pfopt.volume=GetVolLevel();
+      char *pp=strrchr(fname,':')-1;
+      fs=findmp3length(pp);
+      fm=(fs-(fs%60))/60;
+      fs=fs%60;
 #ifdef NEWSGOLD
       pfopt.unk6=1;
       pfopt.unk7=1;
@@ -319,7 +307,6 @@ if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
       SetPHandle(PlayFile(0xC, sndPath, sndFName, 0,GBS_GetCurCepid(), MSG_PLAYFILE_REPORT, &pfopt));
       SetPlayingStatus(2);
       PlayMelody_ChangeVolume(phandle,GetVolLevel());  // Что бы была нормальная громкость - иначе криво...
-      
 #endif
       UpdateCSMname(sndFName); // Покажем что играем XTask Blind007
 //      BeginTime = SetBeginTime(); // Время начала играния файла Blind007
@@ -387,7 +374,14 @@ void load_skin(char const* cfgname)              // Извращенец... Такое создать.
         // Время
         time_x=data[36];
         time_y=data[37]+data[38];
-        // Время
+        // Длительность песни
+        length_x=data[39];
+        length_y=data[40]+data[41];
+        // Прогрессбар
+        progress_x=data[42];
+        progress_y=data[43]+data[44];
+        progress_x2=data[45];
+        progress_y2=data[46]+data[47];
         }
         else
         {
@@ -423,6 +417,23 @@ void load_skin(char const* cfgname)              // Извращенец... Такое создать.
           COLOR_BANDROLL_C[1]=data[32];
           COLOR_BANDROLL_C[2]=data[33];
           COLOR_BANDROLL_C[3]=data[34];
+          
+          COLOR_PROG_BG[0]=data[35];
+          COLOR_PROG_BG[1]=data[36];
+          COLOR_PROG_BG[2]=data[37];
+          COLOR_PROG_BG[3]=data[38];
+          COLOR_PROG_BG_FRAME[0]=data[39];
+          COLOR_PROG_BG_FRAME[1]=data[40];
+          COLOR_PROG_BG_FRAME[2]=data[41];
+          COLOR_PROG_BG_FRAME[3]=data[42];
+          COLOR_PROG_MAIN[0]=data[43];
+          COLOR_PROG_MAIN[1]=data[44];
+          COLOR_PROG_MAIN[2]=data[45];
+          COLOR_PROG_MAIN[3]=data[46];
+          COLOR_PROG_MAIN_FRAME[0]=data[47];
+          COLOR_PROG_MAIN_FRAME[1]=data[48];
+          COLOR_PROG_MAIN_FRAME[2]=data[49];
+          COLOR_PROG_MAIN_FRAME[3]=data[50];
         }
         mfree(data);
       }
@@ -443,7 +454,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   unsigned short top = 0;
 #endif
 //  DrawRoundedFrame(left+1,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),color(COLOR_BG));  // А это зачем??? Если нужно - объясни!   AAA
-//#ifdef USE_PNG_EXT                         // А это еще надо????
+#ifndef NO_PNG                         // А это еще надо????  // Сделаем режим без скина - DG
   // --- Делаем типа скин ---
   DrawImg(left,top,(int)I_BACKGROUND);  // Рисуем фон
   // Громкость
@@ -543,11 +554,20 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
     sprintf(pfname,"%s%s",PIC_DIR,"keylock.png");
     DrawImg(KeyLock_x,KeyLock_y,(int)pfname);
   }
-  
-// #endif
+  // Прогрессбар DG
+  DrawRoundedFrame(progress_x,progress_y,progress_x2,progress_y2,2,2,0,
+			COLOR_PROG_BG_FRAME,
+			COLOR_PROG_BG);
+  int ii=(progress_x2-progress_x)*(ns+nm*60);
+  ii=ii/(fs+fm*60);
+  DrawRoundedFrame(progress_x,progress_y,ii+progress_x,progress_y2,2,2,0,
+			COLOR_PROG_MAIN_FRAME,
+			COLOR_PROG_MAIN);
+#endif
 
     PL_Redraw();
     TimeRedraw();
+    
   }
 }
 
@@ -590,6 +610,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
   if(Quit_Required)return 1; //Происходит вызов GeneralFunc для тек. GUI -> закрытие GUI
   if (KeyLock){
     if ((msg->gbsmsg->msg==LONG_PRESS)&&(msg->gbsmsg->submess=='#')){
+     KbdUnlock();
      KeyLock=(KeyLock+1)%2;
      ShowMSG(1,(int)"Клавиатура разблокирована");
      REDRAW();}
@@ -713,9 +734,8 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       break;
       case '#':
        if (KeyLock==0){
+          KbdLock();
           Mode_keypressed = 0;
-          playmode-=1;
-          if (playmode==-1) playmode=3;
           ShowMSG(1,(int)"Клавиатура заблокирована");
           KeyLock=1;
        }
@@ -841,7 +861,8 @@ void maincsm_onclose(CSM_RAM *csm)
 {
   GBS_DelTimer(&mytmr);
   DisableScroll();       // Оказалось его перед закрытием еще и останавливать надо... А то такое начинается! :D
-  StopAllPlayback();
+  StopAllPlayback();  
+  FreeWS(wl.wfilename);
   SUBPROC((void *)ElfKiller);
 }
 
@@ -915,10 +936,10 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
     TogglePlayback();
   }
 #else 
-  if (IsCalling()&&(PlayingStatus==2))
-  {
-    TogglePlayback();
-  }
+//  if (IsCalling()&&(PlayingStatus==2))
+//  {
+//    TogglePlayback();
+//  }
 #endif
        
   if (msg->msg==MSG_PLAYFILE_REPORT)   // Для определения конца воспр.  AAA
@@ -945,10 +966,10 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
         }
         REDRAW();
       }
-      if (pmsg->cmd==M_SAE_HANDSFREE_UPDATED)
-      {
-        GetAccessoryType();
-      }
+//      if (pmsg->cmd==M_SAE_HANDSFREE_UPDATED)
+//      {
+//        GetAccessoryType();
+//      }
     }
   }
   return(1);
@@ -1010,6 +1031,8 @@ int main(char *exename, char *fname)
   load_skin(sfname);
   playmode = PlayMode;
   SoundVolume = soundvolume;
+  
+  wl.wfilename=AllocWS(128);
   
   // Если что-то передали в параметре - загружаем...
   if (fname)
