@@ -64,7 +64,7 @@ void Settings()   //Настройки  AAA
 
 void AboutDlg()
 {
-  ShowMSG(0,(int)"SPlayer v0.7.4.1\n(c) Anderstand, Blind007, DemonGloom");
+  ShowMSG(0,(int)"SPlayer v0.7.4.2\n(c) Anderstand, Blind007, DemonGloom");
 };
 
 void Exit_SPlayer()
@@ -144,7 +144,7 @@ char exitpic[128];
 
 void MM_Show()
 {
-#ifdef USE_PNG_EXT
+#ifndef NO_PNG
   // Картинка Настройки
   strcpy(coordinatespic,PIC_DIR);
   strcat(coordinatespic,"coordinates.png");
@@ -164,6 +164,15 @@ void MM_Show()
   strcpy(exitpic,PIC_DIR);
   strcat(exitpic,"exit.png");
   S_ICONS[3] = (int)exitpic;
+  menuitems[3].icon = S_ICONS+3;
+#else
+  S_ICONS[0] = 0;
+  menuitems[0].icon = S_ICONS;
+  S_ICONS[1] = 0;
+  menuitems[1].icon = S_ICONS+1;
+  S_ICONS[2] = 0;
+  menuitems[2].icon = S_ICONS+2;
+  S_ICONS[3] = 0;
   menuitems[3].icon = S_ICONS+3;
 #endif  
   
