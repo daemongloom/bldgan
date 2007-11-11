@@ -238,7 +238,7 @@ void TimeRedraw()
 
 int findmp3length(char *playy) { 
   #ifdef NEWSGOLD 
-  return(GetWavLen(filename)); 
+  return ((GetWavLen(playy))/1000); 
   #else
   TWavLen wl;
   zeromem(&wl, sizeof(wl));
@@ -246,8 +246,8 @@ int findmp3length(char *playy) {
   wl.wfilename=AllocWS(128);
   str_2ws(wl.wfilename,playy,128); 
   GetWavLen(&wl); 
-  #endif 
   return (wl.length/1000);
+  #endif 
 
 }
 
@@ -454,7 +454,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   unsigned short top = 0;
 #endif
 //  DrawRoundedFrame(left+1,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),color(COLOR_BG));  // А это зачем??? Если нужно - объясни!   AAA
-#ifndef NO_PNG                         // А это еще надо????  // Сделаем режим без скина - DG
+#ifndef NO_PNG                         // Сделаем режим без скина - DG
   // --- Делаем типа скин ---
   DrawImg(left,top,(int)I_BACKGROUND);  // Рисуем фон
   // Громкость
@@ -554,6 +554,9 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
     sprintf(pfname,"%s%s",PIC_DIR,"keylock.png");
     DrawImg(KeyLock_x,KeyLock_y,(int)pfname);
   }
+#else
+#endif
+                                     // Здесь будут универсальные строки, одинаковые как для png, так и для их отсутствия
   // Прогрессбар DG
   DrawRoundedFrame(progress_x,progress_y,progress_x2,progress_y2,2,2,0,
 			COLOR_PROG_BG_FRAME,
@@ -563,8 +566,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   DrawRoundedFrame(progress_x,progress_y,ii+progress_x,progress_y2,2,2,0,
 			COLOR_PROG_MAIN_FRAME,
 			COLOR_PROG_MAIN);
-#endif
-
+  
     PL_Redraw();
     TimeRedraw();
     
