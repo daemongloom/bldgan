@@ -100,9 +100,7 @@ void PL_Redraw();
 // Полоса прокрутки   AAA
 void BandRoll();
 
-//double GetWavkaLength(char *fpath,char *fname);
+//Ищем файлы в папке   AAA
+void FindMusic(const char *dir, int i);
 
-/*
-void DrawPlayTime(char* fname);
-*/
 #endif

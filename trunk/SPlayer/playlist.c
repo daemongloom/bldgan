@@ -995,3 +995,38 @@ void BandRoll()
     DrawRoundedFrame(BRC_x,BR1_y+yy-(BR2_y-BR1_y)/TC,BRC_x+BRC_w-1,BR1_y+yy,0,0,0,0,color(COLOR_BANDROLL_C));
   }
 }
+
+//»щем файлы в папке   AAA
+void FindMusic(const char *dir, int i)
+{
+ // int i;
+  DIR_ENTRY de;
+  unsigned int err;
+  char path[256];
+  memcpy(path,dir,strlen(dir)-1);
+  char *ptr=path+strlen(path)+1;
+  strcat(path,"\\*.mp3");
+  if (FindFirstFile(&de,path,&err))
+  {
+   // i=1;
+    do
+    {
+      strcpy(ptr,de.file_name);
+      if(isdir(path,&err))
+      {
+       // FindMusic(path,i);
+      }
+      else
+      {
+        char *p=malloc(256);
+        strncpy(p,path,255);
+        playlist_lines=realloc(playlist_lines,(i+1)*sizeof(char *));
+        playlist_lines[i++]=p;
+      }
+    }
+    while(FindNextFile(&de,&err));
+  }
+  FindClose(&de,&err);
+  if(i>1) {TC=i-1;}
+  else {TC=0;}
+}
