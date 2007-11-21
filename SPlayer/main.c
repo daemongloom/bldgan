@@ -4,7 +4,7 @@
 #include "main.h"
 #include "mainmenu.h"
 #include "playlist.h"
-
+/*
 typedef struct {
  unsigned short type; //00 
  WSHDR *wfilename; //04 
@@ -16,7 +16,7 @@ typedef struct {
  int unk_1C; //1C 
  int unk_20 ; //20 
 } TWavLen;
-
+*/
 #pragma swi_number=0x45 
 #ifdef NEWSGOLD 
 __swi __arm int GetWavLen(char *filename); 
@@ -113,10 +113,9 @@ char COLOR_PROG_MAIN_FRAME[4];             // Ободок
 //--- настройки из конфига ---
 //extern const char COLOR_BG[];
 //extern const char COLOR_TEXT[];
-extern const char I_BACKGROUND[];
+//extern const char I_BACKGROUND[];
 extern const char PIC_DIR[];
-//extern const char COORD[];
-//extern const char COLOR[];
+extern const char MUSIC[];
 extern const char PLAYLISTS[];
 extern const char DEFAULT_PLAYLIST[];
 extern const unsigned int IDLE_X;
@@ -456,7 +455,9 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
 //  DrawRoundedFrame(left+1,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),color(COLOR_BG));  // А это зачем??? Если нужно - объясни!   AAA
 #ifndef NO_PNG                         // Сделаем режим без скина - DG
   // --- Делаем типа скин ---
-  DrawImg(left,top,(int)I_BACKGROUND);  // Рисуем фон
+  char sfname[256];
+  sprintf(sfname,"%s%s",PIC_DIR,"background.png");
+  DrawImg(left,top,(int)sfname);  // Рисуем фон
   // Громкость
   char vfname[256];
   sprintf(vfname,"%s%s%i%s",PIC_DIR,"volume",GetVolLevel(),".png");
@@ -702,6 +703,9 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       CTDovnSix();
       break;
     case '9':
+      CTandPTtoFirst();
+      FreePlaylist();
+      FindMusic(MUSIC, 1);
       break;
     case '*':
       ToggleVolume();
