@@ -1,6 +1,8 @@
 #include "../inc/swilib.h"
 #include "main.h"
 #include "mainmenu.h"
+#include "lang.h"
+#include "playlist.h"
 
 #ifdef NEWSGOLD
 #define DEFAULT_DISK "4"
@@ -14,6 +16,10 @@
  пока новые пункты не добавлять...
 */
 // Ну да ладно! это не помешает!
+
+// Mr. Anderstand:
+// Переделал все...
+
 //==============================================================================
 // ELKA Compatibility
 #pragma inline
@@ -34,9 +40,10 @@ void patch_input(INPUTDIA_DESC* inp)
 }
 //==============================================================================
 char exename[]=DEFAULT_DISK":\\ZBin\\SPlayer\\SPlayer cfg editor.elf";
+extern unsigned short EditPL;
 //extern const char COORD[];
 
-#define N_ITEMS 4
+#define N_ITEMS 5
 
 int MainMenu_ID;
 
@@ -49,6 +56,13 @@ void Coordinates()
   sprintf(sfname,"%s%s",PIC_DIR,"skin.cfg");
   ExecuteFile(ws,0,(char*)sfname);
   FreeWS(ws);
+}
+
+void SetEditPL()
+{
+  EditPL=!(EditPL);
+  RefreshGUI();
+  PTtoFirst();
 }
 
 void Settings()   //Настройки  AAA
@@ -78,20 +92,39 @@ int mmenusoftkeys[]={0,1,2};
 
 int icon_array[2];
 
+static const char * const menutexts[N_ITEMS]=
+{
+  LG_Coordinates,
+  LG_SetEditPL,
+  LG_Settings,
+  LG_AboutDlg,
+  LG_Exit_SPlayer
+};
+/*
 MENUITEM_DESC menuitems[N_ITEMS]=
 {
   {0,(int)"Позиционирование",LGP_NULL,0,NULL,MENU_FLAG3,MENU_FLAG2},
+  {0,(int)"Редактирование",LGP_NULL,0,NULL,MENU_FLAG3,MENU_FLAG2},
   {0,(int)"Настройки",LGP_NULL,0,NULL,MENU_FLAG3,MENU_FLAG2},
   {0,(int)"Об эльфе...",LGP_NULL,0,NULL,MENU_FLAG3,MENU_FLAG2},
   {0,(int)"Выход",LGP_NULL,0,NULL,MENU_FLAG3,MENU_FLAG2}
-};
+};*/
 
 void *menuprocs[N_ITEMS]={
                           (void *)Coordinates,
+                          (void *)SetEditPL,
                           (void *)Settings,
                           (void *)AboutDlg,
                           (void *)Exit_SPlayer
                          };
+/*
+static const MENUPROCS_DESC menuprocs[N_ITEMS]={
+                          Coordinates,
+                          SetEditPL,
+                          Settings,
+                          AboutDlg,
+                          Exit_SPlayer
+                         };*/
 
 SOFTKEY_DESC mmenu_sk[]=
 {
@@ -105,23 +138,7 @@ SOFTKEYSTAB mmenu_skt=
   mmenu_sk,0
 };
 
-// Выкинем пока это...
 /*
-void menuitemhandler(void *data, int curitem, int *unk)
-{
-  switch(curitem)
-  {
-  case 4:
-//    SetMenuItemIcon(data,curitem,Is_Vibra_Enabled?0:1);
-    break;
-
-  case 5:
-//    SetMenuItemIcon(data,curitem,Is_Sounds_Enabled?0:1);
-    break;
-  }
-}
-*/
-
 // swilib.h от 17.08.07. Проблема со структурой MENU_DESC
 MENU_DESC tmenu=
 {
@@ -133,11 +150,69 @@ MENU_DESC tmenu=
   menuitems,
   (MENUPROCS_DESC*)menuprocs, // Дописал (MENUPROCS_DESC*)
   N_ITEMS
+};*/
+int S_ICONS[N_ITEMS];
+
+void menuitemhandler(void *data, int curitem, void *unk)
+{
+  WSHDR *ws;
+  void *item=AllocMenuItem(data);
+  ws=AllocMenuWS(data,strlen(menutexts[curitem]));
+  wsprintf(ws,"%t",menutexts[curitem]);
+  switch(curitem)
+  {
+  case 0:
+    SetMenuItemIconArray(data,item,S_ICONS+0);
+    break;
+  case 1:
+    SetMenuItemIconArray(data,item,icon_array+(EditPL?0:1));
+    break;
+  case 2:
+    SetMenuItemIconArray(data,item,S_ICONS+2);
+    break;
+  case 3:
+    SetMenuItemIconArray(data,item,S_ICONS+3);
+    break;
+  case 4:
+    SetMenuItemIconArray(data,item,S_ICONS+4);
+    break;
+  }
+  SetMenuItemText(data, item, ws, curitem);
+}
+
+void mmenu_ghook(void *data, int cmd)
+{
+  if (cmd==0x0A)
+  {
+    DisableIDLETMR();
+  }
+}
+
+static int mmenu_keyhook(void *data, GUI_MSG *msg)
+{
+  if ((msg->keys==0x18)||(msg->keys==0x3D))
+  {
+    ((void (*)(void))(menuprocs[GetCurMenuItem(data)]))();
+  }
+  return(0);
+}
+
+static const MENU_DESC tmenu=
+{
+  8,mmenu_keyhook,mmenu_ghook,NULL,
+  mmenusoftkeys,
+  &mmenu_skt,
+  0x11,
+  menuitemhandler,
+  NULL, //menuitems,
+  NULL, //menuprocs,
+  N_ITEMS
 };
 
 extern const char PIC_DIR[128];
 int S_ICONS[N_ITEMS];
 char coordinatespic[128];
+char editplpic[128];
 char settingspic[128];
 char aboutpic[128];
 char exitpic[128];
@@ -149,32 +224,39 @@ void MM_Show()
   strcpy(coordinatespic,PIC_DIR);
   strcat(coordinatespic,"coordinates.png");
   S_ICONS[0] = (int)coordinatespic;
-  menuitems[0].icon = S_ICONS;
+ // menuitems[0].icon = S_ICONS;
+  // Картинка Редактирорвание пл
+  // S_ICONS[1]
   // Картинка Настройки
   strcpy(settingspic,PIC_DIR);
   strcat(settingspic,"settings.png");
-  S_ICONS[1] = (int)settingspic;
-  menuitems[1].icon = S_ICONS+1;
+  S_ICONS[2] = (int)settingspic;
+ // menuitems[2].icon = S_ICONS+2;
   // Картинка Об эльфе...
   strcpy(aboutpic,PIC_DIR);
   strcat(aboutpic,"about.png");
-  S_ICONS[2] = (int)aboutpic;
-  menuitems[2].icon = S_ICONS+2;
+  S_ICONS[3] = (int)aboutpic;
+ // menuitems[3].icon = S_ICONS+3;
   // Картинка Выход
   strcpy(exitpic,PIC_DIR);
   strcat(exitpic,"exit.png");
-  S_ICONS[3] = (int)exitpic;
-  menuitems[3].icon = S_ICONS+3;
+  S_ICONS[4] = (int)exitpic;
+ // menuitems[4].icon = S_ICONS+4;
 #else
   S_ICONS[0] = 0;
   menuitems[0].icon = S_ICONS;
   S_ICONS[1] = 0;
-  menuitems[1].icon = S_ICONS+1;
-  S_ICONS[2] = 0;
+ // menuitems[1].icon = S_ICONS+1;
+ // S_ICONS[2] = 0;
   menuitems[2].icon = S_ICONS+2;
   S_ICONS[3] = 0;
   menuitems[3].icon = S_ICONS+3;
+  S_ICONS[4] = 0;
+  menuitems[4].icon = S_ICONS+4;
 #endif  
+  
+  icon_array[0]=GetPicNByUnicodeSymbol(CBOX_CHECKED);
+  icon_array[1]=GetPicNByUnicodeSymbol(CBOX_UNCHECKED);
   
   patch_header(&menuhdr);
   MainMenu_ID = CreateMenu(0,0,&tmenu,&menuhdr,0,N_ITEMS,0,0);

@@ -55,6 +55,14 @@ typedef struct
   short genre;
 }MP3Tagv1;
 
+#ifdef NEWSGOLD
+#define CBOX_CHECKED 0xE116
+#define CBOX_UNCHECKED 0xE117
+#else
+#define CBOX_CHECKED 0xE10B
+#define CBOX_UNCHECKED 0xE10C
+#endif
+
 void PlayMP3File(const char * fname);
 
 void PausingTime(unsigned short action);

@@ -47,6 +47,8 @@ unsigned short maincsm_name_body[140];
 unsigned int MAINCSM_ID = 0;
 unsigned int MAINGUI_ID = 0;
 
+unsigned short move=0; // 1, если перемещаем   AAA
+unsigned short EditPL=0; // 1, если редактируем   AAA
 int mode; // 1, если длинное нажатие боковой клавиши
 int KeyLock; // 1, если заблокирована;
 short Stat_keypressed = 0; // нажата ли клавиша изменени€ статуса?
@@ -620,6 +622,8 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
      return 0;
      }
   else{
+    if(EditPL==0)         //  Mr. Anderstand: самому не оч нравитс€ такой вариант...
+  {
   if (msg->gbsmsg->msg==KEY_UP)
   {
     switch(msg->gbsmsg->submess)
@@ -664,7 +668,8 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       MM_Show();
       break;
     case GREEN_BUTTON:  // ѕо зеленой кнопке загружаем плейлист по умолчанию...
-      CTandPTtoFirst();
+      CTtoFirst();
+      PTtoFirst();
       LoadingPlaylist(DEFAULT_PLAYLIST);
       break;
     case ENTER_BUTTON:
@@ -703,7 +708,8 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       CTDovnSix();
       break;
     case '9':
-      CTandPTtoFirst();
+      CTtoFirst();
+      PTtoFirst();
       FreePlaylist();
       FindMusic(MUSIC, 1);
       break;
@@ -748,6 +754,47 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       break;
     }
     REDRAW();
+  }
+  }else{
+  if (msg->gbsmsg->msg==KEY_DOWN)
+  {
+    switch(msg->gbsmsg->submess)
+    {
+    case RIGHT_SOFT:
+      MsgBoxYesNo(1,(int)"«акрыть SPlayer?",QuitCallbackProc);
+      break;
+    case RED_BUTTON:
+      MsgBoxYesNo(1,(int)"«акрыть SPlayer?",QuitCallbackProc);
+      break;
+    case LEFT_SOFT:
+      MM_Show();
+      break;
+    case GREEN_BUTTON:
+      
+      break;
+    case ENTER_BUTTON:
+      move=!(move);
+      break;
+    case UP_BUTTON:
+      if(move==1) {MoveLineUp();}
+      else {CTUp();}
+      break;
+    case DOWN_BUTTON:
+      if(move==1) {MoveLineDown();}
+      else {CTDown();}
+      break;
+    case '0':
+      DeleteLine();
+      break;
+    case '2':
+      if(move==0) {CTUpSix();}
+      break;
+    case '8':
+      if(move==0) {CTDovnSix();}
+      break;
+    }
+    REDRAW();
+  }
   }
   }
   return(0);

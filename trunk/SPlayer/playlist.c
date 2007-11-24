@@ -24,7 +24,6 @@ short phandle = -1;                   // Что играем
 int CurrentTrack = 1;                 // Текущий трек
 unsigned int TC = 0;                  // Количество треков в пл 
 int PlayedTrack = 0;         // Проигрываемый трек   AAA
-char * l_color_text;                  // Ослабленный цвет
 int PlayTime;
 
 extern unsigned short CTmy_x;     // Координаты CurrentTrack
@@ -233,9 +232,14 @@ void StopAllPlayback()
 }
 
 // Потребовалось для исправления глюка AAA
-void CTandPTtoFirst()
+void CTtoFirst()
 {
   if(CurrentTrack>1)CurrentTrack = 1;
+}
+
+// Сделал в две для удобства AAA
+void PTtoFirst()
+{
   if(PlayedTrack>0)PlayedTrack = 0;
 }
 
@@ -439,7 +443,6 @@ int LoadPlaylist(const char * fn)
     }
     p++;
   }
-  l_color_text = Lighten((char*)COLOR_TEXT);
   return i;
 }
 
@@ -496,6 +499,78 @@ void SavePlaylist(char *fn)
   ShowMSG(1,(int)"Playlist saved!");
 }
 
+// Удаляем строку из пл   AAA
+void DeleteLine()
+{
+  if(CurrentTrack>0)
+  {
+  int i=CurrentTrack;
+  if(i!=TC)
+  {
+    while(i<TC)
+    {
+      playlist_lines[i]=malloc(256);
+      playlist_lines[i]=playlist_lines[i+1];
+      i++;
+    }
+  }
+  else
+  {
+    CurrentTrack--;
+  }
+  playlist_lines[TC]=NULL;
+  TC--;
+  }
+}
+
+// Перемещаем строку в пл вверх   AAA
+void MoveLineUp()
+{
+  if(CurrentTrack>0)
+  {
+  char *p=playlist_lines[CurrentTrack];
+  playlist_lines[CurrentTrack]=malloc(256);
+  if(CurrentTrack!=1)
+  {
+    playlist_lines[CurrentTrack]=playlist_lines[CurrentTrack-1];
+    playlist_lines[CurrentTrack-1]=malloc(256);
+    playlist_lines[CurrentTrack-1]=p;
+    CurrentTrack--;
+  }
+  else
+  {
+    playlist_lines[CurrentTrack]=playlist_lines[TC];
+    playlist_lines[TC]=malloc(256);
+    playlist_lines[TC]=p;
+    CurrentTrack=TC;
+  }
+  }
+}
+
+// Перемещаем строку в пл вниз   AAA
+void MoveLineDown()
+{
+  if(CurrentTrack>0)
+  {
+  char *p=playlist_lines[CurrentTrack];
+  playlist_lines[CurrentTrack]=malloc(256);
+  if(CurrentTrack!=TC)
+  {
+    playlist_lines[CurrentTrack]=playlist_lines[CurrentTrack+1];
+    playlist_lines[CurrentTrack+1]=malloc(256);
+    playlist_lines[CurrentTrack+1]=p;
+    CurrentTrack++;
+  }
+  else
+  {
+    playlist_lines[CurrentTrack]=playlist_lines[1];
+    playlist_lines[1]=malloc(256);
+    playlist_lines[1]=p;
+    CurrentTrack=1;
+  }
+  }
+}
+
 // Возвращает имя файла по полному пути...
 void FullpathToFilename(char * fname, WSHDR * wsFName)
 {
@@ -525,15 +600,6 @@ char * GetPlayedTrack()
 char * GetTrackByNumber(int number)
 {
   return playlist_lines[number];
-}
-
-// Ослабление альфа-канала
-char * Lighten(char * source)
-{
-  char * dest = "";
-  if((source[3]-=0x15)<=0x00)source[3]=0x00;
-  setColor(source[0],source[1],source[2],source[3],dest);
-  return dest;
 }
 
 // Перерисовка
@@ -1019,7 +1085,7 @@ void FindMusic(const char *dir, int i)
       else
       {
         char *p=malloc(256);
-        strncpy(p,path,255);
+        strncpy(p,path,256);
         playlist_lines=realloc(playlist_lines,(i+1)*sizeof(char *));
         playlist_lines[i++]=p;
       }
