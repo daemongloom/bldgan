@@ -3158,6 +3158,9 @@
     <name>$PROJ_DIR$\func.asm</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\lang.h</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\main.c</name>
   </file>
   <file>
@@ -3174,6 +3177,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\playlist.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\setlang.h</name>
   </file>
 </project>
 

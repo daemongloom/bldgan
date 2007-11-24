@@ -35,7 +35,10 @@ void TogglePlayback();
 void StopAllPlayback();
 
 // Потребовалось для исправления глюка AAA
-void CTandPTtoFirst();
+void CTtoFirst();
+
+// Сделал в две для удобства AAA
+void PTtoFirst();
 
 //Пробуем листание вниз AAA
 void CTDown();
@@ -85,14 +88,20 @@ int LoadPlaylist(const char * fn);
 // Сохраняем пл!   AAA
 void SavePlaylist(char *fn);
 
+// Удаляем строку из пл   AAA
+void DeleteLine();
+
+// Перемещаем строку в пл вверх   AAA
+void MoveLineUp();
+
+// Перемещаем строку в пл вниз   AAA
+void MoveLineDown();
+
 // Возвращется трек по номеру в пл
 char * GetCurrentTrack();
 
 // Возвращется играющий трек по номеру в пл
 char * GetPlayedTrack();
-
-// Ослабление альфа-канала
-char * Lighten(char * source);
 
 // Перерисовка
 void PL_Redraw();
