@@ -43,9 +43,15 @@ char exename[]=DEFAULT_DISK":\\ZBin\\SPlayer\\SPlayer cfg editor.elf";
 extern unsigned short EditPL;
 //extern const char COORD[];
 
-#define N_ITEMS 5
+#define N_ITEMS 6
 
 int MainMenu_ID;
+
+void SetNextPlayedOn()
+{
+  SetNextPlayed();
+  GeneralFuncF1(1);
+}
 
 void Coordinates()
 {
@@ -62,7 +68,6 @@ void SetEditPL()
 {
   EditPL=!(EditPL);
   RefreshGUI();
-  PTtoFirst();
 }
 
 void Settings()   //Настройки  AAA
@@ -94,6 +99,7 @@ int icon_array[2];
 
 static const char * const menutexts[N_ITEMS]=
 {
+  LG_SetNextPlayed,
   LG_Coordinates,
   LG_SetEditPL,
   LG_Settings,
@@ -111,6 +117,7 @@ MENUITEM_DESC menuitems[N_ITEMS]=
 };*/
 
 void *menuprocs[N_ITEMS]={
+                          (void *)SetNextPlayedOn,
                           (void *)Coordinates,
                           (void *)SetEditPL,
                           (void *)Settings,
@@ -165,16 +172,19 @@ void menuitemhandler(void *data, int curitem, void *unk)
     SetMenuItemIconArray(data,item,S_ICONS+0);
     break;
   case 1:
-    SetMenuItemIconArray(data,item,icon_array+(EditPL?0:1));
+    SetMenuItemIconArray(data,item,S_ICONS+1);
     break;
   case 2:
-    SetMenuItemIconArray(data,item,S_ICONS+2);
+    SetMenuItemIconArray(data,item,icon_array+(EditPL?0:1));
     break;
   case 3:
     SetMenuItemIconArray(data,item,S_ICONS+3);
     break;
   case 4:
     SetMenuItemIconArray(data,item,S_ICONS+4);
+    break;
+  case 5:
+    SetMenuItemIconArray(data,item,S_ICONS+5);
     break;
   }
   SetMenuItemText(data, item, ws, curitem);
@@ -211,6 +221,7 @@ static const MENU_DESC tmenu=
 
 extern const char PIC_DIR[128];
 int S_ICONS[N_ITEMS];
+char setnexttrackpic[128];
 char coordinatespic[128];
 char editplpic[128];
 char settingspic[128];
@@ -220,39 +231,46 @@ char exitpic[128];
 void MM_Show()
 {
 #ifndef NO_PNG
+  // Картинка В очередь
+  strcpy(setnexttrackpic,PIC_DIR);
+  strcat(setnexttrackpic,"setnexttrack.png");
+  S_ICONS[0] = (int)setnexttrackpic;
+ // menuitems[0].icon = S_ICONS;
   // Картинка Настройки
   strcpy(coordinatespic,PIC_DIR);
   strcat(coordinatespic,"coordinates.png");
-  S_ICONS[0] = (int)coordinatespic;
+  S_ICONS[1] = (int)coordinatespic;
  // menuitems[0].icon = S_ICONS;
   // Картинка Редактирорвание пл
-  // S_ICONS[1]
+  // S_ICONS[2]
   // Картинка Настройки
   strcpy(settingspic,PIC_DIR);
   strcat(settingspic,"settings.png");
-  S_ICONS[2] = (int)settingspic;
+  S_ICONS[3] = (int)settingspic;
  // menuitems[2].icon = S_ICONS+2;
   // Картинка Об эльфе...
   strcpy(aboutpic,PIC_DIR);
   strcat(aboutpic,"about.png");
-  S_ICONS[3] = (int)aboutpic;
+  S_ICONS[4] = (int)aboutpic;
  // menuitems[3].icon = S_ICONS+3;
   // Картинка Выход
   strcpy(exitpic,PIC_DIR);
   strcat(exitpic,"exit.png");
-  S_ICONS[4] = (int)exitpic;
+  S_ICONS[5] = (int)exitpic;
  // menuitems[4].icon = S_ICONS+4;
 #else
   S_ICONS[0] = 0;
   menuitems[0].icon = S_ICONS;
   S_ICONS[1] = 0;
- // menuitems[1].icon = S_ICONS+1;
+  menuitems[1].icon = S_ICONS+1;
  // S_ICONS[2] = 0;
-  menuitems[2].icon = S_ICONS+2;
+ // menuitems[2].icon = S_ICONS+2;
   S_ICONS[3] = 0;
-  menuitems[3].icon = S_ICONS+3;
+  menuitems[3].icon = S_ICONS+2;
   S_ICONS[4] = 0;
   menuitems[4].icon = S_ICONS+4;
+  S_ICONS[5] = 0;
+  menuitems[5].icon = S_ICONS+5;
 #endif  
   
   icon_array[0]=GetPicNByUnicodeSymbol(CBOX_CHECKED);

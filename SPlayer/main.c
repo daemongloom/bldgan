@@ -15,8 +15,8 @@ typedef struct {
  long length; //18 <-- return 
  int unk_1C; //1C 
  int unk_20 ; //20 
-} TWavLen;
-*/
+} TWavLen;*/
+
 #pragma swi_number=0x45 
 #ifdef NEWSGOLD 
 __swi __arm int GetWavLen(char *filename); 
@@ -47,6 +47,9 @@ unsigned short maincsm_name_body[140];
 unsigned int MAINCSM_ID = 0;
 unsigned int MAINGUI_ID = 0;
 
+extern int CurrentPL;
+extern unsigned short stop; // 1, если останавливаем листание   AAA
+unsigned short copy=0; // 1, если копируем   AAA
 unsigned short move=0; // 1, если перемещаем   AAA
 unsigned short EditPL=0; // 1, если редактируем   AAA
 int mode; // 1, если длинное нажатие боковой клавиши
@@ -130,7 +133,7 @@ extern const int soundvolume;
 extern short phandle;  // ƒл€ определени€ конца воспр.  AAA
 extern char GetAccessoryType();   // Ќе пашет   AAA
 extern unsigned short PlayingStatus;
-extern unsigned int TC;
+extern unsigned int TC[5];
 char Quit_Required = 0;     // ‘лаг необходимости завершить работу
 char list[256];
 char sfname[256];
@@ -632,6 +635,12 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       PlayTrackUnderC();
       Stat_keypressed = 0;
       break;
+    case UP_BUTTON:
+        stop=1;
+      break;
+    case DOWN_BUTTON:
+        stop=1;
+      break;
     case '0':           // Stop
       StopAllPlayback();
       Stat_keypressed = 0;
@@ -650,6 +659,9 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       playmode+=1;
       if (playmode==4) playmode=0;
       Mode_keypressed = 0;
+      break;
+    case '*':
+      if (mode==0) {ToggleVolume();} else {mode=0;}
       break;
     }
     REDRAW();
@@ -681,6 +693,12 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     case DOWN_BUTTON:
       CTDown();
       break;
+    case RIGHT_BUTTON:
+      NextPL();
+      break;
+    case LEFT_BUTTON:
+      PrevPL();
+      break;
     case '0':           // ќстанавливаем воспроизведение
       Stat_keypressed = 1;
       break;
@@ -710,11 +728,8 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     case '9':
       CTtoFirst();
       PTtoFirst();
-      FreePlaylist();
+     // FreePlaylist();
       FindMusic(MUSIC, 1);
-      break;
-    case '*':
-      ToggleVolume();
       break;
     case '#':
         Mode_keypressed = 1;
@@ -727,10 +742,12 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     switch(msg->gbsmsg->submess)
     {
       case UP_BUTTON:
-        CTUp();
+        stop=0;
+        CTUpSpeed();
       break;
       case DOWN_BUTTON:
-        CTDown();
+        stop=0;
+        CTDownSpeed();
       break;
       case '2':
         CTUpSix();
@@ -752,10 +769,30 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
           KeyLock=1;
        }
       break;
+      case '*':
+        if (mode==0) {EditPL=!(EditPL); mode=1;}
+      break;
     }
     REDRAW();
   }
   }else{
+    
+  if (msg->gbsmsg->msg==KEY_UP)
+  {
+    switch(msg->gbsmsg->submess)
+    {
+    case UP_BUTTON:
+      if(move==0) {stop=1;}
+      break;
+    case DOWN_BUTTON:
+      if(move==0) {stop=1;}
+      break;
+    case '*':
+      EditPL=!(EditPL);
+      break;
+    }
+    REDRAW();
+  }
   if (msg->gbsmsg->msg==KEY_DOWN)
   {
     switch(msg->gbsmsg->submess)
@@ -770,18 +807,28 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       MM_Show();
       break;
     case GREEN_BUTTON:
-      
+      CTtoFirst();
+      PTtoFirst();
+      LoadingPlaylist(DEFAULT_PLAYLIST);
       break;
     case ENTER_BUTTON:
       move=!(move);
       break;
     case UP_BUTTON:
-      if(move==1) {MoveLineUp();}
-      else {CTUp();}
+      if(move==0) {CTUp();}
+      else {MoveLineUp();}
       break;
     case DOWN_BUTTON:
-      if(move==1) {MoveLineDown();}
-      else {CTDown();}
+      if(move==0) {CTDown();}
+      else {MoveLineDown();}
+      break;
+    case RIGHT_BUTTON:
+      if(move==0) {NextPL();}
+      else {MoveLineRight();}
+      break;
+    case LEFT_BUTTON:
+      if(move==0) {PrevPL();}
+      else {MoveLineLeft();}
       break;
     case '0':
       DeleteLine();
@@ -789,8 +836,33 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     case '2':
       if(move==0) {CTUpSix();}
       break;
+    case '5':
+      move=1;
+      copy=1;
+      break;
     case '8':
       if(move==0) {CTDovnSix();}
+      break;
+    }
+    REDRAW();
+  }
+  if (msg->gbsmsg->msg==LONG_PRESS)
+  {
+    switch(msg->gbsmsg->submess)
+    {
+      case UP_BUTTON:
+        if(move==0) {stop=0; CTUpSpeed();}
+        else {MoveLineUp();}
+      break;
+      case DOWN_BUTTON:
+        if(move==0) {stop=0; CTDownSpeed();}
+        else {MoveLineDown();}
+      break;
+      case '2':
+        CTUpSix();
+      break;
+      case '8':
+        CTDovnSix();
       break;
     }
     REDRAW();
@@ -912,9 +984,10 @@ void maincsm_oncreate(CSM_RAM *data)
 // ¬ызываетс€ при закрытии главного CSM. “ут и вызываетс€ киллер
 void maincsm_onclose(CSM_RAM *csm)
 {
+  MemoryFree();
   GBS_DelTimer(&mytmr);
-  DisableScroll();       // ќказалось его перед закрытием еще и останавливать надо... ј то такое начинаетс€! :D
   StopAllPlayback();  
+  FreePlaylist();
   FreeWS(wl.wfilename);
   SUBPROC((void *)ElfKiller);
 }
@@ -1086,14 +1159,14 @@ int main(char *exename, char *fname)
   SoundVolume = soundvolume;
   
   wl.wfilename=AllocWS(128);
-  
+  Memory();
   // ≈сли что-то передали в параметре - загружаем...
   if (fname)
   {
     LoadingPlaylist(fname);
   }
   
-  if(TC==0){ // если плейлист из параметра пустой или нет параметров-> грузим стандарт
+  if(TC[CurrentPL]==0){ // если плейлист из параметра пустой или нет параметров-> грузим стандарт
     if (DEFAULT_PLAYLIST!="")
     {
       LoadingPlaylist(DEFAULT_PLAYLIST);

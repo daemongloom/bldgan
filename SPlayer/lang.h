@@ -12,6 +12,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 #ifdef LANG_RU
+
+#define LG_SetNextPlayed    "B очередь"
 #define LG_Coordinates      "Позиционирование"
 #define LG_SetEditPL        "Редактирование плейлиста"
 #define LG_Settings         "Настройки"

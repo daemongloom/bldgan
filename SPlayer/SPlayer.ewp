@@ -2180,8 +2180,8 @@
       <name>BUILDACTION</name>
       <archiveVersion>1</archiveVersion>
       <data>
-        <prebuild>obexdel "Config\Misc\Data inbox\SPlayer.elf"</prebuild>
-        <postbuild>obexcopy $TARGET_PATH$ "Config\Misc\Data inbox\SPlayer.elf"</postbuild>
+        <prebuild></prebuild>
+        <postbuild></postbuild>
       </data>
     </settings>
     <settings>
@@ -2197,7 +2197,7 @@
         </option>
         <option>
           <name>OutputFile</name>
-          <state>SPLayer.elf</state>
+          <state>SPlayer_SGold.elf</state>
         </option>
         <option>
           <name>OutputFormat</name>
@@ -3156,6 +3156,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\func.asm</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\history.txt</name>
   </file>
   <file>
     <name>$PROJ_DIR$\lang.h</name>
