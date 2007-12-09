@@ -2,7 +2,7 @@
 #include "main.h"
 #include "playlist.h"
 
-char **playlist_lines;  // Массив указателей на имена файлов в пл
+char ***playlist_lines;  // Массив указателей на имена файлов в пл   Mr. Anderstand: Воплотим мечту в жизнь!
 char **id3tags1_lines;  // Массив указателей на ID3v1-теги
 
 // Из конфига
@@ -21,10 +21,16 @@ unsigned short SoundVolume;           // Громкость
 unsigned short SVforToggle = 0;       // Прежняя громкость
 unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 - играем)   // Было char стало unsigned short! :D   AAA
 short phandle = -1;                   // Что играем
-int CurrentTrack = 1;                 // Текущий трек
-unsigned int TC = 0;                  // Количество треков в пл 
-int PlayedTrack = 0;         // Проигрываемый трек   AAA
+
+int CurrentTrack[5];                 // Текущий трек
+int PlayedTrack[5];         // Проигрываемый трек   AAA
+int CurrentPL=0;
+int PlayedPL=0;
+unsigned int TC[5];                  // Количество треков в пл 
+/*extern */const unsigned int TCPL=5;
+extern const unsigned int LinesInPL;
 int PlayTime;
+unsigned short NextPlayedTrack[2];
 
 extern unsigned short CTmy_x;     // Координаты CurrentTrack
 extern unsigned short CTmy_y;
@@ -40,8 +46,13 @@ unsigned short BRC_x;  //=128;
 unsigned short BRC_w;  //=2;
 // Полоса прокрутки
 
+// Всякие "мелкие" переменные
 extern unsigned short w;
 extern int playmode;
+extern unsigned short copy;
+extern const unsigned int GrafOn; // 1,если включены эффекты типа скролла   AAA
+unsigned short stop=1; // 1, если останавливаем листание   AAA
+// Всякие "мелкие" переменные
 
 extern unsigned int MAINGUI_ID;
 
@@ -49,6 +60,7 @@ extern unsigned int MAINGUI_ID;
 
 #define TMR_SEC 216*2
 GBSTMR tmr_scroll;
+GBSTMR tmr_displacement;
 volatile int scroll_disp;
 volatile int max_scroll_disp;
 
@@ -64,7 +76,7 @@ void scroll_timer_proc(void)
     }
     else
     {
-      scroll_disp=scroll_disp+5; //scroll_disp++;
+     scroll_disp=scroll_disp+5;
      if(IsGuiOnTop(MAINGUI_ID)) GBS_StartTimerProc(&tmr_scroll,scroll_disp!=i?TMR_SEC>>4:TMR_SEC,scroll_timer_proc);  //scroll_disp!=i?TMR_SEC>>5:TMR_SEC
     }
     REDRAW();
@@ -133,39 +145,47 @@ int random(int max)
 void RandTrack() 
 { 
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
-  int prevtrack=PlayedTrack;
-  while (PlayedTrack==prevtrack) {
-    PlayedTrack=random(TC);
+  if(NextPlayedTrack[1]){PlaySetTrack();}
+  else{
+  int prevtrack=PlayedTrack[PlayedPL];
+  while (PlayedTrack[PlayedPL]==prevtrack) {
+    PlayedTrack[PlayedPL]=random(TC[PlayedPL]);
   }
-  if(PlayedTrack>TC)PlayedTrack=1;
-  if (CurrentTrack==prevtrack){  // Перенос курсора на следующую песню
-    CurrentTrack=PlayedTrack;
+  if(PlayedTrack[PlayedPL]>TC[PlayedPL])PlayedTrack[PlayedPL]=1;
+  if (CurrentPL==PlayedPL){
+  if (CurrentTrack[CurrentPL]==prevtrack){  // Перенос курсора на следующую песню
+    CurrentTrack[CurrentPL]=PlayedTrack[PlayedPL];
     }
   if (0==prevtrack){  // Перенос курсора на следующую песню
-    CurrentTrack=PlayedTrack;
-    }
-  PlayMP3File(GetPlayedTrack(PlayedTrack));
+    CurrentTrack[CurrentPL]=PlayedTrack[PlayedPL];
+  }
+  }
+  }
+  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));
 }
 
 //Повторяющийся трек       Ничего умнее не придумал...  AAA
 void RepeatTrack()
 {
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
-  PlayMP3File(GetPlayedTrack(PlayedTrack));
+  if(NextPlayedTrack[1]){PlaySetTrack();}
+  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));
 }
 
 // Для plamode==1       Ничего умнее не придумал...  AAA // Не понял я этого режима... DG
 void NextTrackX()
 {
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
-  PlayedTrack++;
-  if(PlayedTrack>TC)
+  
+  if(PlayedTrack[PlayedPL]<TC[PlayedPL]||NextPlayedTrack[1])
   {
-    PlayedTrack=1;
+    if(NextPlayedTrack[1]){PlaySetTrack();}
+    else {PlayedTrack[PlayedPL]++;}
+    PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));
   }
   else
   {
-    PlayMP3File(GetPlayedTrack(PlayedTrack));
+    PlayedTrack[PlayedPL]=1;
   }
 }
 
@@ -173,22 +193,25 @@ void NextTrackX()
 void NextTrack()
 {
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
-  PlayedTrack++;
 //  if (CurrentTrack==(PlayedTrack-1)){// Перенос курсора на следующую песню  // И зачем? То пытаемся не повторять ошибок
 //    CurrentTrack=PlayedTrack;        // встроенного плеера, а тут... И Где логика если у следующей функции нет аналогичного свойства??  AAA
 //    if(PlayedTrack>TC) CurrentTrack=1;
 //    }
-  if(PlayedTrack>TC)PlayedTrack=1;
-  PlayMP3File(GetPlayedTrack(PlayedTrack));
+  if(NextPlayedTrack[1]){PlaySetTrack();}
+  else{
+  if(PlayedTrack[PlayedPL]<TC[PlayedPL]) {PlayedTrack[PlayedPL]++;}
+  else {PlayedTrack[PlayedPL]=1;}
+  }
+  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));
 }
 
 // Предыдущий трек пл AAA
 void PreviousTrack()
 {
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
-  PlayedTrack--;
-  if(PlayedTrack<0)PlayedTrack=TC;
-  PlayMP3File(GetPlayedTrack(PlayedTrack));
+  if(PlayedTrack[PlayedPL]>1) {PlayedTrack[PlayedPL]--;}
+  else {PlayedTrack[PlayedPL]=TC[PlayedPL];}
+  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));
 }
 
 // Пауза/Воспроизведение
@@ -198,7 +221,7 @@ void TogglePlayback()
   {
   case 0:
     // Если стоп, то воспроизводим текущий...
-    PlayMP3File(GetPlayedTrack(PlayedTrack = 1)); //Чуток изменил   AAA
+    PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL] = 1)); //Чуток изменил   AAA
     break;
   case 1:
     // Если пауза - продолжаем воспроизведение...
@@ -231,80 +254,184 @@ void StopAllPlayback()
   }
 }
 
+// Постановка в очередь   AAA
+void SetNextPlayed()
+{
+  NextPlayedTrack[0]=CurrentPL;
+  NextPlayedTrack[1]=CurrentTrack[CurrentPL];
+}
+
+// Воспроизведение поставленного в очередь   AAA
+void PlaySetTrack()
+{
+  PlayedTrack[PlayedPL]=0;
+  PlayedPL=NextPlayedTrack[0];
+  PlayedTrack[PlayedPL]=NextPlayedTrack[1];
+  CurrentTrack[PlayedPL]=PlayedTrack[PlayedPL];
+  NextPlayedTrack[0]=NULL;
+  NextPlayedTrack[1]=NULL;
+}
+
+// Слудующий пл   AAA
+void NextPL()
+{
+  DisableScroll();
+  if(CurrentPL<TCPL-1)
+  {
+  //  if(TC[CurrentPL+1]==0) {CurrentTrack[CurrentPL+1]=1;/*PlayedTrack[PlayedPL+1] = 0;*/}
+    CurrentPL++;
+  }
+  else
+  {
+  //  if(TC[0]==0) {CurrentTrack[0]=1;/*PlayedTrack[0] = 0;*/}
+    CurrentPL=0;
+  }
+  REDRAW();
+}
+
+// Предыдущий пл   AAA
+void PrevPL()
+{
+  DisableScroll();
+  if(CurrentPL>0)
+  {
+  //  if(TC[CurrentPL-1]==0) {CurrentTrack[CurrentPL-1]=1;/*PlayedTrack[PlayedPL-1] = 0;*/}
+    CurrentPL--;
+  }
+  else
+  {
+  //  if(TC[4]==0) {CurrentTrack[4]=1;/*PlayedTrack[4] = 0;*/}
+    CurrentPL=TCPL-1;
+  }
+  REDRAW();
+}
+
 // Потребовалось для исправления глюка AAA
 void CTtoFirst()
 {
-  if(CurrentTrack>1)CurrentTrack = 1;
+  if(CurrentTrack[CurrentPL]!=1)CurrentTrack[CurrentPL] = 1;
 }
 
 // Сделал в две для удобства AAA
 void PTtoFirst()
 {
-  if(PlayedTrack>0)PlayedTrack = 0;
+  if(PlayedTrack[PlayedPL]!=0)PlayedTrack[PlayedPL] = 0;
 }
 
 //Пробуем листание вниз AAA
 void CTDown()
 {
-  if (CurrentTrack<TC)
+  DisableScroll();
+  if (CurrentTrack[CurrentPL]<TC[CurrentPL])
   {
-    CurrentTrack++;
+    CurrentTrack[CurrentPL]++;
   }
   else
   {
-    CurrentTrack = 1;
+    CurrentTrack[CurrentPL] = 1;
   }
-  DisableScroll();
 }
 
 //Пробуем листание вверх AAA
 void CTUp()
 {
-  if (CurrentTrack>1)
+  DisableScroll();
+  if (CurrentTrack[CurrentPL]>1)
   {
-    CurrentTrack--;
+    CurrentTrack[CurrentPL]--;
   }
   else
   {
-    CurrentTrack = TC;
+    CurrentTrack[CurrentPL] = TC[CurrentPL];
   }
+}
+
+// Быстрое листание вниз AAA
+void CTDownSpeed(void)
+{
   DisableScroll();
+  if(stop==0)
+  {
+    if (CurrentTrack[CurrentPL]<TC[CurrentPL])
+    {
+      CurrentTrack[CurrentPL]++;
+    }
+    else
+    {
+      CurrentTrack[CurrentPL] = 1;
+    }
+    REDRAW();
+    GBS_StartTimerProc(&tmr_displacement,10,CTDownSpeed);
+    
+  }else{
+    
+    GBS_DelTimer(&tmr_displacement);
+  }
+}
+
+
+// Быстрое листание вверх AAA
+void CTUpSpeed(void)
+{
+  DisableScroll();
+  if(stop==0)
+  {
+    if (CurrentTrack[CurrentPL]>1)
+    {
+      CurrentTrack[CurrentPL]--;
+    }
+    else
+    {
+      CurrentTrack[CurrentPL] = TC[CurrentPL];
+    }
+    REDRAW();
+    GBS_StartTimerProc(&tmr_displacement,10,CTUpSpeed);
+    
+  }else{
+    
+    GBS_DelTimer(&tmr_displacement);
+  }
 }
 
 //Листание шопестец вниз AAA
 void CTDovnSix()
 {
-  if ((TC>6)&&(CurrentTrack+6<TC+1))
+  DisableScroll();
+  if ((TC[CurrentPL]>6)&&(CurrentTrack[CurrentPL]+6<TC[CurrentPL]+1))
   {
-    CurrentTrack = CurrentTrack+6;
+    CurrentTrack[CurrentPL] = CurrentTrack[CurrentPL]+6;
   }
   else
   {
-    CurrentTrack = TC;
+    CurrentTrack[CurrentPL] = TC[CurrentPL];
   }
-  DisableScroll();
 }
 
 //Листание шопестец вверх AAA
 void CTUpSix()
 {
-  if ((TC>6)&&(CurrentTrack-6>0))
+  DisableScroll();
+  if ((TC[CurrentPL]>6)&&(CurrentTrack[CurrentPL]-6>0))
   {
-    CurrentTrack = CurrentTrack-6;
+    CurrentTrack[CurrentPL] = CurrentTrack[CurrentPL]-6;
   }
   else
   {
-    CurrentTrack = 1;
+    CurrentTrack[CurrentPL] = 1;
   }
-  DisableScroll();
 }
 
 //Воспроизвести AAA
 void PlayTrackUnderC()
 {
   StopAllPlayback();
-  PlayMP3File(GetCurrentTrack(CurrentTrack));
-  PlayedTrack = CurrentTrack;
+  PlayMP3File(GetCurrentTrack(CurrentTrack[CurrentPL]));
+  if(PlayedPL!=CurrentPL)
+  {
+    PlayedTrack[PlayedPL] = 0;
+    PlayedPL=CurrentPL;
+  }
+  PlayedTrack[PlayedPL] = CurrentTrack[CurrentPL];
 }
 
 // Выдаем текущий статус
@@ -334,7 +461,7 @@ void SetPHandle(short ph)
 // Возвращает кол-во треков в загруженном пл
 int GetTC()
 {
-  return TC;
+  return TC[CurrentPL];
 }
 
 /*
@@ -370,11 +497,24 @@ int GetMP3Tag_v1(const char * fname, MP3Tagv1 * tag)
  Здесь собственно работа с плейлистом...
 */
 
+// Выделим память   AAA
+void Memory()
+{
+  playlist_lines=malloc(TCPL*sizeof(char *)); // 5 пл на 256 строк
+  for(unsigned int i=0;i<TCPL;i++)
+  {
+    playlist_lines[i]=malloc(LinesInPL*sizeof(char *));
+  }
+ // CurrentTrack=malloc(TCPL*sizeof(int *));
+ // PlayedTrack=malloc(TCPL*sizeof(int *));
+ // TC=malloc(TCPL*sizeof(unsigned int *));
+}
+
 // Для загрузки пл из главного модуля
 void LoadingPlaylist(const char * fn)
 {
-  if(LoadPlaylist(fn)-1>0) {TC = LoadPlaylist(fn)-1;}   // Экономим память + избавляемся от лишнего пикоффа   AAA
-  else {TC=0;}
+  if(LoadPlaylist(fn)-1>0) {TC[CurrentPL] = LoadPlaylist(fn)-1; CTtoFirst();}   // Экономим память + избавляемся от лишнего пикоффа + от одного недочета   AAA
+  else {TC[CurrentPL]=0;}
 }
 
 // Свобода пл!
@@ -397,7 +537,7 @@ int LoadPlaylist(const char * fn)
   char *p;
   char *pp;
   int c;
-  FreePlaylist();
+ // FreePlaylist();
 
   if (GetFileStats(fn,&stat,&ul)==-1) return 0;
   if ((fsize=stat.size)<=0) return 0;
@@ -415,9 +555,13 @@ int LoadPlaylist(const char * fn)
     {
       if (pp&&(pp!=p))
       {
-	playlist_lines=realloc(playlist_lines,(i+1)*sizeof(char *));
+	//playlist_lines=realloc(playlist_lines,(i+1)*sizeof(char *));
 //        id3tags1_lines=realloc(id3tags1_lines,(i+1)*sizeof(char *));
-	playlist_lines[i++]=pp;
+     //   playlist_lines[CurrentPL][i+1]=malloc(256);
+      //  playlist_lines=realloc(playlist_lines,(1)*sizeof(char *));
+       // playlist_lines[CurrentPL]=realloc(playlist_lines[CurrentPL],(i+1)*sizeof(char *));
+	playlist_lines[CurrentPL][i++]=pp;
+        
         /*
         MP3Tagv1 * mytag = malloc(sizeof(MP3Tagv1)+1);
         if (GetMP3Tag_v1(playlist_lines[i],mytag))
@@ -489,9 +633,9 @@ void SavePlaylist(char *fn)
     else{sprintf(m,"%s%i%s",fn,j,".m3u");}
   }
   f=fopen(m,A_WriteOnly+A_MMCStream+A_Create,P_WRITE,&err);
-  for (i=0;i<TC+1;i++)
+  for (i=0;i<TC[CurrentPL]+1;i++)
   {
-  fwrite(f,playlist_lines[i],strlen(playlist_lines[i]),&err);
+  fwrite(f,playlist_lines[CurrentPL][i],strlen(playlist_lines[CurrentPL][i]),&err);
   fwrite(f,s,1,&err);
   fwrite(f,s2,1,&err);
   }
@@ -499,50 +643,87 @@ void SavePlaylist(char *fn)
   ShowMSG(1,(int)"Playlist saved!");
 }
 
+/////////////////////////////////////////////////////<<<РЕДАКТИРОВАНИЕ ПЛ>>>/////////////////////////////////////////////////////////
+// Добавляем строку в пл   AAA
+void PastLine(char *p)
+{
+  playlist_lines[CurrentPL][TC[CurrentPL]+1]=p;
+  TC[CurrentPL]++;
+  CurrentTrack[CurrentPL]=TC[CurrentPL];
+}
+
+// Копируем строку в пл   AAA
+void CopyLine(char *p)
+{
+  TC[CurrentPL]++;
+  for(int i=TC[CurrentPL];i>CurrentTrack[CurrentPL]-1;i--)
+    {
+      playlist_lines[CurrentPL][i]=playlist_lines[CurrentPL][i-1];
+    }
+  playlist_lines[CurrentPL][CurrentTrack[CurrentPL]]=p;
+  if(PlayedTrack[PlayedPL]>CurrentTrack[CurrentPL]-1) {PlayedTrack[PlayedPL]++;}
+  copy=0;
+}
+
 // Удаляем строку из пл   AAA
 void DeleteLine()
 {
-  if(CurrentTrack>0)
+  DisableScroll();
+  if(CurrentTrack[CurrentPL]>0)
   {
-  int i=CurrentTrack;
-  if(i!=TC)
+  int i=CurrentTrack[CurrentPL];
+  if(i!=TC[CurrentPL])
   {
-    while(i<TC)
+    while(i<TC[CurrentPL])
     {
-      playlist_lines[i]=malloc(256);
-      playlist_lines[i]=playlist_lines[i+1];
+      playlist_lines[CurrentPL][i]=playlist_lines[CurrentPL][i+1];
       i++;
     }
   }
   else
   {
-    CurrentTrack--;
+    CurrentTrack[CurrentPL]--;
   }
-  playlist_lines[TC]=NULL;
-  TC--;
+//  mfree(playlist_lines[CurrentPL][TC[CurrentPL]]);
+  playlist_lines[CurrentPL][TC[CurrentPL]]=NULL;
+  if(CurrentTrack[CurrentPL]==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]=0;}
+  else{if(CurrentTrack[CurrentPL]<PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]--;}}
+  TC[CurrentPL]--;
   }
 }
 
 // Перемещаем строку в пл вверх   AAA
 void MoveLineUp()
 {
-  if(CurrentTrack>0)
+  DisableScroll();
+  if(CurrentTrack[CurrentPL]>0)
   {
-  char *p=playlist_lines[CurrentTrack];
-  playlist_lines[CurrentTrack]=malloc(256);
-  if(CurrentTrack!=1)
+  char *p=playlist_lines[CurrentPL][CurrentTrack[CurrentPL]];
+  if(copy)
   {
-    playlist_lines[CurrentTrack]=playlist_lines[CurrentTrack-1];
-    playlist_lines[CurrentTrack-1]=malloc(256);
-    playlist_lines[CurrentTrack-1]=p;
-    CurrentTrack--;
+    CopyLine(p);
+    
+  }else{
+    
+  if(CurrentTrack[CurrentPL]!=1)
+  {
+    if(CurrentTrack[CurrentPL]==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]--;}
+    else{if(CurrentTrack[CurrentPL]-1==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]++;}}
+    playlist_lines[CurrentPL][CurrentTrack[CurrentPL]]=playlist_lines[CurrentPL][CurrentTrack[CurrentPL]-1];
+    playlist_lines[CurrentPL][CurrentTrack[CurrentPL]-1]=p;
+    CurrentTrack[CurrentPL]--;
   }
   else
   {
-    playlist_lines[CurrentTrack]=playlist_lines[TC];
-    playlist_lines[TC]=malloc(256);
-    playlist_lines[TC]=p;
-    CurrentTrack=TC;
+    if(CurrentTrack[CurrentPL]==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]=TC[CurrentPL];}
+    else{if(PlayedTrack[PlayedPL]!=0) {PlayedTrack[PlayedPL]--;}}
+    for(int i=1;i<TC[CurrentPL];i++)
+    {
+      playlist_lines[CurrentPL][i]=playlist_lines[CurrentPL][i+1];
+    }
+    playlist_lines[CurrentPL][TC[CurrentPL]]=p;
+    CurrentTrack[CurrentPL]=TC[CurrentPL];
+  }
   }
   }
 }
@@ -550,26 +731,59 @@ void MoveLineUp()
 // Перемещаем строку в пл вниз   AAA
 void MoveLineDown()
 {
-  if(CurrentTrack>0)
+  DisableScroll();
+  if(CurrentTrack[CurrentPL]>0)
   {
-  char *p=playlist_lines[CurrentTrack];
-  playlist_lines[CurrentTrack]=malloc(256);
-  if(CurrentTrack!=TC)
+  char *p=playlist_lines[CurrentPL][CurrentTrack[CurrentPL]];
+  if(copy)
   {
-    playlist_lines[CurrentTrack]=playlist_lines[CurrentTrack+1];
-    playlist_lines[CurrentTrack+1]=malloc(256);
-    playlist_lines[CurrentTrack+1]=p;
-    CurrentTrack++;
+    CopyLine(p);
+    
+  }else{
+    
+  if(CurrentTrack[CurrentPL]!=TC[CurrentPL])
+  {
+    if(CurrentTrack[CurrentPL]==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]++;}
+    else{if(CurrentTrack[CurrentPL]+1==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]--;}}
+    playlist_lines[CurrentPL][CurrentTrack[CurrentPL]]=playlist_lines[CurrentPL][CurrentTrack[CurrentPL]+1];
+    playlist_lines[CurrentPL][CurrentTrack[CurrentPL]+1]=p;
+    CurrentTrack[CurrentPL]++;
   }
   else
   {
-    playlist_lines[CurrentTrack]=playlist_lines[1];
-    playlist_lines[1]=malloc(256);
-    playlist_lines[1]=p;
-    CurrentTrack=1;
+    if(CurrentTrack[CurrentPL]==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]=1;}
+    else {if(PlayedTrack[PlayedPL]!=0) {PlayedTrack[PlayedPL]++;}}
+    for(int i=TC[CurrentPL];i>1;i--)
+    {
+      playlist_lines[CurrentPL][i]=playlist_lines[CurrentPL][i-1];
+    }
+    playlist_lines[CurrentPL][1]=p;
+    CurrentTrack[CurrentPL]=1;
+  }
   }
   }
 }
+
+// Перемещаем строку в следующий пл   AAA
+void MoveLineRight()
+{
+  char *p=playlist_lines[CurrentPL][CurrentTrack[CurrentPL]];
+  if(copy==0) {DeleteLine();}
+  else {copy=0; DisableScroll();}
+  NextPL();
+  PastLine(p);
+}
+
+// Перемещаем строку в предыдущий пл   AAA
+void MoveLineLeft()
+{
+  char *p=playlist_lines[CurrentPL][CurrentTrack[CurrentPL]];
+  if(copy==0) {DeleteLine();}
+  else {copy=0; DisableScroll();}
+  PrevPL();
+  PastLine(p);
+}
+/////////////////////////////////////////////////////<<<РЕДАКТИРОВАНИЕ ПЛ>>>/////////////////////////////////////////////////////////
 
 // Возвращает имя файла по полному пути...
 void FullpathToFilename(char * fname, WSHDR * wsFName)
@@ -588,62 +802,80 @@ void FullpathToFilename(char * fname, WSHDR * wsFName)
 // Возвращется трек по номеру в пл
 char * GetCurrentTrack()
 {
-  return playlist_lines[CurrentTrack];
+  return playlist_lines[CurrentPL][CurrentTrack[CurrentPL]];
 }
 
 char * GetPlayedTrack()
 {
-  return playlist_lines[PlayedTrack];
+  return playlist_lines[PlayedPL][PlayedTrack[PlayedPL]];
 }
 
 // Возвращает имя воспроизводимого по номеру в пл
 char * GetTrackByNumber(int number)
 {
-  return playlist_lines[number];
+  return playlist_lines[CurrentPL][number];
 }
 
-// Перерисовка
+// Нет функциям океренной величины!!   AAA
 void PL_Redraw()
 {
-  unsigned short c = 0;  // Координаты  AAA
+  
   unsigned short my_x;
   unsigned short my_y;
+  unsigned short k;
+  unsigned short c = 0;  // Координаты  AAA
+  int i;
   
   // Имя файла...
-  if (TC>0)
+  if (TC[CurrentPL]>0)
   {
     my_x = CTmy_x;
     my_y = CTmy_y;
 
     WSHDR * out_ws = AllocWS(128);
-
-    // Выравнивание  AAA
-  if (TC>5)
-  {
-    if (CurrentTrack==1) {my_y = my_y-2*s;}
-    if (CurrentTrack==2) {my_y = my_y-s;}
-    if (CurrentTrack==TC-2) {my_y = my_y+s;}
-    if (CurrentTrack==TC-1) {my_y = my_y+2*s;}
-    if (CurrentTrack==TC) {my_y = my_y+3*s;}
-  }
-  else
-  {
-    if (TC<6)
+/*
+    switch(CurrentTrack[CurrentPL])
     {
-      if (CurrentTrack==1) {my_y = my_y-2*s;}
-      if (CurrentTrack==2) {my_y = my_y-s;}
-      if (CurrentTrack==4) {my_y = my_y+s;}
-      if (CurrentTrack==5) {my_y = my_y+2*s;}
+    case 1:
+      k=0;
+      break;
+    case 2:
+      k=1;
+      break;
+    case TC[CurrentPL]-2:
+      k=3;
+      break;
+    case TC[CurrentPL]-1:
+      k=4;
+      break;
+    case TC[CurrentPL]:
+      k=5;
+      break;
+    case default:
+      k=2;
+      break;
     }
-  }
-
-    // -5
-    int i = CurrentTrack-5;
-    if((CurrentTrack==TC)&&(TC>5))
+*/
+    if (TC[CurrentPL]>5)
     {
-    c = -s*5;
-    if(i<0)i=TC+i;
-    if(i==0)i=TC;
+    if(CurrentTrack[CurrentPL]==1) {k=0;}
+    else{ if(CurrentTrack[CurrentPL]==2) {k=1;}
+    else{ if(CurrentTrack[CurrentPL]==TC[CurrentPL]-2) {k=3;}
+    else{ if(CurrentTrack[CurrentPL]==TC[CurrentPL]-1) {k=4;}
+    else{ if(CurrentTrack[CurrentPL]==TC[CurrentPL]) {k=5;} else {k=2;}}}}}
+    }else{
+    if(CurrentTrack[CurrentPL]==1) {k=0;}
+    else{ if(CurrentTrack[CurrentPL]==2) {k=1;}
+    else{ if(CurrentTrack[CurrentPL]==3) {k=2;}
+    else{ if(CurrentTrack[CurrentPL]==4) {k=3;}
+    else{ if(CurrentTrack[CurrentPL]==5) {k=4;}}}}}
+    }
+    
+    for(int l=0;l<6;l++)
+    {
+    i = CurrentTrack[CurrentPL]+l-k;
+    if(TC[CurrentPL]>l)
+    {
     if (SHOW_FULLNAMES)
     {
       utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
@@ -652,401 +884,78 @@ void PL_Redraw()
     {
       FullpathToFilename(GetTrackByNumber(i),out_ws);
     };
+    if(k!=l)
+    {
     // Делаем другой цвет для не текущего трека...
-    if (PlayedTrack==i)
+    if (PlayedTrack[CurrentPL]==i)
     {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//               color(COLOR_TEXT_PLAY),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL)+c,
                    1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
-    }
-    else
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_CURSOR),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
+    }else{
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL)+c,
                    1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
     }
-    }
     
-    // -4
-    if(((TC>5)&&(CurrentTrack>TC-2))||((TC<6)&&(CurrentTrack==5)))
-    {
-    i = CurrentTrack-4;
-    c = -s*4;
-    if(i<0)i=TC+i;
-    if(i==0)i=TC;
-    if (SHOW_FULLNAMES)
-    {
-      utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
-    }
-    else
-    {
-      FullpathToFilename(GetTrackByNumber(i),out_ws);
-    };
-    // Делаем другой цвет для не текущего трека...
-    if (PlayedTrack==i)
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//               color(COLOR_TEXT_PLAY),0);
+    }else{
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
-    }
-    else
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_CURSOR),0);
+      char sfname[256];
+      sprintf(sfname,"%s%s",PIC_DIR,"cursor.png");
+      DrawImg(my_x-1,my_y+c-3,(int)sfname);
       
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
-    }
-    }
-    
-    
-    // -3
-    if(((TC>5)&&(CurrentTrack>TC-3))||((TC<6)&&(CurrentTrack>3)))
-    {
-    i = CurrentTrack-3;
-    c = -s*3;
-    if(i<0)i=TC+i;
-    if(i==0)i=TC;
-    if (SHOW_FULLNAMES)
-    {
-      utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
-    }
-    else
-    {
-      FullpathToFilename(GetTrackByNumber(i),out_ws);
-    };
-    // Делаем другой цвет для не текущего трека...
-    if (PlayedTrack==i)
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//               color(COLOR_TEXT_PLAY),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
-    }
-    else
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_CURSOR),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
-    }
-    }
-    
-    // -2
-    if(((TC>5)&&(CurrentTrack>2))||((TC<6)&&(CurrentTrack>2)))
-    {
-    i = CurrentTrack-2;
-    c = -s*2;
-    if(i<0)i=TC+i;
-    if(i==0)i=TC;
-    if (SHOW_FULLNAMES)
-    {
-      utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
-    }
-    else
-    {
-      FullpathToFilename(GetTrackByNumber(i),out_ws);
-    };
-    // Делаем другой цвет для не текущего трека...
-    if (PlayedTrack==i)
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//               color(COLOR_TEXT_PLAY),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
-    }
-    else
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_CURSOR),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
-    }
-    }
-    
-    // -1
-    if(((TC>5)&&(CurrentTrack>1))||((TC<6)&&(CurrentTrack>1)))
-    {
-    i = CurrentTrack-1;
-    c = -s;
-    if(i==0)i=TC;
-    if (SHOW_FULLNAMES)
-    {
-      utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
-    }
-    else
-    {
-      FullpathToFilename(GetTrackByNumber(i),out_ws);
-    };
-    
-    // Делаем другой цвет для не текущего трека...
-    if (PlayedTrack==i)
-    {
-//      DrawString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_PLAY),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
-    }
-    else
-    {
-//      DrawString(out_ws,my_x,my_y+c,w-5,my_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_CURSOR),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
-    }
-    }
-    
-    // Текущий 0
-    char sfname[256];
-    sprintf(sfname,"%s%s",PIC_DIR,"cursor.png");
-    DrawImg(my_x-1,my_y-3,(int)sfname);
-    
-    if (SHOW_FULLNAMES)
-    {
-      utf8_2ws(out_ws,GetCurrentTrack(),strlen(GetCurrentTrack()));
-    }
-    else
-    {
-      FullpathToFilename(GetCurrentTrack(),out_ws);
-    };
-     if (PlayedTrack==CurrentTrack)
+    if (PlayedTrack[CurrentPL]==CurrentTrack[CurrentPL])
     {
 //      DrawString(out_ws,my_x,my_y,w,my_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //                 color(COLOR_TEXT_PLAY),0);
-      int i=Get_WS_width(out_ws,FONT_SMALL);  //Определяет кол-во пикселей при этом шрифте (или что то вроде того...)
+      if(GrafOn)
+      {
+          int i=Get_WS_width(out_ws,FONT_SMALL);  //Определяет кол-во пикселей при этом шрифте (или что то вроде того...)
 	  i-=(w-9);   //До куда докручивать
 	  if (i<0)
 	  {
 	    DisableScroll();
-	  }
-	  else
-	  {
+	  }else{
 	    if (!max_scroll_disp)
 	    {
 	      GBS_StartTimerProc(&tmr_scroll,TMR_SEC,scroll_timer_proc);
 	    }
 	    max_scroll_disp=i;
 	  }
-      DrawScrollString(out_ws,my_x,my_y,w-7,my_y+GetFontYSIZE(FONT_SMALL),
+      }
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL)+c,
                    scroll_disp+1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
-    }
-    else
-    {
+    }else{
 //      DrawString(out_ws,my_x,my_y,w,my_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //               color(COLOR_TEXT),0);
 
-	  int i=Get_WS_width(out_ws,FONT_SMALL);
+	if(GrafOn)
+        {
+          int i=Get_WS_width(out_ws,FONT_SMALL);
 	  i-=(w-9);
 	  if (i<0)
 	  {
 	    DisableScroll();
-	  }
-	  else
-	  {
+	  }else{
 	    if (!max_scroll_disp)
 	    {
 	      GBS_StartTimerProc(&tmr_scroll,TMR_SEC,scroll_timer_proc);
 	    }
 	    max_scroll_disp=i;
 	  }
-      DrawScrollString(out_ws,my_x,my_y,w-7,my_y+GetFontYSIZE(FONT_SMALL),
+        }
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL)+c,
                    scroll_disp+1,FONT_SMALL,0,color(COLOR_TEXT),0);
     }
-    
-    // +1
-    if(((CurrentTrack<TC)&&(TC>5))||((TC<6)&&(CurrentTrack<TC)))
-    {
-    i = CurrentTrack+1;
-    c = s*2;
-    
-    if(i>TC)i=i-TC;
-    if (SHOW_FULLNAMES)
-    {
-      utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
+    c+=15;
     }
-    else
-    {
-      FullpathToFilename(GetTrackByNumber(i),out_ws);
-    };
-    
-    if (PlayedTrack==i)
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_PLAY),0);
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
-      
-    }
-    else
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_CURSOR),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
+    c+=15;
     }
     }
-    
-    // +2
-    if(((CurrentTrack<TC-1))&&((TC>5)||(TC<6)&&(CurrentTrack<TC-1)))
-    {
-    i = CurrentTrack+2;
-    c = s*3;
-    
-    if(i>TC)i=i-TC;
-    if (SHOW_FULLNAMES)
-    {
-      utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
-    }
-    else
-    {
-      FullpathToFilename(GetTrackByNumber(i),out_ws);
-    };
-    
-    if (PlayedTrack==i)
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_PLAY),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0); 
-    }
-    else
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_CURSOR),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
-    }
-    }
-    
-    // +3
-    if(((CurrentTrack<TC-2)&&(TC>5))||((TC<6)&&(CurrentTrack<TC-2)))
-    {
-    i = CurrentTrack+3;
-    c = s*4;
-    
-    if(i>TC)i=i-TC;
-    if (SHOW_FULLNAMES)
-    {
-      utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
-    }
-    else
-    {
-      FullpathToFilename(GetTrackByNumber(i),out_ws);
-    };
-
-    if (PlayedTrack==i)
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_PLAY),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
-    }
-    else
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_CURSOR),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
-    }
-    }
-    
-    // +4
-    if(((CurrentTrack<3)&&(TC>5))||((TC<6)&&(CurrentTrack<TC-3)))
-    {
-    i = CurrentTrack+4;
-    c = s*5;
-    
-    if(i>TC)i=i-TC;
-    if (SHOW_FULLNAMES)
-    {
-      utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
-    }
-    else
-    {
-      FullpathToFilename(GetTrackByNumber(i),out_ws);
-    };
-
-    if (PlayedTrack==i)
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_PLAY),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
-    }
-    else
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_CURSOR),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
-    }
-    }
-    
-    // +5
-    if((CurrentTrack==1)&&(TC>5))
-    {
-    i = CurrentTrack+5;
-    c = s*6;
-    
-    if(i>TC)i=i-TC;
-    if (SHOW_FULLNAMES)
-    {
-      utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
-    }
-    else
-    {
-      FullpathToFilename(GetTrackByNumber(i),out_ws);
-    };
-
-    if (PlayedTrack==i)
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_PLAY),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
-    }
-    else
-    {
-//      DrawString(out_ws,my_x,my_y+c,w,my_y+c+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_CURSOR),0);
-      
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+c+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
-    }
-    }
-  // Заготовка на будущее для скроллинга... :)
-  /*
-  DrawScrollString(filen,my_x,my_y,w,my_y+GetFontYSIZE(FONT_SMALL),
-                   1,FONT_SMALL,0,color(COLOR_TEXT),0);
-  */
     FreeWS(out_ws);
   }
-
   // Плейлист
   WSHDR * pl_c = AllocWS(64);
-  wsprintf(pl_c,"%i/%i/%i",PlayedTrack,CurrentTrack,TC);
-  DrawString(pl_c,NUMmy_x,NUMmy_y,NUMmy_x+50,NUMmy_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-           color(COLOR_TEXT),0);
+  wsprintf(pl_c,"%i/%i/%i;%i/%i",CurrentTrack[CurrentPL],TC[CurrentPL],CurrentPL+1,PlayedTrack[PlayedPL],PlayedPL+1);
+  DrawString(pl_c,NUMmy_x,NUMmy_y,NUMmy_x+w,NUMmy_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
   FreeWS(pl_c);
   BandRoll();
 }
@@ -1054,11 +963,11 @@ void PL_Redraw()
 // Полоса прокрутки   AAA
 void BandRoll()
 {
-  if(TC>6)
+  if(TC[CurrentPL]>6)
   {
-    int yy=CurrentTrack*(BR2_y-BR1_y)/TC;
+    int yy=CurrentTrack[CurrentPL]*(BR2_y-BR1_y)/TC[CurrentPL];
     DrawRoundedFrame(BR_x,BR1_y,BR_x+BR_w-1,BR2_y,0,0,0,0,color(COLOR_BANDROLL));
-    DrawRoundedFrame(BRC_x,BR1_y+yy-(BR2_y-BR1_y)/TC,BRC_x+BRC_w-1,BR1_y+yy,0,0,0,0,color(COLOR_BANDROLL_C));
+    DrawRoundedFrame(BRC_x,BR1_y+yy-(BR2_y-BR1_y)/TC[CurrentPL],BRC_x+BRC_w-1,BR1_y+yy,0,0,0,0,color(COLOR_BANDROLL_C));
   }
 }
 
@@ -1086,13 +995,21 @@ void FindMusic(const char *dir, int i)
       {
         char *p=malloc(256);
         strncpy(p,path,256);
-        playlist_lines=realloc(playlist_lines,(i+1)*sizeof(char *));
-        playlist_lines[i++]=p;
+        //playlist_lines=realloc(playlist_lines,(i+1)*sizeof(p));
+       // playlist_lines[CurrentPL][i+1]=malloc(256);
+        playlist_lines[CurrentPL][i++]=p;
       }
     }
     while(FindNextFile(&de,&err));
   }
   FindClose(&de,&err);
-  if(i>1) {TC=i-1;}
-  else {TC=0;}
+  if(i>1) {TC[CurrentPL]=i-1;}
+  else {TC[CurrentPL]=0;}
+}
+
+// Утечка памяти в самом деле достала...   AAA
+void MemoryFree()
+{
+  GBS_DelTimer(&tmr_scroll);
+  GBS_DelTimer(&tmr_displacement);
 }
