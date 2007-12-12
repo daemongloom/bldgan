@@ -345,6 +345,11 @@ void CTUp()
     CurrentTrack[CurrentPL] = TC[CurrentPL];
   }
 }
+#ifdef NEWSGOLD
+#define SCROLL_MULT 1
+#else 
+#define SCROLL_MULT 10
+#endif
 
 // Быстрое листание вниз AAA
 void CTDownSpeed(void)
@@ -361,7 +366,7 @@ void CTDownSpeed(void)
       CurrentTrack[CurrentPL] = 1;
     }
     REDRAW();
-    GBS_StartTimerProc(&tmr_displacement,10,CTDownSpeed);
+    GBS_StartTimerProc(&tmr_displacement,10*SCROLL_MULT,CTDownSpeed); // фикс для sgold
     
   }else{
     
@@ -385,13 +390,14 @@ void CTUpSpeed(void)
       CurrentTrack[CurrentPL] = TC[CurrentPL];
     }
     REDRAW();
-    GBS_StartTimerProc(&tmr_displacement,10,CTUpSpeed);
+    GBS_StartTimerProc(&tmr_displacement,10*SCROLL_MULT,CTUpSpeed); // фикс для sgold
     
   }else{
     
     GBS_DelTimer(&tmr_displacement);
   }
 }
+
 
 //Листание шопестец вниз AAA
 void CTDovnSix()
