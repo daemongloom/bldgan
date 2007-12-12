@@ -2181,7 +2181,7 @@
       <archiveVersion>1</archiveVersion>
       <data>
         <prebuild></prebuild>
-        <postbuild></postbuild>
+        <postbuild>$PROJ_DIR$\postbuild.bat $TARGET_PATH$ Data\ZBin\SPlayer\SPlayer.elf</postbuild>
       </data>
     </settings>
     <settings>
