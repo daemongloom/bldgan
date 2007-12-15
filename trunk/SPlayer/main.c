@@ -123,6 +123,8 @@ extern const char PIC_DIR[];
 extern const char MUSIC[];
 extern const char PLAYLISTS[];
 extern const char DEFAULT_PLAYLIST[];
+extern const char DEFAULT_PLAYLIST1[];
+extern const char DEFAULT_PLAYLIST2[];
 extern const unsigned int IDLE_X;
 extern const unsigned int IDLE_Y;
 extern const int PlayMode; 
@@ -1170,6 +1172,11 @@ int main(char *exename, char *fname)
     if (DEFAULT_PLAYLIST!="")
     {
       LoadingPlaylist(DEFAULT_PLAYLIST);
+      CurrentPL++;
+      LoadingPlaylist(DEFAULT_PLAYLIST1);
+      CurrentPL++;
+      LoadingPlaylist(DEFAULT_PLAYLIST2);
+      CurrentPL=0;
     }
   }
   UpdateCSMname(NULL);
