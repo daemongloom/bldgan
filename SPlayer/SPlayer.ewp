@@ -550,7 +550,7 @@
         </option>
         <option>
           <name>OutputFile</name>
-          <state>SPLayer_newsgold.elf</state>
+          <state>SPlayer_newsgold.elf</state>
         </option>
         <option>
           <name>OutputFormat</name>
