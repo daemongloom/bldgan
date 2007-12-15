@@ -346,7 +346,7 @@ void CTUp()
   }
 }
 #ifdef NEWSGOLD
-#define SCROLL_MULT 1
+#define SCROLL_MULT 2
 #else 
 #define SCROLL_MULT 10
 #endif
