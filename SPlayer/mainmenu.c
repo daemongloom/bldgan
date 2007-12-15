@@ -62,6 +62,7 @@ void Coordinates()
   sprintf(sfname,"%s%s",PIC_DIR,"skin.cfg");
   ExecuteFile(ws,0,(char*)sfname);
   FreeWS(ws);
+  GeneralFuncF1(1);
 }
 
 void SetEditPL()
@@ -84,6 +85,7 @@ void Settings()   //Настройки  AAA
 void AboutDlg()
 {
   ShowMSG(0,(int)"SPlayer v0.7.5.6\n(c) Anderstand, Blind007, DemonGloom");
+  GeneralFuncF1(1);
 };
 
 void Exit_SPlayer()

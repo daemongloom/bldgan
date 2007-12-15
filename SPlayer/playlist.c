@@ -23,14 +23,14 @@ unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 -
 short phandle = -1;                   // Что играем
 
 int CurrentTrack[5];                 // Текущий трек
-int PlayedTrack[5];         // Проигрываемый трек   AAA
-int CurrentPL=0;
-int PlayedPL=0;
+int PlayedTrack[5];                  // Проигрываемый трек   AAA
+int CurrentPL=0;                     // Текущий пл   AAA
+int PlayedPL=0;                      // Пл воспроизведения   AAA
 unsigned int TC[5];                  // Количество треков в пл 
-/*extern */const unsigned int TCPL=5;
-extern const unsigned int LinesInPL;
+/*extern */const unsigned int TCPL=5;// Количество пл
+extern const unsigned int LinesInPL; // Количество треков (макс)
 int PlayTime;
-unsigned short NextPlayedTrack[2];
+unsigned short NextPlayedTrack[2];   // № трека и пл в очереди
 
 extern unsigned short CTmy_x;     // Координаты CurrentTrack
 extern unsigned short CTmy_y;

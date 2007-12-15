@@ -9,10 +9,16 @@
 __root const CFG_HDR cfghdr0={CFG_STR_UTF8,"Default playlist",3,127};
 __root const char DEFAULT_PLAYLIST[128] = "0:\\Sounds\\Playlist.m3u";
 
-__root const CFG_HDR cfghdr01={CFG_STR_UTF8,"Music folder",3,127};
+__root const CFG_HDR cfghdr01={CFG_STR_UTF8,"Default playlist 2",3,127};
+__root const char DEFAULT_PLAYLIST1[128] = "0:\\Sounds\\Playlist2.m3u";
+
+__root const CFG_HDR cfghdr02={CFG_STR_UTF8,"Default playlist 3",3,127};
+__root const char DEFAULT_PLAYLIST2[128] = "0:\\Sounds\\Playlist3.m3u";
+
+__root const CFG_HDR cfghdr03={CFG_STR_UTF8,"Music folder",3,127};
 __root const char MUSIC[128] = DEFAULT_DISK ":\\Music\\";
 
-__root const CFG_HDR cfghdr02={CFG_COORDINATES,"Idle coordinates",0,0};
+__root const CFG_HDR cfghdr04={CFG_COORDINATES,"Idle coordinates",0,0};
 __root const unsigned int IDLE_X = 5;
 __root const unsigned int IDLE_Y = 50;
 
