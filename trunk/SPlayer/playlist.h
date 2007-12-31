@@ -92,7 +92,7 @@ void SetPHandle(short ph);
 int GetTC();
 
 // Возвращаем структуру mp3-тега
-int GetMP3Tag_v1(const char * fname, MP3Tagv1 * tag);
+//int GetMP3Tag_v1(const char * fname, MP3Tagv1 * tag);
 
 // Выделим память   AAA
 void Memory();
