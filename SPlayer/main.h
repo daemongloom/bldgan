@@ -26,7 +26,7 @@ typedef struct
   int i1;
 }MAIN_GUI;
 // Для модуля main.c
-
+/*
 typedef struct
 {
   char r;
@@ -34,7 +34,7 @@ typedef struct
   char b;
   char a;
 }RGBA;
-
+*/
 // Структура плейлиста
 typedef struct
 {
@@ -43,17 +43,21 @@ typedef struct
   void *next;
 }PLIST;
 
-// Структура mp3-тега
 typedef struct
 {
-  char id[3];
-  char title[30];
-  char artist[30];
-  char album[30];
-  char year[4];
-  char comment[30];
-  short genre;
-}MP3Tagv1;
+  char*full_name; // Путь к файлу   AAA
+  char istagg[3]; // Слово "TAG"
+  char title[30]; // Название
+  char artist[30]; // Исполнитель
+  char album[30]; // Альбом
+  char year[4]; // Год
+  char comment[30]; // Комментарий
+  int genre; // Жанр
+  int present; // Присутствует
+}ID3TAGDATA;
+
+int ReadID3v1(char*fname, ID3TAGDATA *tag); // Чтение ID3 v1
+
 
 #ifdef NEWSGOLD
 #define CBOX_CHECKED 0xE116
@@ -62,6 +66,8 @@ typedef struct
 #define CBOX_CHECKED 0xE10B
 #define CBOX_UNCHECKED 0xE10C
 #endif
+
+void load_skin(char const* cfgname);
 
 void PlayMP3File(const char * fname);
 

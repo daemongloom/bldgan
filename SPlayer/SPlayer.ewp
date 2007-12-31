@@ -559,7 +559,7 @@
         </option>
         <option>
           <name>FormatVariant</name>
-          <version>7</version>
+          <version>8</version>
           <state>2</state>
         </option>
         <option>
@@ -745,7 +745,7 @@
         </option>
         <option>
           <name>ExtraFormatVariant</name>
-          <version>7</version>
+          <version>8</version>
           <state>2</state>
         </option>
         <option>
@@ -1383,7 +1383,7 @@
         </option>
         <option>
           <name>FormatVariant</name>
-          <version>7</version>
+          <version>8</version>
           <state>2</state>
         </option>
         <option>
@@ -1569,7 +1569,7 @@
         </option>
         <option>
           <name>ExtraFormatVariant</name>
-          <version>7</version>
+          <version>8</version>
           <state>2</state>
         </option>
         <option>
@@ -2206,7 +2206,7 @@
         </option>
         <option>
           <name>FormatVariant</name>
-          <version>7</version>
+          <version>8</version>
           <state>2</state>
         </option>
         <option>
@@ -2392,7 +2392,7 @@
         </option>
         <option>
           <name>ExtraFormatVariant</name>
-          <version>7</version>
+          <version>8</version>
           <state>2</state>
         </option>
         <option>
@@ -3159,6 +3159,18 @@
   </file>
   <file>
     <name>$PROJ_DIR$\history.txt</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\ID3Genres.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\ID3Tags.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\item_info.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\item_info.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\lang.h</name>

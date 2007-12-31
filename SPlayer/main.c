@@ -4,6 +4,8 @@
 #include "main.h"
 #include "mainmenu.h"
 #include "playlist.h"
+#include "lang.h"
+
 /*
 typedef struct {
  unsigned short type; //00 
@@ -48,6 +50,7 @@ unsigned int MAINCSM_ID = 0;
 unsigned int MAINGUI_ID = 0;
 
 extern int CurrentPL;
+extern int PlayedPL;
 extern unsigned short stop; // 1, если останавливаем листание   AAA
 unsigned short copy=0; // 1, если копируем   AAA
 unsigned short move=0; // 1, если перемещаем   AAA
@@ -133,7 +136,6 @@ extern const int soundvolume;
 
 //--- Переменные ---
 extern short phandle;  // Для определения конца воспр.  AAA
-extern char GetAccessoryType();   // Не пашет   AAA
 extern unsigned short PlayingStatus;
 extern unsigned int TC[5];
 char Quit_Required = 0;     // Флаг необходимости завершить работу
@@ -235,8 +237,10 @@ void TimeRedraw()
   }
   wsprintf(time_disp,"%02i:%02i",nm,ns);
   DrawString(time_disp,time_x,time_y,time_x+Get_WS_width(time_disp,FONT_SMALL),time_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
+#ifdef X75
   wsprintf(time_disp,"%02i:%02i",fm,fs);
   DrawString(time_disp,length_x,length_y,length_x+Get_WS_width(time_disp,FONT_SMALL),length_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
+#endif
   FreeWS(time_disp);
   if(IsGuiOnTop(MAINGUI_ID)) GBS_StartTimerProc(&mytmr,216,EXT_REDRAW);}
 
@@ -259,7 +263,7 @@ int findmp3length(char *playy) {
 
 void PlayMP3File(const char * fname)
 {
-if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
+if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
 {
   if (!IsCalling()) // Нет ли звонка
   {
@@ -297,9 +301,11 @@ if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
       pfopt.play_first=0;
       pfopt.volume=GetVolLevel();
       char *pp=strrchr(fname,':')-1;
+#ifdef X75
       fs=findmp3length(pp);
       fm=(fs-(fs%60))/60;
       fs=fs%60;
+#endif
 #ifdef NEWSGOLD
       pfopt.unk6=1;
       pfopt.unk7=1;
@@ -327,13 +333,13 @@ if(TC>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
   REDRAW();*/
     } else {
       // Если нет такого файла!
-      ShowMSG(1,(int)"Can't find file!");
+      ShowMSG(1,(int)LG_Can_not_find_file);
     }
   }
 }
 else
 {
-  ShowMSG(1,(int)"Load a playlist, please!");
+  ShowMSG(1,(int)LG_Load_a_playlist);
 }
 }
 
@@ -565,6 +571,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
 #else
 #endif
                                      // Здесь будут универсальные строки, одинаковые как для png, так и для их отсутствия
+#ifdef X75
   // Прогрессбар DG
   DrawRoundedFrame(progress_x,progress_y,progress_x2,progress_y2,2,2,0,
 			COLOR_PROG_BG_FRAME,
@@ -574,6 +581,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   DrawRoundedFrame(progress_x,progress_y,ii+progress_x,progress_y2,2,2,0,
 			COLOR_PROG_MAIN_FRAME,
 			COLOR_PROG_MAIN);
+#endif
   
     PL_Redraw();
     TimeRedraw();
@@ -622,7 +630,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     if ((msg->gbsmsg->msg==LONG_PRESS)&&(msg->gbsmsg->submess=='#')){
      KbdUnlock();
      KeyLock=(KeyLock+1)%2;
-     ShowMSG(1,(int)"Клавиатура разблокирована");
+     ShowMSG(1,(int)LG_Keypad_Unlock);
      REDRAW();}
      return 0;
      }
@@ -673,10 +681,10 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     switch(msg->gbsmsg->submess)
     {
     case RIGHT_SOFT:
-      MsgBoxYesNo(1,(int)"Закрыть SPlayer?",QuitCallbackProc);
+      MsgBoxYesNo(1,(int)LG_Exit,QuitCallbackProc);
       break;
     case RED_BUTTON:
-      MsgBoxYesNo(1,(int)"Закрыть SPlayer?",QuitCallbackProc);
+      MsgBoxYesNo(1,(int)LG_Exit,QuitCallbackProc);
       break;
     case LEFT_SOFT:
       MM_Show();
@@ -767,7 +775,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
        if (KeyLock==0){
           KbdLock();
           Mode_keypressed = 0;
-          ShowMSG(1,(int)"Клавиатура заблокирована");
+          ShowMSG(1,(int)LG_Keypad_Lock);
           KeyLock=1;
        }
       break;
@@ -800,10 +808,10 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     switch(msg->gbsmsg->submess)
     {
     case RIGHT_SOFT:
-      MsgBoxYesNo(1,(int)"Закрыть SPlayer?",QuitCallbackProc);
+      MsgBoxYesNo(1,(int)LG_Exit,QuitCallbackProc);
       break;
     case RED_BUTTON:
-      MsgBoxYesNo(1,(int)"Закрыть SPlayer?",QuitCallbackProc);
+      MsgBoxYesNo(1,(int)LG_Exit,QuitCallbackProc);
       break;
     case LEFT_SOFT:
       MM_Show();
@@ -1050,7 +1058,7 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
     extern const char *successed_config_filename;
     if (strcmp(successed_config_filename,(char *)msg->data0)==0)
     {
-      ShowMSG(1,(int)"SPlayer config updated!");
+      ShowMSG(1,(int)LG_Config_Updated);
       InitConfig();
     }
   }

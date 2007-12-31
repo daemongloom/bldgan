@@ -1,9 +1,9 @@
 #include "../inc/swilib.h"
 #include "main.h"
 #include "playlist.h"
+#include "lang.h"
 
 char ***playlist_lines;  // Массив указателей на имена файлов в пл   Mr. Anderstand: Воплотим мечту в жизнь!
-char **id3tags1_lines;  // Массив указателей на ID3v1-теги
 
 // Из конфига
 extern char COLOR_TEXT[];
@@ -431,13 +431,13 @@ void CTUpSix()
 void PlayTrackUnderC()
 {
   StopAllPlayback();
-  PlayMP3File(GetCurrentTrack(CurrentTrack[CurrentPL]));
   if(PlayedPL!=CurrentPL)
   {
     PlayedTrack[PlayedPL] = 0;
     PlayedPL=CurrentPL;
   }
   PlayedTrack[PlayedPL] = CurrentTrack[CurrentPL];
+  PlayMP3File(GetCurrentTrack(PlayedTrack[PlayedPL]));
 }
 
 // Выдаем текущий статус
@@ -473,7 +473,7 @@ int GetTC()
 /*
  Работаем с mp3-файлами
 */
-
+/*
 // Возвращаем структуру mp3-тега
 int GetMP3Tag_v1(const char * fname, MP3Tagv1 * tag)
 {
@@ -498,7 +498,7 @@ int GetMP3Tag_v1(const char * fname, MP3Tagv1 * tag)
   }
   return 0;
 }
-
+*/
 /*
  Здесь собственно работа с плейлистом...
 */
@@ -528,8 +528,6 @@ void FreePlaylist(void)
 {
   if (playlist_lines) mfree(playlist_lines);
   playlist_lines=NULL;
-  if (id3tags1_lines) mfree(id3tags1_lines);
-  id3tags1_lines=NULL;
 }
 
 // Загружаем пл!
@@ -543,7 +541,6 @@ int LoadPlaylist(const char * fn)
   char *p;
   char *pp;
   int c;
- // FreePlaylist();
 
   if (GetFileStats(fn,&stat,&ul)==-1) return 0;
   if ((fsize=stat.size)<=0) return 0;
@@ -562,26 +559,10 @@ int LoadPlaylist(const char * fn)
       if (pp&&(pp!=p))
       {
 	//playlist_lines=realloc(playlist_lines,(i+1)*sizeof(char *));
-//        id3tags1_lines=realloc(id3tags1_lines,(i+1)*sizeof(char *));
      //   playlist_lines[CurrentPL][i+1]=malloc(256);
       //  playlist_lines=realloc(playlist_lines,(1)*sizeof(char *));
        // playlist_lines[CurrentPL]=realloc(playlist_lines[CurrentPL],(i+1)*sizeof(char *));
 	playlist_lines[CurrentPL][i++]=pp;
-        
-        /*
-        MP3Tagv1 * mytag = malloc(sizeof(MP3Tagv1)+1);
-        if (GetMP3Tag_v1(playlist_lines[i],mytag))
-        {
-          char str[128];
-          sprintf(str,"%s - %s",mytag->artist,mytag->title);
-          strcpy(id3tags1_lines[i],str);
-        }
-        else
-        {
-          id3tags1_lines[i]=NULL;
-        } 
-        mfree(mytag);
-        */
       }
       pp=NULL;
       if (!c) break;
@@ -646,7 +627,7 @@ void SavePlaylist(char *fn)
   fwrite(f,s2,1,&err);
   }
   fclose(f,&err);
-  ShowMSG(1,(int)"Playlist saved!");
+  ShowMSG(1,(int)LG_PL_Saved);
 }
 
 /////////////////////////////////////////////////////<<<РЕДАКТИРОВАНИЕ ПЛ>>>/////////////////////////////////////////////////////////
@@ -1004,6 +985,7 @@ void FindMusic(const char *dir, int i)
         //playlist_lines=realloc(playlist_lines,(i+1)*sizeof(p));
        // playlist_lines[CurrentPL][i+1]=malloc(256);
         playlist_lines[CurrentPL][i++]=p;
+        mfree(p);
       }
     }
     while(FindNextFile(&de,&err));
