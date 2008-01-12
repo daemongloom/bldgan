@@ -17,15 +17,19 @@
 #define LG_Menu                  "Меню"
 #define LG_SetNextPlayed         "B очередь"
 #define LG_ShowID3               "Атрибуты"
-#define LG_Coordinates           "Позиционирование"
-#define LG_Colours               "Цвета"
-#define LG_SetEditPL             "Редактирование плейлиста"
 #define LG_Settings              "Настройки"
 #define LG_AboutDlg              "Об эльфе..."
 #define LG_Exit_SPlayer          "Выход"
 
 #define LG_SELECT                "Выбор"
 #define LG_BACK                  "Назад"
+
+///////////Menu 1///////////
+#define LG_Sets_Menu             "Инструменты"
+#define LG_SetEditPL             "Редактирование плейлиста"
+#define LG_Coordinates           "Позиционирование"
+#define LG_Colours               "Цвета"
+#define LG_Refresh               "Обновить"
 
 ///////////Attributes///////////
 #define LG_ID3_Tag_Info          "ID3 тэги"
@@ -66,7 +70,7 @@
 #define LG_Playlist_folder       "Папка для плейлистов"
 #define LG_Path_To_SCE           "SPlayer cfg editor"
 
-///////////ShowMSG///////////
+///////////ShowMSG/MsgBoxError///////////
 #define LG_Can_not_find_file     "Файл не найден!"
 #define LG_Load_a_playlist       "Пожалуйста, загрузите плейлист!"
 #define LG_Keypad_Unlock         "Клавиатура разблокирована"
@@ -76,6 +80,7 @@
 #define LG_Exit                  "Закрыть SPlayer?"
 #define LG_Is_not_selected       "Не выбрано!"
 #define LG_No_Tags               "Нет ID3 тэгов!"
+#define LG_Error_1               "Ошибка 1"
 
 #endif //RU
 
@@ -85,6 +90,76 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 #ifdef LANG_UA
+
+///////////MainMenu///////////
+#define LG_Menu                  "Меню"
+#define LG_SetNextPlayed         "У чергу"
+#define LG_ShowID3               "Атрибути"
+#define LG_Settings              "Установки"
+#define LG_AboutDlg              "Про ельф..."
+#define LG_Exit_SPlayer          "Выхiд"
+
+#define LG_SELECT                "Вибiр"
+#define LG_BACK                  "Назад"
+
+///////////Menu 1///////////
+#define LG_Sets_Menu             "Струмент"
+#define LG_SetEditPL             "Редактування плейлиста"
+#define LG_Coordinates           "Позициювання"
+#define LG_Colours               "Кольоpи"
+#define LG_Refresh               "Оновлення"
+
+///////////Attributes///////////
+#define LG_ID3_Tag_Info          "ID3 теги"
+#define LG_Full_name             "Повне iм'я"
+#define LG_Size                  "Розмiр файлу"
+#define LG_Title                 "Назва"
+#define LG_Artist                "Виконавець"
+#define LG_Album                 "Альбом"
+#define LG_Year                  "Рiк"
+#define LG_Comment               "Коментарi"
+#define LG_Genre                 "Жанр"
+
+///////////Config///////////
+#define LG_Default_playlist      "Стнад. плейлист"
+#define LG_Default_playlist_2    "Стнад. плейлист 2"
+#define LG_Default_playlist_3    "Стнад. плейлист 3"
+#define LG_Music_folder          "Папка пiсень"
+#define LG_Idle_coordinates      "Координати ярличка на Idle"
+#define LG_Sets                  "Установки"
+#define LG_Show_full_names       "Показ повного iменi"
+
+#define LG_No			"Нi"
+#define LG_Yes			"Так"
+
+#define LG_Show_effects          "Показ ефектiв"
+#define LG_Playmode              "Режим відтворення"
+#define LG_Play_all              "Відтворити все"
+#define LG_Repeat_all            "Повторювати усе"
+#define LG_Random                "Випадково"
+#define LG_Repeat_one            "Повторювати один"
+#define LG_Extension_of_playlist "Розширення плейлиста"
+#define LG_spl                   "spl"
+#define LG_m3u                   "m3u"
+#define LG_Default_volume        "Гучнiсть"
+#define LG_Amount_of_lines       "Кількість треків"
+#define LG_Paths                 "Шлях до файлiв/папок"
+#define LG_Picture_folder        "Папка для графiки"
+#define LG_Playlist_folder       "Папка для плейлистів"
+#define LG_Path_To_SCE           "SPlayer cfg editor"
+
+///////////ShowMSG/MsgBoxError///////////
+#define LG_Can_not_find_file    "файл не знайдено!"
+#define LG_Load_a_playlist      "Будь ласка, завантажте плейлiст!"
+#define LG_Keypad_Unlock	"Клавiатура заблоковано"
+#define LG_Keypad_Lock  	"Клавiатура разблоковано"
+#define LG_Config_Updated	"Конфiг SPlayer'a змiнено!"
+#define LG_PL_Saved		"Плейлiст збережено!"
+#define LG_Exit         	"Закрити SPlayer?"
+#define LG_Is_not_selected	"Не обрано!"
+#define LG_No_Tags		"Вiдсутнi ID3 тегi!"
+#define LG_Error_1		"Помилка 1"
+
 
 #endif //UA
 
@@ -99,15 +174,19 @@
 #define LG_Menu                  "Menu"
 #define LG_SetNextPlayed         "Set next played"
 #define LG_ShowID3               "Attributes"
-#define LG_Coordinates           "Coordinates"
-#define LG_Colours               "Colours"
-#define LG_SetEditPL             "Edit playlist"
 #define LG_Settings              "Settings"
 #define LG_AboutDlg              "About..."
 #define LG_Exit_SPlayer          "Exit"
 
 #define LG_SELECT                "Select"
 #define LG_BACK                  "Back"
+
+///////////Menu 1///////////
+#define LG_Sets_Menu             "Instruments"
+#define LG_SetEditPL             "Edit playlist"
+#define LG_Coordinates           "Coordinates"
+#define LG_Colours               "Colours"
+#define LG_Refresh               "Refresh"
 
 ///////////Attributes///////////
 #define LG_ID3_Tag_Info          "ID3 Tag Info"
@@ -148,7 +227,7 @@
 #define LG_Playlist_folder       "Playlist folder"
 #define LG_Path_To_SCE           "SPlayer cfg editor"
 
-///////////ShowMSG///////////
+///////////ShowMSG/MsgBoxError///////////
 #define LG_Can_not_find_file     "Can't find file!"
 #define LG_Load_a_playlist       "Load a playlist, please!"
 #define LG_Keypad_Unlock         "Keypad unlocked"
@@ -158,6 +237,7 @@
 #define LG_Exit                  "Close SPlayer?"
 #define LG_Is_not_selected       "Isn't selected!"
 #define LG_No_Tags               "No ID3 tags!"
+#define LG_Error_1               "Error 1"
 
 #endif //EN
 
