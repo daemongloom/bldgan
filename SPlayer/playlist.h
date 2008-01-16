@@ -65,7 +65,7 @@ void CTDownSpeed(void);
 void CTUpSpeed(void);
 
 //Листание шопестец вниз AAA
-void CTDovnSix();
+void CTDownSix();
 
 //Листание шопестец вверх AAA
 void CTUpSix();

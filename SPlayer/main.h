@@ -74,4 +74,18 @@ void PlayMP3File(const char * fname);
 void PausingTime(unsigned short action);
 
 void QuitCallbackProc(int decision);
+
+void DoExit();
+
+void LoadDefPlaylist();
+
+void FindingMusic();
+
+void PrevTrackDown();
+
+void NextTrackDown();
+
+void SwitchPlayModeDown();
+
+void DoKey(int key, int ka);
 #endif
