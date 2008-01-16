@@ -52,6 +52,7 @@ extern int playmode;
 extern unsigned short copy;
 extern const unsigned int GrafOn; // 1,если включены эффекты типа скролла   AAA
 unsigned short stop=1; // 1, если останавливаем листание   AAA
+extern short Stat_keypressed;
 // Всякие "мелкие" переменные
 
 extern unsigned int MAINGUI_ID;
@@ -217,6 +218,7 @@ void PreviousTrack()
 // Пауза/Воспроизведение
 void TogglePlayback()
 {
+  Stat_keypressed = 1;
   switch(PlayingStatus)
   {
   case 0:
@@ -247,6 +249,7 @@ void TogglePlayback()
 // Останавливаем проигрывание
 void StopAllPlayback()
 {
+  Stat_keypressed = 1;
   if(PlayingStatus==0)return;
   if (phandle!=-1){
     PlayMelody_StopPlayback(phandle);
@@ -400,7 +403,7 @@ void CTUpSpeed(void)
 
 
 //Листание шопестец вниз AAA
-void CTDovnSix()
+void CTDownSix()
 {
   DisableScroll();
   if ((TC[CurrentPL]>6)&&(CurrentTrack[CurrentPL]+6<TC[CurrentPL]+1))
@@ -430,6 +433,7 @@ void CTUpSix()
 //Воспроизвести AAA
 void PlayTrackUnderC()
 {
+  Stat_keypressed = 1;
   StopAllPlayback();
   if(PlayedPL!=CurrentPL)
   {

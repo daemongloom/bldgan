@@ -619,6 +619,41 @@ void QuitCallbackProc(int decision)
   if(decision==0)Quit_Required = 1;
 }
 
+/* Блок функций. Неоходимо для конфига клавиш. */
+void DoExit() {
+  MsgBoxYesNo(1,(int)LG_Exit,QuitCallbackProc);
+}
+
+void LoadDefPlaylist() {
+  CTtoFirst();
+  PTtoFirst();
+  LoadingPlaylist(DEFAULT_PLAYLIST);
+}
+
+void FindingMusic() {
+  CTtoFirst();
+  PTtoFirst();
+  // FreePlaylist();
+  FindMusic(MUSIC, 1);
+}
+
+void PrevTrackDown() {
+  P_keypressed = 1;
+  PreviousTrack();
+}
+
+void NextTrackDown() {
+  N_keypressed = 1;
+  if (playmode==2) RandTrack(); else NextTrack();
+}
+
+void SwitchPlayModeDown() {
+  playmode+=1;
+  if (playmode==4) playmode=0;
+  Mode_keypressed = 1;
+}
+/* Блок функций. Неоходимо для конфига клавиш. */
+
 /*
   Обработчик нажатий клавиш. Сюда передаются нажатия клавиш
   в виде сообщения GUI_MSG, пример декодирования ниже.
@@ -637,114 +672,16 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
   else{
     if(EditPL==0)         //  Mr. Anderstand: самому не оч нравится такой вариант...
   {
-  if (msg->gbsmsg->msg==KEY_UP)
-  {
-    switch(msg->gbsmsg->submess)
-    {
-    case ENTER_BUTTON:  // Play
-      PlayTrackUnderC();
-      Stat_keypressed = 0;
-      break;
-    case UP_BUTTON:
-        stop=1;
-      break;
-    case DOWN_BUTTON:
-        stop=1;
-      break;
-    case '0':           // Stop
-      StopAllPlayback();
-      Stat_keypressed = 0;
-      break;
-    case '4':           // Переключение на предыдущий трек
-      P_keypressed = 0;
-      break;
-    case '5':           // Play/Pause
-      TogglePlayback();
-      Stat_keypressed = 0;
-      break;
-    case '6':           // Переключение на следующий трек
-      N_keypressed = 0;
-      break;
-    case '#':           // Mode
-      playmode+=1;
-      if (playmode==4) playmode=0;
-      Mode_keypressed = 0;
-      break;
-    case '*':
-      if (mode==0) {ToggleVolume();} else {mode=0;}
-      break;
-    }
-    REDRAW();
+  if (msg->gbsmsg->msg==KEY_UP) {
+     Stat_keypressed = 0;
+     P_keypressed = 0;
+     N_keypressed = 0;
+     Mode_keypressed = 0;
+     REDRAW();
   }
   if (msg->gbsmsg->msg==KEY_DOWN)
   {
-    switch(msg->gbsmsg->submess)
-    {
-    case RIGHT_SOFT:
-      MsgBoxYesNo(1,(int)LG_Exit,QuitCallbackProc);
-      break;
-    case RED_BUTTON:
-      MsgBoxYesNo(1,(int)LG_Exit,QuitCallbackProc);
-      break;
-    case LEFT_SOFT:
-      MM_Show();
-      break;
-    case GREEN_BUTTON:  // По зеленой кнопке загружаем плейлист по умолчанию...
-      CTtoFirst();
-      PTtoFirst();
-      LoadingPlaylist(DEFAULT_PLAYLIST);
-      break;
-    case ENTER_BUTTON:
-      Stat_keypressed = 1;
-      break;
-    case UP_BUTTON:
-      CTUp();
-      break;
-    case DOWN_BUTTON:
-      CTDown();
-      break;
-    case RIGHT_BUTTON:
-      NextPL();
-      break;
-    case LEFT_BUTTON:
-      PrevPL();
-      break;
-    case '0':           // Останавливаем воспроизведение
-      Stat_keypressed = 1;
-      break;
-    case '1':           // Забиваем. Здесь будет перемотка :)
-      break;
-    case '3':           // Забиваем. Здесь будет перемотка :)
-      break;
-    case '2':
-      CTUpSix();
-      break;
-    case '4':           // Переключение на предыдущий трек
-      P_keypressed = 1;
-      PreviousTrack();
-      break;
-    case '5':           // Play/Pause
-      Stat_keypressed = 1;
-      break;
-    case '6':           // Переключение на следующий трек
-      N_keypressed = 1;
-      if (playmode==2) RandTrack(); else NextTrack();
-      break;
-    case '7':
-      break;
-    case '8':
-      CTDovnSix();
-      break;
-    case '9':
-      CTtoFirst();
-      PTtoFirst();
-     // FreePlaylist();
-      FindMusic(MUSIC, 1);
-      break;
-    case '#':
-        Mode_keypressed = 1;
-      break;
-    }
+    DoKey(msg->gbsmsg->submess,1);
     REDRAW();
   }
   if (msg->gbsmsg->msg==LONG_PRESS)
@@ -767,7 +704,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
         SavePlaylist(list);
       break;
       case '8':
-        CTDovnSix();
+        CTDownSix();
       break;
       case '9':
       break;
@@ -851,7 +788,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       copy=1;
       break;
     case '8':
-      if(move==0) {CTDovnSix();}
+      if(move==0) {CTDownSix();}
       break;
     }
     REDRAW();
@@ -872,7 +809,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
         CTUpSix();
       break;
       case '8':
-        CTDovnSix();
+        CTDownSix();
       break;
     }
     REDRAW();
