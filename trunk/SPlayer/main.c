@@ -620,6 +620,10 @@ void QuitCallbackProc(int decision)
 }
 
 /* Блок функций. Неоходимо для конфига клавиш. */
+void DoErrKey() {
+  ShowMSG(1, (int)LG_Error_2);
+}
+
 void DoExit() {
   MsgBoxYesNo(1,(int)LG_Exit,QuitCallbackProc);
 }
@@ -1102,6 +1106,7 @@ int main(char *exename, char *fname)
   load_skin(sfname);
   sprintf(sfname,"%s%s",PIC_DIR,"colour.cfg");
   load_skin(sfname);
+  SUBPROC((void*)LoadKeys);
   playmode = PlayMode;
   SoundVolume = soundvolume;
   

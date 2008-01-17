@@ -3176,6 +3176,9 @@
     <name>$PROJ_DIR$\keys.c</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\klib.c</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\lang.h</name>
   </file>
   <file>

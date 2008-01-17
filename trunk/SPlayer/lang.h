@@ -81,6 +81,7 @@
 #define LG_Is_not_selected       "Не выбрано!"
 #define LG_No_Tags               "Нет ID3 тэгов!"
 #define LG_Error_1               "Ошибка 1"
+#define LG_Error_2               "Ошибка 2: Неверно назначена клавиша!"
 
 #endif //RU
 
@@ -159,6 +160,7 @@
 #define LG_Is_not_selected	"Не обрано!"
 #define LG_No_Tags		"Вiдсутнi ID3 тегi!"
 #define LG_Error_1		"Помилка 1"
+#define LG_Error_2		"Помилка 2"
 
 
 #endif //UA
@@ -238,6 +240,7 @@
 #define LG_Is_not_selected       "Isn't selected!"
 #define LG_No_Tags               "No ID3 tags!"
 #define LG_Error_1               "Error 1"
+#define LG_Error_2               "Error 2: Bad key!"
 
 #endif //EN
 
