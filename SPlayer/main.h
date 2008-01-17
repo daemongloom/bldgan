@@ -7,6 +7,10 @@
 
 #define USE_LOG  // Вести лог, если нет - строку закомментировать
 
+#define MAX_INIBUF 256  // Размер буфера ини-файла
+
+typedef void (*INIPROC) (char *name, char *value); // Процедура обработки ини-файла
+
 // Общие функции модуля MAIN.C
 
 #define color(x) (char *)(&(x))
@@ -75,6 +79,8 @@ void PausingTime(unsigned short action);
 
 void QuitCallbackProc(int decision);
 
+void DoErrKey();
+
 void DoExit();
 
 void LoadDefPlaylist();
@@ -88,4 +94,11 @@ void NextTrackDown();
 void SwitchPlayModeDown();
 
 void DoKey(int key, int ka);
+
+char *strtolower(char *src, char *dst, int sz);
+
+int EnumIni(int local, char *ininame, INIPROC proc);
+
+void LoadKeys();
+
 #endif

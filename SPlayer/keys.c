@@ -98,16 +98,16 @@ KEY_PROC procmap[] = {
   NULL,
   CTDownSix,
   FindingMusic,
-  NULL,
+  ToggleVolume,
   SwitchPlayModeDown,
 };
 
 // Вот не могу понять как эта конструкция работает!
-#define KEYS_COUNT (sizeof(procmap)/sizeof(procmap[0])
+#define KEYS_COUNT (sizeof(procmap)/sizeof(procmap[0]))
 
 void DoKey(int key, int ka)
 {
-  for(int cc=0;cc<KEYS_COUNT);cc++)
+  for(int cc=0;cc<KEYS_COUNT;cc++)
    if(keynames[cc].key==key)
    {
      /*
@@ -123,4 +123,68 @@ void DoKey(int key, int ka)
      if(procmap[cc])procmap[cc]();
      return;
    }
+}
+
+typedef struct {
+  char* name;
+  KEY_PROC proc;
+} PROC_MAP;
+
+const PROC_MAP keyprocs[] = {
+  {"none", NULL},
+  {"mainmenu", MM_Show},
+  {"exit", DoExit},
+  {"loaddefpl", LoadDefPlaylist},
+  {"playtrack", PlayTrackUnderC},
+  {"goup", CTUp},
+  {"godown", CTDown},
+  {"go6up", CTUpSix},
+  {"go6down", CTDownSix},
+  {"nextpl", NextPL},
+  {"prevpl", PrevPL},
+  {"volup", VolumeUp},
+  {"voldown", VolumeDown},
+  {"togglevolume", ToggleVolume},
+  {"togglepb", TogglePlayback},
+  {"stopall", StopAllPlayback},
+  {"nexttrack", NextTrackDown},
+  {"prevtrack", PrevTrackDown},
+  {"findmusic", FindMusic},
+  {"switchmode", SwitchPlayModeDown},
+};
+
+void KeysProc(char *name, char *value)
+{
+  strtolower(name, name, -1);
+  strtolower(value, value, -1);
+
+  int inkey=-1;
+  KEY_PROC keyproc = DoErrKey;
+  
+  for(int cc=0;cc<KEYS_COUNT;cc++)
+   if(strcmp(keynames[cc].name,name)==0)
+   {
+     inkey=cc;
+     break;
+   }
+  if(inkey==-1) return;
+
+  for(int cc=0;cc<sizeof(keyprocs)/sizeof(keyprocs[0]);cc++)
+   if(strcmp(keyprocs[cc].name,value)==0)
+   {
+     keyproc=keyprocs[cc].proc;
+     break;
+   }
+  
+  procmap[inkey] = keyproc;    
+}
+
+const int LOAD_KEYS = 1;
+
+char* keys_file = "4:\\ZBin\\SPlayer\\spkeys.cfg";
+
+void LoadKeys()
+{
+  if(LOAD_KEYS)
+  EnumIni(1,(char*)&keys_file,KeysProc);
 }

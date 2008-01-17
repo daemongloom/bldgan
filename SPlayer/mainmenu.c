@@ -133,7 +133,7 @@ void AboutDlg()
   FreeWS(ews);
   */
   ShowMSG(0,(int)"(r)\nIlya_ZX\n-Shadow-\nCaptain SISka\nVedan\nGanster and The_Zen");
-  ShowMSG(0,(int)"SPlayer v0.7.6.0\n(c): \nAnderstand\nBlind007\nDemonGloom");
+  ShowMSG(0,(int)"SPlayer v0.7.7.0\n(c): \nAnderstand\nBlind007\nDemonGloom");
   GeneralFuncF1(1);
 };
 /////////////////////////////////////////////Ξα ύλότε///////////////////////////////////////////////////
