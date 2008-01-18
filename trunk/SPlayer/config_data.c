@@ -71,6 +71,18 @@ __root const CFG_HDR cfghdr24={CFG_STR_UTF8,LG_Path_To_SCE,3,127};
 __root const char EXENAME[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\SPlayer cfg editor.elf";
 
 __root const CFG_HDR cfghdr_m20={CFG_LEVEL,"",0,0};
+
+// Level 3
+__root const CFG_HDR cfghdr_m31={CFG_LEVEL,LG_Key_Settings,1,0};
+
+__root const CFG_HDR cfghdr32={CFG_CBOX,LG_LoadKeys,0,2};
+__root const unsigned int LOAD_KEYS = 1;
+__root const CFG_CBOX_ITEM cfgcbox5[2]={LG_No,LG_Yes};
+
+__root const CFG_HDR cfghdr33={CFG_STR_UTF8,LG_KeySet_Path,3,127};
+__root const char KEYCFG_PATH[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\spkeys.cfg";
+
+__root const CFG_HDR cfghdr_m30={CFG_LEVEL,"",0,0};
 /*
 // Level 3
 __root const CFG_HDR cfghdr_m31={CFG_LEVEL,"Skin",1,0};
