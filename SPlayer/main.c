@@ -1009,7 +1009,6 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
   // Blind007: А что не так?
   // Ы! В самом начале писал, что не пашет, так не пашет и теперь... AAA
   if (((msg->msg==MSG_INCOMMING_CALL)&&(PlayingStatus==2)) || ((msg->msg==MSG_END_CALL)&&(PlayingStatus==1)))  
-  {
     TogglePlayback();
   }
 #else 

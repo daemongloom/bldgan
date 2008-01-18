@@ -9,6 +9,9 @@
   То что в комментариях, не удаляйте, может пригодиться!
  */
 
+extern const unsigned int LOAD_KEYS; // Грузить ли из файла
+extern const char KEYCFG_PATH[];      // Откуда грузятся настройки
+
 typedef void (*KEY_PROC) ();
 
 /*
@@ -179,12 +182,8 @@ void KeysProc(char *name, char *value)
   procmap[inkey] = keyproc;    
 }
 
-const int LOAD_KEYS = 1;
-
-char* keys_file = "4:\\ZBin\\SPlayer\\spkeys.cfg";
-
 void LoadKeys()
 {
   if(LOAD_KEYS)
-  EnumIni(1,(char*)&keys_file,KeysProc);
+  EnumIni(1,(char*)&KEYCFG_PATH,KeysProc);
 }

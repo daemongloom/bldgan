@@ -50,6 +50,9 @@
 #define LG_Idle_coordinates      "Координаты иконки на Idle"
 #define LG_Sets                  "Настройки"
 #define LG_Show_full_names       "Показ. полные имена"
+#define LG_Key_Settings          "Настройки конфига клавиш"
+#define LG_LoadKeys              "Загружать из файла?"
+#define LG_KeySet_Path           "Файл настроек клавиш"
 
 #define LG_No                    "Нет"
 #define LG_Yes                   "Да"
@@ -129,6 +132,9 @@
 #define LG_Idle_coordinates      "Координати ярличка на Idle"
 #define LG_Sets                  "Установки"
 #define LG_Show_full_names       "Показ повного iменi"
+#define LG_Key_Settings          "Настроки конфига клавиш"
+#define LG_LoadKeys              "Загружать настройки клавиш из файла?"
+#define LG_KeySet_Path           "Файл настроек клавиш"
 
 #define LG_No			"Нi"
 #define LG_Yes			"Так"
@@ -209,6 +215,9 @@
 #define LG_Idle_coordinates      "Idle coordinates"
 #define LG_Sets                  "Sets"
 #define LG_Show_full_names       "Show full names"
+#define LG_Key_Settings          "Key-config settings"
+#define LG_LoadKeys              "Load key-config from file"
+#define LG_KeySet_Path           "File key-config"
 
 #define LG_No                    "No"
 #define LG_Yes                   "Yes"
