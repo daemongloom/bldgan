@@ -68,6 +68,7 @@
 #define LG_m3u                   "m3u"
 #define LG_Default_volume        "Станд. громкость"
 #define LG_Amount_of_lines       "Количество треков"
+#define LG_Send_fname            "Отправлять имя файла"
 #define LG_Paths                 "Пути к файлам/папкам"
 #define LG_Picture_folder        "Папка для графики"
 #define LG_Playlist_folder       "Папка для плейлистов"
@@ -83,6 +84,7 @@
 #define LG_Exit                  "Закрыть SPlayer?"
 #define LG_Is_not_selected       "Не выбрано!"
 #define LG_No_Tags               "Нет ID3 тэгов!"
+#define LG_Already_Started       "Уже запущен!"
 #define LG_Error_1               "Ошибка 1"
 #define LG_Error_2               "Ошибка 2: Неверно назначена клавиша!"
 
@@ -165,6 +167,7 @@
 #define LG_Exit         	"Закрити SPlayer?"
 #define LG_Is_not_selected	"Не обрано!"
 #define LG_No_Tags		"Вiдсутнi ID3 тегi!"
+#define LG_Already_Started    ////////////////////////////////////////////   "Уже запущен!"
 #define LG_Error_1		"Помилка 1"
 #define LG_Error_2		"Помилка 2"
 
@@ -233,6 +236,7 @@
 #define LG_m3u                   "m3u"
 #define LG_Default_volume        "Default volume"
 #define LG_Amount_of_lines       "Amount of lines"
+#define LG_Send_fname            "Send filename"
 #define LG_Paths                 "Paths"
 #define LG_Picture_folder        "Picture folder"
 #define LG_Playlist_folder       "Playlist folder"
@@ -248,6 +252,7 @@
 #define LG_Exit                  "Close SPlayer?"
 #define LG_Is_not_selected       "Isn't selected!"
 #define LG_No_Tags               "No ID3 tags!"
+#define LG_Already_Started       "Already started!"
 #define LG_Error_1               "Error 1"
 #define LG_Error_2               "Error 2: Bad key!"
 

@@ -1,6 +1,8 @@
 #ifndef _PLAYLIST_H_
   #define _PLAYLIST_H_
 
+#define TCPL 5             // Количество пл   AAA
+
 // Оказалось его перед закрытием еще и останавливать надо... А то такое начинается! :D  AAA
 void DisableScroll(void);
 
@@ -73,9 +75,6 @@ void CTUpSix();
 //Воспроизвести AAA
 void PlayTrackUnderC();
 
-//Раскраска AAA
-//int * TextColor(int my_x,int my_y,int c,int w,int out_ws,int i);       Не вышла оптимизация, ибо некогда
-
 // Выдаем текущий статус
 char GetPlayingStatus();
 
@@ -91,17 +90,11 @@ void SetPHandle(short ph);
 // Возвращает кол-во треков в загруженном пл
 int GetTC();
 
-// Возвращаем структуру mp3-тега
-//int GetMP3Tag_v1(const char * fname, MP3Tagv1 * tag);
-
 // Выделим память   AAA
 void Memory();
 
 // Для загрузки пл из главного модуля
 void LoadingPlaylist(const char * fn);
-
-// Свобода пл!
-void FreePlaylist(void);
 
 // Загружаем пл!
 int LoadPlaylist(const char * fn);
@@ -144,6 +137,8 @@ void BandRoll();
 
 //Ищем файлы в папке   AAA
 void FindMusic(const char *dir, int i);
+
+int LoadDaemonList(char* path);
 
 // Утечка памяти в самом деле достала...   AAA
 void MemoryFree();

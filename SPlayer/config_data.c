@@ -49,12 +49,16 @@ __root const int soundvolume=2;
 __root const CFG_HDR cfghdr16={CFG_INT,LG_Default_volume,0,14};
 __root const int soundvolume=6;
 #endif
-/*
-__root const CFG_HDR cfghdr17 = {CFG_INT,"Amount of playlists",0,100};
-__root const unsigned int TCPL = 5;
-*/
+
 __root const CFG_HDR cfghdr17 = {CFG_INT,LG_Amount_of_lines,0,10000};
-__root const unsigned int LinesInPL = 256;
+__root const unsigned int LinesInPL_C = 256;
+
+__root const CFG_HDR cfghdr18 = {CFG_INT,"Size Of Font",0,20};
+__root const unsigned int SizeOfFont = 11;
+
+__root const CFG_HDR cfghdr19={CFG_CBOX,LG_Send_fname,0,2};
+__root const unsigned int FnameIPC = 0;
+__root const CFG_CBOX_ITEM cfgcbox5[2]={LG_No,LG_Yes};
 
 __root const CFG_HDR cfghdr_m10={CFG_LEVEL,"",0,0};
 
@@ -77,7 +81,7 @@ __root const CFG_HDR cfghdr_m31={CFG_LEVEL,LG_Key_Settings,1,0};
 
 __root const CFG_HDR cfghdr32={CFG_CBOX,LG_LoadKeys,0,2};
 __root const unsigned int LOAD_KEYS = 1;
-__root const CFG_CBOX_ITEM cfgcbox5[2]={LG_No,LG_Yes};
+__root const CFG_CBOX_ITEM cfgcbox6[2]={LG_No,LG_Yes};
 
 __root const CFG_HDR cfghdr33={CFG_STR_UTF8,LG_KeySet_Path,3,127};
 __root const char KEYCFG_PATH[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\spkeys.cfg";

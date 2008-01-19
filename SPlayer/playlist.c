@@ -15,6 +15,7 @@ extern const int SHOW_FULLNAMES;
 extern const char PIC_DIR[];           // Для курсора AAA
 extern const int EXT;                  // Расширение по умолчанию
 extern const int soundvolume;          // Громкость
+extern const unsigned int SizeOfFont;  // Шрифт AAA
 
 // Мои переменные
 unsigned short SoundVolume;           // Громкость
@@ -22,13 +23,13 @@ unsigned short SVforToggle = 0;       // Прежняя громкость
 unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 - играем)   // Было char стало unsigned short! :D   AAA
 short phandle = -1;                   // Что играем
 
-int CurrentTrack[5];                 // Текущий трек
-int PlayedTrack[5];                  // Проигрываемый трек   AAA
+int CurrentTrack[TCPL];                 // Текущий трек
+int PlayedTrack[TCPL];                  // Проигрываемый трек   AAA
 int CurrentPL=0;                     // Текущий пл   AAA
 int PlayedPL=0;                      // Пл воспроизведения   AAA
-unsigned int TC[5];                  // Количество треков в пл 
-/*extern */const unsigned int TCPL=5;// Количество пл
-extern const unsigned int LinesInPL; // Количество треков (макс)
+unsigned int TC[TCPL];                  // Количество треков в пл 
+extern const unsigned int LinesInPL_C; // Количество треков (макс)
+unsigned int LinesInPL;
 int PlayTime;
 unsigned short NextPlayedTrack[2];   // № трека и пл в очереди
 
@@ -441,7 +442,7 @@ void PlayTrackUnderC()
     PlayedPL=CurrentPL;
   }
   PlayedTrack[PlayedPL] = CurrentTrack[CurrentPL];
-  PlayMP3File(GetCurrentTrack(PlayedTrack[PlayedPL]));
+  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));
 }
 
 // Выдаем текущий статус
@@ -510,14 +511,12 @@ int GetMP3Tag_v1(const char * fname, MP3Tagv1 * tag)
 // Выделим память   AAA
 void Memory()
 {
+  LinesInPL=LinesInPL_C;
   playlist_lines=malloc(TCPL*sizeof(char *)); // 5 пл на 256 строк
   for(unsigned int i=0;i<TCPL;i++)
   {
     playlist_lines[i]=malloc(LinesInPL*sizeof(char *));
   }
- // CurrentTrack=malloc(TCPL*sizeof(int *));
- // PlayedTrack=malloc(TCPL*sizeof(int *));
- // TC=malloc(TCPL*sizeof(unsigned int *));
 }
 
 // Для загрузки пл из главного модуля
@@ -530,8 +529,21 @@ void LoadingPlaylist(const char * fn)
 // Свобода пл!
 void FreePlaylist(void)
 {
-  if (playlist_lines) mfree(playlist_lines);
-  playlist_lines=NULL;
+  if (playlist_lines)
+  {
+    for(unsigned int i=0;i<TCPL;i++)
+    {
+      for(int j=LinesInPL-1;j>-1;j--)
+      {
+        mfree(playlist_lines[i][j]);
+        playlist_lines[i][j]=0;
+      }
+      mfree(playlist_lines[i]);
+      playlist_lines[i]=0;
+    }
+    mfree(playlist_lines);
+    playlist_lines=0;
+  }
 }
 
 // Загружаем пл!
@@ -880,11 +892,11 @@ void PL_Redraw()
     // Делаем другой цвет для не текущего трека...
     if (PlayedTrack[CurrentPL]==i)
     {
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL)+c,
-                   1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(SizeOfFont)+c,
+                   1,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
     }else{
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL)+c,
-                   1,FONT_SMALL,0,color(COLOR_TEXT_CURSOR),0);
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(SizeOfFont)+c,
+                   1,SizeOfFont,0,color(COLOR_TEXT_CURSOR),0);
     }
     
     }else{
@@ -899,7 +911,7 @@ void PL_Redraw()
 //                 color(COLOR_TEXT_PLAY),0);
       if(GrafOn)
       {
-          int i=Get_WS_width(out_ws,FONT_SMALL);  //Определяет кол-во пикселей при этом шрифте (или что то вроде того...)
+          int i=Get_WS_width(out_ws,SizeOfFont);  //Определяет кол-во пикселей при этом шрифте (или что то вроде того...)
 	  i-=(w-9);   //До куда докручивать
 	  if (i<0)
 	  {
@@ -912,15 +924,15 @@ void PL_Redraw()
 	    max_scroll_disp=i;
 	  }
       }
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL)+c,
-                   scroll_disp+1,FONT_SMALL,0,color(COLOR_TEXT_PLAY),0);
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(SizeOfFont)+c,
+                   scroll_disp+1,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
     }else{
 //      DrawString(out_ws,my_x,my_y,w,my_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
 //               color(COLOR_TEXT),0);
 
 	if(GrafOn)
         {
-          int i=Get_WS_width(out_ws,FONT_SMALL);
+          int i=Get_WS_width(out_ws,SizeOfFont);
 	  i-=(w-9);
 	  if (i<0)
 	  {
@@ -933,12 +945,12 @@ void PL_Redraw()
 	    max_scroll_disp=i;
 	  }
         }
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(FONT_SMALL)+c,
-                   scroll_disp+1,FONT_SMALL,0,color(COLOR_TEXT),0);
+      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(SizeOfFont)+c,
+                   scroll_disp+1,SizeOfFont,0,color(COLOR_TEXT),0);
     }
-    c+=15;
+    c+=s;
     }
-    c+=15;
+    c+=s;
     }
     }
     FreeWS(out_ws);
@@ -984,12 +996,12 @@ void FindMusic(const char *dir, int i)
       }
       else
       {
-        char *p=malloc(256);
-        strncpy(p,path,256);
+        
+        strncpy(playlist_lines[CurrentPL][i++],path,256);
         //playlist_lines=realloc(playlist_lines,(i+1)*sizeof(p));
        // playlist_lines[CurrentPL][i+1]=malloc(256);
-        playlist_lines[CurrentPL][i++]=p;
-        mfree(p);
+       // playlist_lines[CurrentPL][i++]=p;
+        
       }
     }
     while(FindNextFile(&de,&err));
@@ -999,9 +1011,50 @@ void FindMusic(const char *dir, int i)
   else {TC[CurrentPL]=0;}
 }
 
+//LoadDaemonList(" 4:\\Doc\\");
+int LoadDaemonList(char* path)
+{
+ // ShowMSG(0,(int)path);
+  DIR_ENTRY de;
+  unsigned int err;
+  char name[256];
+  unsigned int i=0;
+  strcpy(name,path);
+  strcat(name,"*.mp3");
+  int count1=0;
+  if(FindFirstFile(&de,name,&err))
+  {
+    do
+    {
+      if (!(de.file_attr&FA_DIRECTORY))
+      {
+        //////////////////
+        // тута делаем что хотим с найдеными файлами
+        //////////////////
+       // strcpy(playlist_lines[CurrentPL][i++],path);
+       // strcat(playlist_lines[CurrentPL][i++],de.file_name);
+        sprintf(playlist_lines[CurrentPL][i++],"%t%t",path,de.file_name);
+        ShowMSG(1,(int)playlist_lines[CurrentPL][i++]);
+        count1++;
+      }
+      else //если ето директория вызываем рекурсивно ето ф.
+      {
+        strcpy(name,path);
+        strcat(name,de.file_name);
+        strcat(name,"\\");
+        count1=count1+LoadDaemonList(name);
+      }
+    }
+    while(FindNextFile(&de,&err));
+  }
+  FindClose(&de,&err);
+  return count1;
+};
+
 // Утечка памяти в самом деле достала...   AAA
 void MemoryFree()
 {
   GBS_DelTimer(&tmr_scroll);
   GBS_DelTimer(&tmr_displacement);
+ // FreePlaylist();
 }
