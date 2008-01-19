@@ -5,6 +5,7 @@
 #include "playlist.h"
 #include "ID3Genres.h"
 #include "item_info.h"
+#include "sets_menu.h"
 
 #ifdef NEWSGOLD
 #define DEFAULT_DISK "4"
@@ -41,15 +42,17 @@ void patch_input(INPUTDIA_DESC* inp)
   inp->rc.y2=ScreenH()-SoftkeyH()-1;
 }
 //==============================================================================
+extern const char PIC_DIR[];
 extern const char EXENAME[];   // SPlayer cfg editor.elf
+char cfgname[256];
 extern unsigned short EditPL;
-extern int CurrentTrack[5];
+extern int CurrentTrack[TCPL];
 extern int CurrentPL;
-extern unsigned int TC[5];
+extern unsigned int TC[TCPL];
 void inp_locret(void){}
 ID3TAGDATA *MainTag;
 
-#define N_ITEMS 8
+#define N_ITEMS 6
 
 int MainMenu_ID;
 
@@ -71,39 +74,15 @@ void ShowID3()
   }
   else
   {
-    ShowMSG(0,(int)LG_Is_not_selected);
+    MsgBoxError(0,(int)LG_Is_not_selected);
   }
   GeneralFuncF1(1);
 }
 
-void Coordinates()
+void Sets_Menu()
 {
-  WSHDR *ws=AllocWS(256);
-  extern const char PIC_DIR[];
-  char sfname[256];
-  str_2ws(ws,EXENAME,strlen(EXENAME)+1);
-  sprintf(sfname,"%s%s",PIC_DIR,"skin.cfg");
-  ExecuteFile(ws,0,(char*)sfname);
-  FreeWS(ws);
+  Disp_Sets_Menu();
   GeneralFuncF1(1);
-}
-
-void Colours()
-{
-  WSHDR *ws=AllocWS(256);
-  extern const char PIC_DIR[];
-  char sfname[256];
-  str_2ws(ws,EXENAME,strlen(EXENAME)+1);
-  sprintf(sfname,"%s%s",PIC_DIR,"colour.cfg");
-  ExecuteFile(ws,0,(char*)sfname);
-  FreeWS(ws);
-  GeneralFuncF1(1);
-}
-
-void SetEditPL()
-{
-  EditPL=!(EditPL);
-  RefreshGUI();
 }
 
 void Settings()   //Настройки  AAA
@@ -153,9 +132,7 @@ static const char * const menutexts[N_ITEMS]=
 {
   LG_SetNextPlayed,
   LG_ShowID3,
-  LG_Coordinates,
-  LG_Colours,
-  LG_SetEditPL,
+  LG_Sets_Menu,
   LG_Settings,
   LG_AboutDlg,
   LG_Exit_SPlayer
@@ -173,9 +150,7 @@ MENUITEM_DESC menuitems[N_ITEMS]=
 void *menuprocs[N_ITEMS]={
                           (void *)SetNextPlayedOn,
                           (void *)ShowID3,
-                          (void *)Coordinates,
-                          (void *)Colours,
-                          (void *)SetEditPL,
+                          (void *)Sets_Menu,
                           (void *)Settings,
                           (void *)AboutDlg,
                           (void *)Exit_SPlayer
@@ -201,19 +176,6 @@ SOFTKEYSTAB mmenu_skt=
   mmenu_sk,0
 };
 
-/*
-// swilib.h от 17.08.07. Проблема со структурой MENU_DESC
-MENU_DESC tmenu=
-{
-  8,NULL,NULL,NULL,
-  mmenusoftkeys,
-  &mmenu_skt,
-  1,
-  NULL,             // Написал NULL, не знаю что будет...
-  menuitems,
-  (MENUPROCS_DESC*)menuprocs, // Дописал (MENUPROCS_DESC*)
-  N_ITEMS
-};*/
 int S_ICONS[N_ITEMS];
 
 void menuitemhandler(void *data, int curitem, void *unk)
@@ -237,16 +199,10 @@ void menuitemhandler(void *data, int curitem, void *unk)
     SetMenuItemIconArray(data,item,S_ICONS+3);
     break;
   case 4:
-    SetMenuItemIconArray(data,item,icon_array+(EditPL?0:1));
+    SetMenuItemIconArray(data,item,S_ICONS+4);
     break;
   case 5:
     SetMenuItemIconArray(data,item,S_ICONS+5);
-    break;
-  case 6:
-    SetMenuItemIconArray(data,item,S_ICONS+6);
-    break;
-  case 7:
-    SetMenuItemIconArray(data,item,S_ICONS+7);
     break;
   }
   SetMenuItemText(data, item, ws, curitem);
@@ -281,13 +237,10 @@ static const MENU_DESC tmenu=
   N_ITEMS
 };
 
-extern const char PIC_DIR[128];
-int S_ICONS[N_ITEMS];
+//int S_ICONS[N_ITEMS];
 char setnexttrackpic[128];
 char showid3[128];
-char coordinatespic[128];
-char colourspic[128];
-char editplpic[128];
+char setsmenupic[128];
 char settingspic[128];
 char aboutpic[128];
 char exitpic[128];
@@ -306,31 +259,24 @@ void MM_Show()
   S_ICONS[1] = (int)showid3;
 
   // Картинка Коордиаты
-  strcpy(coordinatespic,PIC_DIR);
-  strcat(coordinatespic,"coordinates.png");
-  S_ICONS[2] = (int)coordinatespic;
+  strcpy(setsmenupic,PIC_DIR);
+  strcat(setsmenupic,"setsmenu.png");
+  S_ICONS[2] = (int)setsmenupic;
 
-  // Картинка Цвета
-  strcpy(colourspic,PIC_DIR);
-  strcat(colourspic,"colours.png");
-  S_ICONS[3] = (int)colourspic;
-  
-  // Картинка Редактирорвание пл
-  // S_ICONS[4]
   // Картинка Настройки
   strcpy(settingspic,PIC_DIR);
   strcat(settingspic,"settings.png");
-  S_ICONS[5] = (int)settingspic;
+  S_ICONS[3] = (int)settingspic;
 
   // Картинка Об эльфе...
   strcpy(aboutpic,PIC_DIR);
   strcat(aboutpic,"about.png");
-  S_ICONS[6] = (int)aboutpic;
+  S_ICONS[4] = (int)aboutpic;
 
   // Картинка Выход
   strcpy(exitpic,PIC_DIR);
   strcat(exitpic,"exit.png");
-  S_ICONS[7] = (int)exitpic;
+  S_ICONS[5] = (int)exitpic;
 
 #else
   S_ICONS[0] = 0;
@@ -341,14 +287,10 @@ void MM_Show()
   menuitems[2].icon = S_ICONS+2;
   S_ICONS[3] = 0;
   menuitems[3].icon = S_ICONS+3;
- // S_ICONS[4] = 0;
- // menuitems[4].icon = S_ICONS+4;
+  S_ICONS[4] = 0;
+  menuitems[4].icon = S_ICONS+4;
   S_ICONS[5] = 0;
   menuitems[5].icon = S_ICONS+5;
-  S_ICONS[6] = 0;
-  menuitems[6].icon = S_ICONS+6;
-  S_ICONS[7] = 0;
-  menuitems[7].icon = S_ICONS+7;
 #endif  
   
   icon_array[0]=GetPicNByUnicodeSymbol(CBOX_CHECKED);

@@ -3202,6 +3202,15 @@
   <file>
     <name>$PROJ_DIR$\setlang.h</name>
   </file>
+  <file>
+    <name>$PROJ_DIR$\sets_menu.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\sets_menu.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\SPlayer_ipc.h</name>
+  </file>
 </project>
 
 

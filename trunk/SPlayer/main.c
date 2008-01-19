@@ -5,6 +5,8 @@
 #include "mainmenu.h"
 #include "playlist.h"
 #include "lang.h"
+#include "SPlayer_ipc.h"
+#include "../inc/xtask_ipc.h"
 
 /*
 typedef struct {
@@ -49,8 +51,12 @@ unsigned short maincsm_name_body[140];
 unsigned int MAINCSM_ID = 0;
 unsigned int MAINGUI_ID = 0;
 
-extern int CurrentPL;
-extern int PlayedPL;
+//IPC   AAA
+const char ipc_my_name[32]=IPC_SPLAYER_NAME;
+const char ipc_xtask_name[]=IPC_XTASK_NAME;
+const char ipc_grantee_name[]=IPC_GRANTEE_NAME;
+IPC_REQ gipc;
+
 extern unsigned short stop; // 1, если останавливаем листание   AAA
 unsigned short copy=0; // 1, если копируем   AAA
 unsigned short move=0; // 1, если перемещаем   AAA
@@ -130,14 +136,19 @@ extern const char DEFAULT_PLAYLIST1[];
 extern const char DEFAULT_PLAYLIST2[];
 extern const unsigned int IDLE_X;
 extern const unsigned int IDLE_Y;
-extern const int PlayMode; 
-extern const int soundvolume; 
+extern const int PlayMode;
+extern const int soundvolume;
+extern const unsigned int SizeOfFont;  // Шрифт   AAA
+extern const unsigned int FnameIPC;    // Отправлять или нет   AAA
 //--- настройки из конфига ---
 
 //--- Переменные ---
 extern short phandle;  // Для определения конца воспр.  AAA
 extern unsigned short PlayingStatus;
-extern unsigned int TC[5];
+extern int CurrentPL;
+extern int PlayedPL;
+extern unsigned int TC[TCPL];
+extern int PlayedTrack[TCPL];
 char Quit_Required = 0;     // Флаг необходимости завершить работу
 char list[256];
 char sfname[256];
@@ -292,6 +303,10 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       
       const char *p=strrchr(fname,'\\')+1; 
       str_2ws(sndFName,p,128);
+      // Вылавливаем имя трека   AAA
+      char *trackname=malloc(128);
+      strncpy(trackname,p,128);
+      // Выловили имя трека   AAA
       strncpy(s,fname,p-fname);
       s[p-fname]='\0';
       str_2ws(sndPath,s,128);
@@ -321,6 +336,20 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       PlayMelody_ChangeVolume(phandle,GetVolLevel());  // Что бы была нормальная громкость - иначе криво...
 #endif
       UpdateCSMname(sndFName); // Покажем что играем XTask Blind007
+      // Покажем что играем тем кому нужно :)))   AAA
+      if(FnameIPC)
+      {
+        ID3TAGDATA *StatTag;
+        gipc.name_to=ipc_grantee_name;
+        gipc.name_from=ipc_my_name;
+        StatTag=malloc(sizeof(ID3TAGDATA));   // С этим жопа какая то... Наверно лучше не пытаться   AAA
+        ReadID3v1(GetPlayedTrack(PlayedTrack[PlayedPL]), StatTag);
+        if(StatTag->artist&&StatTag->title) {sprintf(trackname,"%s%s%s%s",StatTag->artist," - ",StatTag->title,".mp3");}
+        gipc.data=(void*)trackname;
+        GBS_SendMessage(MMI_CEPID,MSG_IPC,0,&gipc);
+        mfree(trackname);
+        mfree(StatTag);
+      }
 //      BeginTime = SetBeginTime(); // Время начала играния файла Blind007
       FreeWS(sndPath);
       FreeWS(sndFName);
@@ -453,6 +482,19 @@ void load_skin(char const* cfgname)              // Извращенец... Такое создать.
   }
 }
 
+void CheckDoubleRun(void)
+{
+  if ((int)(gipc.data)>1)
+  {
+    LockSched();
+    CloseCSM(MAINCSM_ID);
+    ShowMSG(1,(int)LG_Already_Started);
+    UnlockSched();
+  }
+  else
+  {}
+}
+
 void OnRedraw(MAIN_GUI *data) // OnRedraw
 {
   if(IsGuiOnTop(MAINGUI_ID))
@@ -465,7 +507,6 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
 #else
   unsigned short top = 0;
 #endif
-//  DrawRoundedFrame(left+1,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),color(COLOR_BG));  // А это зачем??? Если нужно - объясни!   AAA
 #ifndef NO_PNG                         // Сделаем режим без скина - DG
   // --- Делаем типа скин ---
   char sfname[256];
@@ -569,6 +610,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
     DrawImg(KeyLock_x,KeyLock_y,(int)pfname);
   }
 #else
+  DrawRoundedFrame(left+1,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),color(COLOR_BG));  // Поселим это сюда   AAA
 #endif
                                      // Здесь будут универсальные строки, одинаковые как для png, так и для их отсутствия
 #ifdef X75
@@ -658,6 +700,7 @@ void SwitchPlayModeDown() {
 }
 /* Блок функций. Неоходимо для конфига клавиш. */
 
+
 /*
   Обработчик нажатий клавиш. Сюда передаются нажатия клавиш
   в виде сообщения GUI_MSG, пример декодирования ниже.
@@ -677,6 +720,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     if(EditPL==0)         //  Mr. Anderstand: самому не оч нравится такой вариант...
   {
   if (msg->gbsmsg->msg==KEY_UP) {
+     stop=1;              //  Mr. Anderstand: а это??
      Stat_keypressed = 0;
      P_keypressed = 0;
      N_keypressed = 0;
@@ -823,6 +867,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
   return(0);
 }
 
+
 int my_keyhook(int submsg,int msg)
 {
 #ifdef ELKA
@@ -930,15 +975,19 @@ void maincsm_oncreate(CSM_RAM *data)
   csm->csm.unk1=0;
   csm->gui_id=CreateGUI(main_gui);
   MAINGUI_ID=csm->gui_id;
+  
+  gipc.name_to=ipc_my_name;
+  gipc.name_from=ipc_my_name;
+  gipc.data=0;
+  GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_CHECK_DOUBLERUN,&gipc);
 }
 
 // Вызывается при закрытии главного CSM. Тут и вызывается киллер
 void maincsm_onclose(CSM_RAM *csm)
 {
-  MemoryFree();
   GBS_DelTimer(&mytmr);
-  StopAllPlayback();  
-  FreePlaylist();
+  StopAllPlayback();
+  MemoryFree();
   FreeWS(wl.wfilename);
   SUBPROC((void *)ElfKiller);
 }
@@ -947,6 +996,31 @@ void maincsm_onclose(CSM_RAM *csm)
 int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
 {
   MAIN_CSM *csm=(MAIN_CSM*)data;
+  {
+  if (msg->msg==MSG_IPC)
+    {
+      IPC_REQ *ipc;
+      if ((ipc=(IPC_REQ*)msg->data0))
+      {
+        if (strcmp(ipc->name_to,ipc_my_name)==0)//strcmp_nocase
+        {
+          switch (msg->submess)
+          {
+          case IPC_CHECK_DOUBLERUN:
+            ipc->data=(void *)((int)(ipc->data)+1);
+	    //Если приняли свое собственное сообщение, значит запускаем чекер
+	    if (ipc->name_from==ipc_my_name) SUBPROC((void *)CheckDoubleRun);
+            /*
+            gipc.name_to=ipc_xtask_name;
+            gipc.name_from=ipc_my_name;
+            gipc.data=(void *)MAINCSM_ID;
+            GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_XTASK_SHOW_CSM,&gipc);*/
+            break;
+          }
+        }
+      }
+     // if (ipc->name_to==ipc_grantee_name) {ShowMSG(1,(int)ipc->data);}
+    }
   if (Quit_Required)
   {
     csm->csm.state=-3;
@@ -974,16 +1048,16 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
         switch(GetPlayingStatus())
 	{
         case 0:
-          sprintf(sfname,"%s%s",PIC_DIR,"stop.png");
+          sprintf(sfname,"%s%s",PIC_DIR,"stop_idle.png");
           break;
         case 1:
-          sprintf(sfname,"%s%s",PIC_DIR,"pause.png");
+          sprintf(sfname,"%s%s",PIC_DIR,"pause_idle.png");
           break;
         case 2:
-          sprintf(sfname,"%s%s",PIC_DIR,"play.png");
+          sprintf(sfname,"%s%s",PIC_DIR,"play_idle.png");
           break;
 	}
-        DrawCanvas(canvasdata,IDLE_X,IDLE_Y,IDLE_X+16,IDLE_Y+16,1);
+        DrawCanvas(canvasdata,IDLE_X,IDLE_Y,IDLE_X+GetImgWidth((int)sfname)-1,IDLE_Y+GetImgHeight((int)sfname)-1,1); // Сделаем так   AAA
 	DrawImg(IDLE_X,IDLE_Y,(int)sfname);
 #ifdef ELKA
 #else
@@ -991,7 +1065,7 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
 #endif
     }
   }
-
+  }
   // если реконфиг
   
   if (msg->msg==MSG_RECONFIGURE_REQ)
@@ -1008,7 +1082,8 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
   // У кого руки такие кривые??
   // Blind007: А что не так?
   // Ы! В самом начале писал, что не пашет, так не пашет и теперь... AAA
-  if (((msg->msg==MSG_INCOMMING_CALL)&&(PlayingStatus==2)) || ((msg->msg==MSG_END_CALL)&&(PlayingStatus==1)))  
+  if (((msg->msg==MSG_INCOMMING_CALL)&&(PlayingStatus==2)) || ((msg->msg==MSG_END_CALL)&&(PlayingStatus==1)))
+  {
     TogglePlayback();
   }
 #else 
