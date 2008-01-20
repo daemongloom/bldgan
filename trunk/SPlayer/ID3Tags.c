@@ -31,7 +31,14 @@ int ReadID3v1(char*fname, ID3TAGDATA *tag) // Чтение ID3 v1
     memcpy(tag->artist,&tagtext[30],30);
     memcpy(tag->album,&tagtext[60],30);
     memcpy(tag->year,&tagtext[90],4);
-    memcpy(tag->comment,&tagtext[94],30);
+    if(tagtext[122])   // Прилепим еще это :)   AAA
+    {
+      memcpy(tag->comment,&tagtext[94],30);
+    }else{
+      tag->version1_1=1;   // Определили версию тэгов   AAA
+      memcpy(tag->comment,&tagtext[94],28);
+      tag->number = tagtext[123];
+    }
     tag->genre = tagtext[124];
     mfree(tagtext); // Освобождаем память
   }

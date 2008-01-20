@@ -148,6 +148,17 @@ void Disp_Info(ID3TAGDATA *tag)
   wsprintf(ws_info,"%t",tag->comment);
   ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,30);
   AddEditControlToEditQend(eq,&ec,ma);
+  if(tag->version1_1&&tag->number)
+  {
+    // Number
+    wsprintf(ws_info,"%t",LG_Number);
+    ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
+    AddEditControlToEditQend(eq,&ec,ma);
+    
+    wsprintf(ws_info,"%i",tag->number);
+    ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,128);
+    AddEditControlToEditQend(eq,&ec,ma);
+  }
   // Genre
   wsprintf(ws_info,"%t",LG_Genre);
   ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);

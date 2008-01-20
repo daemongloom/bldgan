@@ -56,7 +56,9 @@ typedef struct
   char album[30]; // Альбом
   char year[4]; // Год
   char comment[30]; // Комментарий
+  int number; // Номер   AAA
   int genre; // Жанр
+  int version1_1; // 1 - версия 1.1, 0 - версия 1.0   AAA
   int present; // Присутствует
 }ID3TAGDATA;
 
@@ -74,6 +76,8 @@ int ReadID3v1(char*fname, ID3TAGDATA *tag); // Чтение ID3 v1
 void load_skin(char const* cfgname);
 
 void PlayMP3File(const char * fname);
+
+void ToDevelop();   // Развернуть   AAA
 
 void PausingTime(unsigned short action);
 

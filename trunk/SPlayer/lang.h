@@ -40,6 +40,7 @@
 #define LG_Album                 "Альбом"
 #define LG_Year                  "Год"
 #define LG_Comment               "Комментарий"
+#define LG_Number                "Номер"
 #define LG_Genre                 "Жанр"
 
 ///////////Config///////////
@@ -48,6 +49,7 @@
 #define LG_Default_playlist_3    "Станд. плейлист 3"
 #define LG_Music_folder          "Папка музыки"
 #define LG_Idle_coordinates      "Координаты иконки на Idle"
+#define LG_Auto_Exit_Min         "Время до автозакрытия"
 #define LG_Sets                  "Настройки"
 #define LG_Show_full_names       "Показ. полные имена"
 #define LG_Key_Settings          "Настройки конфига клавиш"
@@ -124,6 +126,7 @@
 #define LG_Album                 "Альбом"
 #define LG_Year                  "Рiк"
 #define LG_Comment               "Коментарi"
+#define LG_Number             ////////////////////////   "Номер"
 #define LG_Genre                 "Жанр"
 
 ///////////Config///////////
@@ -132,6 +135,7 @@
 #define LG_Default_playlist_3    "Стнад. плейлист 3"
 #define LG_Music_folder          "Папка пiсень"
 #define LG_Idle_coordinates      "Координати ярличка на Idle"
+#define LG_Auto_Exit_Min       ///////////////////////  "Время до автозакрытия"
 #define LG_Sets                  "Установки"
 #define LG_Show_full_names       "Показ повного iменi"
 #define LG_Key_Settings          "Настроки конфига клавиш"
@@ -208,6 +212,7 @@
 #define LG_Album                 "Album"
 #define LG_Year                  "Year"
 #define LG_Comment               "Comment"
+#define LG_Number                "Number"
 #define LG_Genre                 "Genre"
 
 ///////////Config///////////
@@ -216,6 +221,7 @@
 #define LG_Default_playlist_3    "Default playlist 3"
 #define LG_Music_folder          "Music folder"
 #define LG_Idle_coordinates      "Idle coordinates"
+#define LG_Auto_Exit_Min         "Time before close"
 #define LG_Sets                  "Sets"
 #define LG_Show_full_names       "Show full names"
 #define LG_Key_Settings          "Key-config settings"

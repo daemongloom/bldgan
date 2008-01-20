@@ -319,7 +319,7 @@ void CTtoFirst()
 // Сделал в две для удобства AAA
 void PTtoFirst()
 {
-  if(PlayedTrack[PlayedPL]!=0)PlayedTrack[PlayedPL] = 0;
+  if(PlayedPL=CurrentPL&&PlayedTrack[PlayedPL]!=0)PlayedTrack[PlayedPL] = 0;
 }
 
 //Пробуем листание вниз AAA
@@ -519,13 +519,6 @@ void Memory()
   }
 }
 
-// Для загрузки пл из главного модуля
-void LoadingPlaylist(const char * fn)
-{
-  if(LoadPlaylist(fn)-1>0) {TC[CurrentPL] = LoadPlaylist(fn)-1; CTtoFirst();}   // Экономим память + избавляемся от лишнего пикоффа + от одного недочета   AAA
-  else {TC[CurrentPL]=0;}
-}
-
 // Свобода пл!
 void FreePlaylist(void)
 {
@@ -591,6 +584,24 @@ int LoadPlaylist(const char * fn)
     p++;
   }
   return i;
+}
+
+// Для загрузки пл из главного модуля
+void LoadingPlaylist(const char * fn)
+{
+  if(LoadPlaylist(fn)-1>0)   // Экономим память + избавляемся от лишнего пикоффа + от одного недочета   AAA
+  {
+    CTtoFirst();
+    PTtoFirst();
+    if(TC[CurrentPL]>0)
+    {
+      for(unsigned int i=0;i<TC[CurrentPL]+1;i++)
+      {
+        playlist_lines[CurrentPL][i++]=0;
+      }
+    }
+    TC[CurrentPL] = LoadPlaylist(fn)-1;
+  } else {TC[CurrentPL]=0;}
 }
 
 unsigned int char8to16(int c)
@@ -1012,13 +1023,13 @@ void FindMusic(const char *dir, int i)
 }
 
 //LoadDaemonList(" 4:\\Doc\\");
-int LoadDaemonList(char* path)
+int LoadDaemonList(const char* path)
 {
  // ShowMSG(0,(int)path);
   DIR_ENTRY de;
   unsigned int err;
   char name[256];
-  unsigned int i=0;
+  unsigned int i=1;
   strcpy(name,path);
   strcat(name,"*.mp3");
   int count1=0;
@@ -1033,8 +1044,8 @@ int LoadDaemonList(char* path)
         //////////////////
        // strcpy(playlist_lines[CurrentPL][i++],path);
        // strcat(playlist_lines[CurrentPL][i++],de.file_name);
-        sprintf(playlist_lines[CurrentPL][i++],"%t%t",path,de.file_name);
-        ShowMSG(1,(int)playlist_lines[CurrentPL][i++]);
+        sprintf(playlist_lines[CurrentPL][i++],"%s%s",path,de.file_name);
+       // ShowMSG(1,(int)playlist_lines[CurrentPL][i++]);
         count1++;
       }
       else //если ето директория вызываем рекурсивно ето ф.
@@ -1050,6 +1061,23 @@ int LoadDaemonList(char* path)
   FindClose(&de,&err);
   return count1;
 };
+
+void LoadingDaemonList(const char* path)
+{
+  if(LoadDaemonList(path)>0)
+  {
+    CTtoFirst();
+    PTtoFirst();
+    if(TC[CurrentPL]>0)
+    {
+      for(unsigned int i=0;i<TC[CurrentPL]+1;i++)
+      {
+        playlist_lines[CurrentPL][i++]=0;
+      }
+    }
+    TC[CurrentPL] = LoadDaemonList(path);
+  } else {TC[CurrentPL]=0;}
+}
 
 // Утечка памяти в самом деле достала...   AAA
 void MemoryFree()
