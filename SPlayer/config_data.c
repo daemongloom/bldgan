@@ -23,6 +23,9 @@ __root const CFG_HDR cfghdr04={CFG_COORDINATES,LG_Idle_coordinates,0,0};
 __root const unsigned int IDLE_X = 5;
 __root const unsigned int IDLE_Y = 120;
 
+__root const CFG_HDR cfghdr05 = {CFG_INT,LG_Auto_Exit_Min,0,2000};
+__root const unsigned int AUTO_EXIT_MIN=30;
+
 //Level 1
 __root const CFG_HDR cfghdr_m11={CFG_LEVEL,LG_Sets,1,0};
 

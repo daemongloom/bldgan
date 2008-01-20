@@ -140,6 +140,7 @@ extern const int PlayMode;
 extern const int soundvolume;
 extern const unsigned int SizeOfFont;  // Шрифт   AAA
 extern const unsigned int FnameIPC;    // Отправлять или нет   AAA
+extern const unsigned int AUTO_EXIT_MIN;  // Время до автозакрытия   AAA
 //--- настройки из конфига ---
 
 //--- Переменные ---
@@ -154,6 +155,7 @@ char list[256];
 char sfname[256];
 extern unsigned short SoundVolume;
 int playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
+GBSTMR offtm;     // Таймер автоотключения   AAA
 
 // Переписываем время... DemonGloom
 TWavLen wl;
@@ -362,6 +364,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
   REDRAW();*/
     } else {
       // Если нет такого файла!
+      ToDevelop();
       ShowMSG(1,(int)LG_Can_not_find_file);
     }
   }
@@ -482,7 +485,15 @@ void load_skin(char const* cfgname)              // Извращенец... Такое создать.
   }
 }
 
-void CheckDoubleRun(void)
+void ToDevelop()   // Развернуть   AAA
+{
+  gipc.name_to=ipc_xtask_name;
+  gipc.name_from=ipc_my_name;
+  gipc.data=(void *)MAINCSM_ID;
+  GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_XTASK_SHOW_CSM,&gipc);
+}
+
+void CheckDoubleRun(void)   // При открытии копии   AAA
 {
   if ((int)(gipc.data)>1)
   {
@@ -494,6 +505,21 @@ void CheckDoubleRun(void)
   else
   {}
 }
+
+//////////////Автовыход   AAA//////////////
+int AutoExitCounter;
+
+void ResetAutoExit() 
+{
+  AutoExitCounter=0;
+}
+
+void AutoExit()
+{
+  if(AUTO_EXIT_MIN) {AutoExitCounter++; GBS_StartTimerProc(&offtm, 216 * 15, AutoExit);
+  if(AutoExitCounter*15>AUTO_EXIT_MIN*60) {CloseCSM(MAINCSM_ID);}}
+}
+//////////////Автовыход   AAA//////////////
 
 void OnRedraw(MAIN_GUI *data) // OnRedraw
 {
@@ -677,10 +703,8 @@ void LoadDefPlaylist() {
 }
 
 void FindingMusic() {
-  CTtoFirst();
-  PTtoFirst();
-  // FreePlaylist();
-  FindMusic(MUSIC, 1);
+ // FindMusic(MUSIC, 1);
+  LoadingDaemonList(MUSIC);
 }
 
 void PrevTrackDown() {
@@ -707,6 +731,7 @@ void SwitchPlayModeDown() {
 */
 int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
 {
+  if(IsGuiOnTop(MAINGUI_ID)) {ResetAutoExit();}
   if(Quit_Required)return 1; //Происходит вызов GeneralFunc для тек. GUI -> закрытие GUI
   if (KeyLock){
     if ((msg->gbsmsg->msg==LONG_PRESS)&&(msg->gbsmsg->submess=='#')){
@@ -870,6 +895,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
 
 int my_keyhook(int submsg,int msg)
 {
+  if(IsGuiOnTop(MAINGUI_ID)) {ResetAutoExit();}
 #ifdef ELKA
   if (submsg==POC_BUTTON){
     switch (msg){
@@ -976,6 +1002,8 @@ void maincsm_oncreate(CSM_RAM *data)
   csm->gui_id=CreateGUI(main_gui);
   MAINGUI_ID=csm->gui_id;
   
+  if(AUTO_EXIT_MIN) {AutoExit();}
+  
   gipc.name_to=ipc_my_name;
   gipc.name_from=ipc_my_name;
   gipc.data=0;
@@ -985,6 +1013,7 @@ void maincsm_oncreate(CSM_RAM *data)
 // Вызывается при закрытии главного CSM. Тут и вызывается киллер
 void maincsm_onclose(CSM_RAM *csm)
 {
+  GBS_DelTimer(&offtm);
   GBS_DelTimer(&mytmr);
   StopAllPlayback();
   MemoryFree();
@@ -1075,6 +1104,9 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
     {
       ShowMSG(1,(int)LG_Config_Updated);
       InitConfig();
+      
+      if(!IsTimerProc(&offtm)) {AutoExit();}
+      ResetAutoExit();
     }
   }
 #ifdef NEWSGOLD

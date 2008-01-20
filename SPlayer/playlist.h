@@ -96,9 +96,6 @@ void Memory();
 // Для загрузки пл из главного модуля
 void LoadingPlaylist(const char * fn);
 
-// Загружаем пл!
-int LoadPlaylist(const char * fn);
-
 // Сохраняем пл!   AAA
 void SavePlaylist(char *fn);
 
@@ -138,7 +135,7 @@ void BandRoll();
 //Ищем файлы в папке   AAA
 void FindMusic(const char *dir, int i);
 
-int LoadDaemonList(char* path);
+void LoadingDaemonList(const char* path);
 
 // Утечка памяти в самом деле достала...   AAA
 void MemoryFree();
