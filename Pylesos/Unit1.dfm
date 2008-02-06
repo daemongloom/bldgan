@@ -1,9 +1,9 @@
 object Form1: TForm1
   Left = 192
   Top = 122
-  Width = 870
-  Height = 500
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
+  ClientHeight = 466
+  ClientWidth = 862
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -41,13 +41,14 @@ object Form1: TForm1
     end
   end
   object GroupBox1: TGroupBox
-    Left = 456
+    Left = 464
     Top = 0
     Width = 398
-    Height = 425
+    Height = 447
     Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     TabOrder = 1
+    ExplicitHeight = 427
   end
   object GroupBox2: TGroupBox
     Left = 8
@@ -96,6 +97,7 @@ object Form1: TForm1
       Top = 24
       Width = 56
       Height = 31
+      Layout = blGlyphTop
       Margin = 0
       OnClick = InsertDivanClick
     end
@@ -195,10 +197,20 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 425
-    Width = 854
+    Top = 447
+    Width = 862
     Height = 19
     Panels = <>
+    ExplicitTop = 427
+  end
+  object BitBtn1: TBitBtn
+    Left = 286
+    Top = 136
+    Width = 75
+    Height = 25
+    Caption = 'BitBtn1'
+    TabOrder = 5
+    OnClick = InsertDivanClick
   end
   object MainMenu1: TMainMenu
     Left = 56
@@ -217,6 +229,10 @@ object Form1: TForm1
         Caption = #1047#1072#1075#1088#1091#1079#1080#1090#1100
         OnClick = N4Click
       end
+      object N5: TMenuItem
+        Caption = #1042#1099#1093#1086#1076
+        OnClick = N5Click
+      end
     end
   end
   object SaveDialog1: TSaveDialog
@@ -230,6 +246,10 @@ object Form1: TForm1
     Filter = #1055#1086#1083#1103' '#1055#1099#1083#1077#1089#1086#1089#1080#1082#1072' (*.pf)|*.pf'
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
     Left = 120
+    Top = 56
+  end
+  object XPManifest1: TXPManifest
+    Left = 152
     Top = 56
   end
 end
