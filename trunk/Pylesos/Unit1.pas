@@ -12,7 +12,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons;
+  Dialogs, StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan;
 
 type
   TForm1 = class(TForm)
@@ -42,6 +42,9 @@ type
     StatusBar1: TStatusBar;
     SaveDialog1: TSaveDialog;
     OpenDialog1: TOpenDialog;
+    N5: TMenuItem;
+    XPManifest1: TXPManifest;
+    BitBtn1: TBitBtn;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -55,6 +58,7 @@ type
     procedure N2Click(Sender: TObject);
     procedure N3Click(Sender: TObject);
     procedure N4Click(Sender: TObject);
+    procedure N5Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -156,7 +160,6 @@ begin
    InsertStul.Glyph := stul;
    InsertStol.Glyph := stol;
    InsertShkaf.Glyph := shkaf;
-   InsertDivan.Glyph := divan;
    // Разбираемся с режимом вставки
    InsMode := false;
    InsType := EMPTY;
@@ -323,6 +326,11 @@ begin
       end;
    end;
    DrawField;   
+end;
+
+procedure TForm1.N5Click(Sender: TObject);
+begin
+Application.Terminate;
 end;
 
 end.
