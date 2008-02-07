@@ -3,7 +3,7 @@
 {= Графический исполнитель "Пылесосик"         =}
 {=  Главный модуль программы                   =}
 {= Авторы: Николай Трубинов (NT)...            =}
-{= Дата: 2008.02.06                            =}
+{= Дата: 2008.02.07                            =}
 {===============================================}
 
 unit Unit1;
@@ -12,7 +12,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan;
+  Dialogs, StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit;
 
 type
   TForm1 = class(TForm)
@@ -44,7 +44,8 @@ type
     OpenDialog1: TOpenDialog;
     N5: TMenuItem;
     XPManifest1: TXPManifest;
-    BitBtn1: TBitBtn;
+    N6: TMenuItem;
+    N7: TMenuItem;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -59,6 +60,7 @@ type
     procedure N3Click(Sender: TObject);
     procedure N4Click(Sender: TObject);
     procedure N5Click(Sender: TObject);
+    procedure N6Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -80,6 +82,7 @@ const Offset = 6; // Константа смещения для частей мебели
       eSTOL = 3;  // Стол
       eDIVAN = 4; // Диван
       eSHKAF = 5; // Шкаф
+      MaxPylsCount = 1; // Максимальное количество пылесосов на поле
 
 {Угол поворота (против часовой): }
 {0 - 0}
@@ -103,6 +106,7 @@ var asize: integer = 24;      // Размер клетки в пикселах
     InsType: TElem;           // Что вставлять
     field_file: file of integer; // Файл поля
     ffname: string;           // Имя файла поля для сохранения или загрузки
+    pylsc: integer;           // Количество пылесосов на поле
 
 procedure TForm1.DrawField;
 var i,j: integer;
@@ -155,6 +159,7 @@ begin
    divan.LoadFromFile('divan.bmp');
    // Заполним поле пустотой
    FillChar(field,SizeOf(field),0);
+   pylsc := 0;
    // Выведем картинки на кнопочки
    InsertPyls.Glyph := pylesos;
    InsertStul.Glyph := stul;
@@ -211,6 +216,12 @@ begin
       // Вставляем элемент на поле, если можно
       if ienable then begin
          field[xp,yp].ElemT := InsType;
+         case InsType of
+            ePYLS: begin
+               Inc(pylsc);
+               if pylsc=MaxPylsCount then InsertPyls.Enabled := false;
+             end;
+         end;
          if InsType in [eSTOL,eDIVAN,eSHKAF] then begin
             txp := xp;
             typ := yp;
@@ -330,7 +341,13 @@ end;
 
 procedure TForm1.N5Click(Sender: TObject);
 begin
-Application.Terminate;
+   Application.Terminate;
+end;
+
+// О программе
+procedure TForm1.N6Click(Sender: TObject);
+begin
+   Form2.ShowModal;
 end;
 
 end.
