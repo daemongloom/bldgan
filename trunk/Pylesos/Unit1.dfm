@@ -1,9 +1,9 @@
 object Form1: TForm1
   Left = 192
   Top = 122
+  Width = 895
+  Height = 522
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
-  ClientHeight = 466
-  ClientWidth = 862
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -41,14 +41,13 @@ object Form1: TForm1
     end
   end
   object GroupBox1: TGroupBox
-    Left = 464
+    Left = 481
     Top = 0
     Width = 398
     Height = 447
     Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     TabOrder = 1
-    ExplicitHeight = 427
   end
   object GroupBox2: TGroupBox
     Left = 8
@@ -99,6 +98,7 @@ object Form1: TForm1
       Height = 31
       Layout = blGlyphTop
       Margin = 0
+      NumGlyphs = 2
       OnClick = InsertDivanClick
     end
   end
@@ -198,19 +198,9 @@ object Form1: TForm1
   object StatusBar1: TStatusBar
     Left = 0
     Top = 447
-    Width = 862
+    Width = 879
     Height = 19
     Panels = <>
-    ExplicitTop = 427
-  end
-  object BitBtn1: TBitBtn
-    Left = 286
-    Top = 136
-    Width = 75
-    Height = 25
-    Caption = 'BitBtn1'
-    TabOrder = 5
-    OnClick = InsertDivanClick
   end
   object MainMenu1: TMainMenu
     Left = 56
@@ -229,10 +219,17 @@ object Form1: TForm1
         Caption = #1047#1072#1075#1088#1091#1079#1080#1090#1100
         OnClick = N4Click
       end
+      object N7: TMenuItem
+        Caption = '-'
+      end
       object N5: TMenuItem
         Caption = #1042#1099#1093#1086#1076
         OnClick = N5Click
       end
+    end
+    object N6: TMenuItem
+      Caption = #1054' '#1087#1088#1086#1075#1088#1072#1084#1084#1077
+      OnClick = N6Click
     end
   end
   object SaveDialog1: TSaveDialog
