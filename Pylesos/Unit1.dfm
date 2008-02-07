@@ -41,10 +41,10 @@ object Form1: TForm1
     end
   end
   object GroupBox1: TGroupBox
-    Left = 481
+    Left = 464
     Top = 0
     Width = 398
-    Height = 447
+    Height = 449
     Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     TabOrder = 1
@@ -53,7 +53,7 @@ object Form1: TForm1
     Left = 8
     Top = 112
     Width = 385
-    Height = 65
+    Height = 113
     Align = alCustom
     Caption = #1069#1083#1077#1084#1077#1085#1090#1099
     TabOrder = 2
@@ -63,7 +63,7 @@ object Form1: TForm1
       Width = 31
       Height = 31
       Transparent = False
-      OnClick = InsertPylsClick
+      OnClick = InsertPyls_bClick
     end
     object InsertStul: TSpeedButton
       Left = 48
@@ -197,10 +197,24 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 447
-    Width = 879
+    Top = 449
+    Width = 862
     Height = 19
-    Panels = <>
+    Panels = <
+      item
+        Text = #1055#1088#1086#1094#1077#1089#1089':'
+        Width = 60
+      end
+      item
+        Width = 0
+      end>
+  end
+  object ProgressBar1: TProgressBar
+    Left = 0
+    Top = 432
+    Width = 150
+    Height = 17
+    TabOrder = 5
   end
   object MainMenu1: TMainMenu
     Left = 56

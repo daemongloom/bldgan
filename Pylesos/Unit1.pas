@@ -46,12 +46,13 @@ type
     XPManifest1: TXPManifest;
     N6: TMenuItem;
     N7: TMenuItem;
+    ProgressBar1: TProgressBar;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FieldBoxMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure InsertPylsClick(Sender: TObject);
+    procedure InsertPyls_bClick(Sender: TObject);
     procedure InsertStulClick(Sender: TObject);
     procedure InsertStolClick(Sender: TObject);
     procedure InsertShkafClick(Sender: TObject);
@@ -61,6 +62,7 @@ type
     procedure N4Click(Sender: TObject);
     procedure N5Click(Sender: TObject);
     procedure N6Click(Sender: TObject);
+    procedure InsertPylsClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -146,17 +148,25 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
+   // Поставим ProgressBar1 в нужное место
+   ProgressBar1.Parent := StatusBar1;
+   ProgressBar1.Top := 1;
+   ProgressBar1.Left := StatusBar1.Panels[0].Width+1;
+   ProgressBar1.Height := StatusBar1.Height - 2;
+   StatusBar1.Panels[1].Width := StatusBar1.Width - StatusBar1.Panels[0].Width;
+   ProgressBar1.Width := StatusBar1.Panels[1].Width - 2;
+   ProgressBar1.Position := 15;
    // Загрузим картинки
    pylesos := TBitmap.Create;
-   pylesos.LoadFromFile('pylesos.bmp');
+   pylesos.LoadFromResourceName(HInstance,'PylesosBMP');
    stul := TBitmap.Create;
-   stul.LoadFromFile('stul.bmp');
+   stul.LoadFromResourceName(HInstance,'StulBMP');
    stol := TBitmap.Create;
-   stol.LoadFromFile('stol.bmp');
+   stol.LoadFromResourceName(HInstance,'StolBMP');
    shkaf := TBitmap.Create;
-   shkaf.LoadFromFile('shkaf.bmp');
+   shkaf.LoadFromResourceName(HInstance,'ShkafBMP');
    divan := TBitmap.Create;
-   divan.LoadFromFile('divan.bmp');
+   divan.LoadFromResourceName(HInstance,'DivanBMP');
    // Заполним поле пустотой
    FillChar(field,SizeOf(field),0);
    pylsc := 0;
@@ -242,7 +252,7 @@ begin
    end;
 end;
 
-procedure TForm1.InsertPylsClick(Sender: TObject);
+procedure TForm1.InsertPyls_bClick(Sender: TObject);
 begin
    InsMode := true;
    InsType := ePYLS;
@@ -348,6 +358,12 @@ end;
 procedure TForm1.N6Click(Sender: TObject);
 begin
    Form2.ShowModal;
+end;
+
+procedure TForm1.InsertPylsClick(Sender: TObject);
+begin
+   InsMode := true;
+   InsType := ePYLS;
 end;
 
 end.
