@@ -63,10 +63,14 @@ type
     procedure N6Click(Sender: TObject);
   private
     { Private declarations }
+    procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
   public
     { Public declarations }
     procedure DrawField;
   end;
+
+const WheelUp = 120;
+      WheelDown = 65416;
 
 var
   Form1: TForm1;
@@ -118,13 +122,14 @@ const DivanSize: TElemSize = (w: 3; h: 2);
                        (w: 3; h: 2));
 
 var asize: integer = 24;      // Размер клетки в пикселах
-    fsize_h, fsize_w: integer;// Размер поля в клетках
+    fsize_h, fsize_w: byte;// Размер поля в клетках
     // Битмапы картинок пылесоса и мебели
     pylesos, stul, stol, shkaf, divan: TBMPs;
     field: TField;            // Поле
     InsMode: boolean;         // Выполняется ли вставка
     InsType: TElem;           // Что вставлять
-    field_file: file of integer; // Файл поля
+    InsRotation: TRotation;   // С каким углом поворота
+    field_file: file of byte; // Файл поля
     ffname: string;           // Имя файла поля для сохранения или загрузки
     pylsc: integer;           // Количество пылесосов на поле
 
@@ -203,6 +208,7 @@ begin
    // Разбираемся с режимом вставки
    InsMode := false;
    InsType := EMPTY;
+   InsRotation := 0;
    // Нарисуем поле
    DrawField;
    // Поставим панель редиктирования под поле
@@ -230,8 +236,8 @@ function InsertEnable(f: TField; esize: TElemSize; ins_pos: TPoint): boolean;
 var i,j: integer;
 begin
    Result := false;
-   if (ins_pos.X + esize.w <= fsize_w) and
-    (ins_pos.Y + esize.h <=fsize_h) then begin
+   if (ins_pos.X + esize.w -1 <= fsize_w) and
+    (ins_pos.Y + esize.h -1 <=fsize_h) then begin
       // По размерам входит в поле
       // Продолжаем проверку
       Result := true;
@@ -250,6 +256,15 @@ var xp,yp: integer;
     ins_pos: TPoint;   // Позиция для вставки
     esize: TElemSize;  // Размер элемента
     i,j: integer;
+
+ // Меняем a и b местами
+ procedure SwapSize(var a,b: integer);
+ begin
+    a := a xor b;
+    b := a xor b;
+    a := a xor b;
+ end;
+
 begin
    // Проверим на режим вставки
    if InsMode then begin
@@ -260,9 +275,11 @@ begin
       ins_pos.Y := yp;
       // Определяем размер вставляемого элемента
       esize := Sizes[InsType];
+      if (InsRotation in [1,3]) then SwapSize(esize.w, esize.h);
       // Вставляем элемент на поле, если можно
       if (InsertEnable(field,esize,ins_pos)) then begin
          field[xp,yp].ElemT := InsType;
+         field[xp,yp].rotation := InsRotation;
          case InsType of
             ePYLS: begin
                Inc(pylsc);
@@ -284,6 +301,7 @@ begin
       // Сбросим режим вставки
       InsMode := false;
       InsType := EMPTY;
+      InsRotation := 0;
    end;
 end;
 
@@ -357,7 +375,7 @@ end;
 // Загружаем поле из файла
 procedure TForm1.N4Click(Sender: TObject);
 var i,j: integer;
-    temp_ElemT, temp_rotation: integer;
+    temp_ElemT, temp_rotation: byte;
 begin
    with OpenDialog1 do begin
       if Execute then begin
@@ -393,6 +411,18 @@ end;
 procedure TForm1.N6Click(Sender: TObject);
 begin
    Form2.ShowModal;
+end;
+
+// Хитрая процедура поворота...
+procedure TForm1.OnMouseWheel;
+begin
+   if not InsMode then
+      {nothing}
+   else
+      case Message.WParamHi of
+         WheelUp: if InsRotation=3 then InsRotation := 0 else Inc(InsRotation);
+         WheelDown: if InsRotation=0 then InsRotation := 3 else Dec(InsRotation);
+      end;
 end;
 
 end.
