@@ -1,6 +1,6 @@
 object Form1: TForm1
   Left = 192
-  Top = 122
+  Top = 123
   Width = 895
   Height = 522
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
@@ -17,16 +17,9 @@ object Form1: TForm1
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
-    Left = 128
-    Top = 8
-    Width = 77
-    Height = 13
-    Caption = #1056#1072#1079#1084#1077#1088#1099' '#1087#1086#1083#1103':'
-  end
   object Panel1: TPanel
     Left = 8
-    Top = 56
+    Top = 64
     Width = 41
     Height = 41
     Color = clMedGray
@@ -51,7 +44,7 @@ object Form1: TForm1
   end
   object GroupBox2: TGroupBox
     Left = 8
-    Top = 112
+    Top = 120
     Width = 385
     Height = 113
     Align = alCustom
@@ -60,44 +53,46 @@ object Form1: TForm1
     object InsertPyls: TSpeedButton
       Left = 8
       Top = 24
-      Width = 31
+      Width = 65
       Height = 31
+      Caption = #1055#1099#1083#1077#1089#1086#1089
       Transparent = False
-      OnClick = InsertPyls_bClick
+      OnClick = InsertPylsClick
     end
     object InsertStul: TSpeedButton
-      Left = 48
-      Top = 24
-      Width = 31
+      Left = 8
+      Top = 64
+      Width = 65
       Height = 31
+      Caption = #1057#1090#1091#1083
       Transparent = False
       OnClick = InsertStulClick
     end
     object InsertStol: TSpeedButton
       Left = 88
       Top = 24
-      Width = 56
+      Width = 65
       Height = 31
-      Margin = 0
+      Caption = #1057#1090#1086#1083
       Transparent = False
       OnClick = InsertStolClick
     end
     object InsertShkaf: TSpeedButton
-      Left = 152
-      Top = 24
-      Width = 56
+      Left = 88
+      Top = 64
+      Width = 65
       Height = 31
-      Margin = 0
+      Caption = #1064#1082#1072#1092
       Transparent = False
       OnClick = InsertShkafClick
     end
     object InsertDivan: TSpeedButton
-      Left = 216
+      Left = 168
       Top = 24
-      Width = 56
+      Width = 65
       Height = 31
+      Caption = #1044#1080#1074#1072#1085
       Layout = blGlyphTop
-      Margin = 0
       NumGlyphs = 2
       OnClick = InsertDivanClick
     end
@@ -218,7 +213,7 @@ object Form1: TForm1
   end
   object MainMenu1: TMainMenu
     Left = 56
-    Top = 56
+    Top = 64
     object N1: TMenuItem
       Caption = #1055#1086#1083#1077
       object N2: TMenuItem
@@ -250,17 +245,17 @@ object Form1: TForm1
     DefaultExt = '*.pf'
     Filter = #1055#1086#1083#1103' '#1055#1099#1083#1077#1089#1086#1089#1080#1082#1072' (*.pf)|*.pf'
     Left = 88
-    Top = 56
+    Top = 64
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = '*.pf'
     Filter = #1055#1086#1083#1103' '#1055#1099#1083#1077#1089#1086#1089#1080#1082#1072' (*.pf)|*.pf'
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
     Left = 120
-    Top = 56
+    Top = 64
   end
   object XPManifest1: TXPManifest
     Left = 152
-    Top = 56
+    Top = 64
   end
 end
