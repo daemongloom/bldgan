@@ -61,6 +61,8 @@ type
     procedure N4Click(Sender: TObject);
     procedure N5Click(Sender: TObject);
     procedure N6Click(Sender: TObject);
+    procedure FieldBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
   private
     { Private declarations }
     procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
@@ -81,62 +83,41 @@ implementation
 
 const Offset = 6; // Константа смещения для частей мебели
       EMPTY = 0;  // Пусто
-      ePYLS = 1;  // Пылесос
-      eSTUL = 2;  // Стул
-      eSTOL = 3;  // Стол
-      eDIVAN = 4; // Диван
-      eSHKAF = 5; // Шкаф
+      RUBSH = 1;// Мусор
+      ePYLS = 2;  // Пылесос
+      eSTUL = 3;  // Стул
+      eSTOL = 4;  // Стол
+      eDIVAN = 5; // Диван
+      eSHKAF = 6; // Шкаф
       MaxPylsCount = 1; // Максимальное количество пылесосов на поле
 
-{Угол поворота (против часовой): }
-{0 - 0}
-{1 - 90}
-{2 - 180}
-{3 - 270}
-type TElem = EMPTY..eSHKAF+Offset;  // Тип элемента
-     TRotation = 0..3;      // Угол поворота
-     TFieldElem = record
-       ElemT: TElem;        // Тип элемента
-       rotation: TRotation; // Угол поворота
-     end;
-     TField = array [1..25,1..25] of TFieldElem;
-     // Размеры элементов мебели 
+type TElem = EMPTY..eSHKAF; // Тип элемента
+     // Размеры элементов мебели
      TElemSize = record
         w,h : integer;
      end;
-     // Массив размеров
-     TSizes = array [EMPTY..eSHKAF] of TElemSize;
-     // Массив картинок мебели 
-     TBMPs = array [TRotation] of TBitmap;
-
-const DivanSize: TElemSize = (w: 3; h: 2);
-      ShkafSize: TElemSize = (w: 3; h: 2);
-      StolSize: TElemSize = (w: 3; h: 2);
-      EmptySize: TElemSize = (w: 1; h: 1);
-      // Размеры элементов мебели
-      Sizes: TSizes = ((w: 1; h: 1),
-                       (w: 1; h: 1),
-                       (w: 1; h: 1),
-                       (w: 3; h: 2),
-                       (w: 3; h: 1),
-                       (w: 3; h: 2));
+     TRotation = 0..3;
+     TFieldElem = record
+       ElemT: TElem;        // Тип элемента
+       Rot: TRotation;      // Поворот (для пылесоса)
+     end;
+     TField = array [1..25,1..25] of TFieldElem;
 
 var asize: integer = 24;      // Размер клетки в пикселах
-    fsize_h, fsize_w: byte;// Размер поля в клетках
-    // Битмапы картинок пылесоса и мебели
-    pylesos, stul, stol, shkaf, divan: TBMPs;
+    fsize_h, fsize_w: byte;   // Размер поля в клетках
     field: TField;            // Поле
     InsMode: boolean;         // Выполняется ли вставка
     InsType: TElem;           // Что вставлять
-    InsRotation: TRotation;   // С каким углом поворота
+    InsRotation: TRotation;   // Поворот
     field_file: file of byte; // Файл поля
     ffname: string;           // Имя файла поля для сохранения или загрузки
     pylsc: integer;           // Количество пылесосов на поле
 
 procedure TForm1.DrawField;
 var i,j: integer;
-    r: TRotation;
+    p: array [1..3] of TPoint;
 begin
+   // Устанавливаем размеры
    Panel1.Width := fsize_w*asize + 1;
    Panel1.Height := fsize_h*asize + 1;
    FieldBox.Width := Panel1.Width;
@@ -149,15 +130,53 @@ begin
    FieldBox.Canvas.Brush.Color := clGreen;
    for i:=1 to fsize_w do begin
       for j:=1 to fsize_h do begin
-         r := field[i,j].rotation;
          case field[i,j].ElemT of
-           EMPTY: FieldBox.Canvas.Rectangle((i-1)*asize,(j-1)*asize,i*asize,j*asize);
-           ePYLS: FieldBox.Canvas.Draw((i-1)*asize,(j-1)*asize,pylesos[r]);
-           eSTUL: FieldBox.Canvas.Draw((i-1)*asize,(j-1)*asize,stul[r]);
-           eSTOL: FieldBox.Canvas.Draw((i-1)*asize,(j-1)*asize,stol[r]);
-           eDIVAN: FieldBox.Canvas.Draw((i-1)*asize,(j-1)*asize,divan[r]);
-           eSHKAF: FieldBox.Canvas.Draw((i-1)*asize,(j-1)*asize,shkaf[r]);
+           EMPTY: FieldBox.Canvas.Brush.Color := clGreen;
+           RUBSH: FieldBox.Canvas.Brush.Color := clGray;
+           ePYLS: FieldBox.Canvas.Brush.Color := clRed;
+           eSTUL: FieldBox.Canvas.Brush.Color := clLime;
+           eSTOL: FieldBox.Canvas.Brush.Color := clBlue;
+           eDIVAN: FieldBox.Canvas.Brush.Color := clAqua;
+           eSHKAF: FieldBox.Canvas.Brush.Color := clTeal;
          end;
+         if field[i,j].ElemT<>ePYLS then FieldBox.Canvas.Rectangle((i-1)*asize,(j-1)*asize,i*asize,j*asize) else begin
+            case field[i,j].Rot of
+              // тут надо нарисовать треугольники
+              0: begin
+                 p[1].X := (i-1)*asize;
+                 p[1].Y := (j-1)*asize;
+                 p[2].X := i*asize;
+                 p[2].Y := (j-1)*asize;
+                 p[3].X := (i-1)*asize + asize div 2;
+                 p[3].Y := j*asize;
+              end;
+              1: begin
+                 p[1].X := i*asize;
+                 p[1].Y := (j-1)*asize;
+                 p[2].X := i*asize;
+                 p[2].Y := j*asize;
+                 p[3].X := (i-1)*asize;
+                 p[3].Y := (j-1)*asize + asize div 2;
+              end;
+              2: begin
+                 p[1].X := i*asize;
+                 p[1].Y := j*asize;
+                 p[2].X := (i-1)*asize;
+                 p[2].Y := j*asize;
+                 p[3].X := (i-1)*asize + asize div 2;
+                 p[3].Y := (j-1)*asize;
+              end;
+              3: begin
+                 p[1].X := (i-1)*asize;
+                 p[1].Y := (j-1)*asize;
+                 p[2].X := i*asize;
+                 p[2].Y := (j-1)*asize + asize div 2;
+                 p[3].X := (i-1)*asize;
+                 p[3].Y := j*asize;
+              end;
+            end;
+            FieldBox.Canvas.Polygon(p);
+         end;     
       end;
    end;
 end;
@@ -165,11 +184,9 @@ end;
 procedure TForm1.Button1Click(Sender: TObject);
 begin
    DrawField;
-   GroupBox2.Top := Panel1.Top + Panel1.Height + 15;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
-var k: TRotation;
 begin
    // Инициализируем размеры поля
    fsize_w := 10;
@@ -177,38 +194,18 @@ begin
    // Поставим ProgressBar1 в нужное место
    ProgressBar1.Parent := StatusBar1;
    ProgressBar1.Top := 1;
-   ProgressBar1.Left := StatusBar1.Panels[0].Width+1;
+   ProgressBar1.Left := StatusBar1.Panels[0].Width+StatusBar1.Panels[1].Width+1;
    ProgressBar1.Height := StatusBar1.Height - 2;
-   StatusBar1.Panels[1].Width := StatusBar1.Width - StatusBar1.Panels[0].Width;
-   ProgressBar1.Width := StatusBar1.Panels[1].Width - 2;
+   StatusBar1.Panels[2].Width := StatusBar1.Width - ProgressBar1.Left;
+   ProgressBar1.Width := StatusBar1.Panels[2].Width - 2;
    ProgressBar1.Position := 15;
-   // Загрузим картинки
-   for k:=0 to 3 do begin
-      pylesos[k] := TBitmap.Create;
-      pylesos[k].LoadFromResourceName(HInstance,'PylesosBMP'+IntToStr(k));
-      stul[k] := TBitmap.Create;
-      stul[k].LoadFromResourceName(HInstance,'StulBMP'+IntToStr(k));
-      stol[k] := TBitmap.Create;
-      stol[k].LoadFromResourceName(HInstance,'StolBMP'+IntToStr(k));
-      shkaf[k] := TBitmap.Create;
-      shkaf[k].LoadFromResourceName(HInstance,'ShkafBMP'+IntToStr(k));
-      divan[k] := TBitmap.Create;
-      divan[k].LoadFromResourceName(HInstance,'DivanBMP'+IntToStr(k));
-   end;
-   // Заполним поле пустотой
-   FillChar(field,SizeOf(field),0);
+   // Заполним поле мусором
+   FillChar(field,SizeOf(field),1);
    pylsc := 0;
-   // Выведем картинки на кнопочки
-   {
-   InsertPyls.Glyph := pylesos[0];
-   InsertStul.Glyph := stul[0];
-   InsertStol.Glyph := stol[0];
-   InsertShkaf.Glyph := shkaf[0];
-   }
    // Разбираемся с режимом вставки
    InsMode := false;
    InsType := EMPTY;
-   InsRotation := 0;
+   InsRotation := 1;
    // Нарисуем поле
    DrawField;
    // Настройка диалогов
@@ -217,16 +214,7 @@ begin
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
-var k: TRotation;
 begin
-   // Освободим память из под картинок
-   for k:=0 to 3 do begin
-      pylesos[k].Free;
-      stul[k].Free;
-      stol[k].Free;
-      shkaf[k].Free;
-      divan[k].Free;
-   end;
 end;
 
 // Проверяет возможность вставки
@@ -252,17 +240,6 @@ procedure TForm1.FieldBoxMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var xp,yp: integer;
     ins_pos: TPoint;   // Позиция для вставки
-    esize: TElemSize;  // Размер элемента
-    i,j: integer;
-
- // Меняем a и b местами
- procedure SwapSize(var a,b: integer);
- begin
-    a := a xor b;
-    b := a xor b;
-    a := a xor b;
- end;
-
 begin
    // Проверим на режим вставки
    if InsMode then begin
@@ -271,35 +248,23 @@ begin
       yp := Y div 24 + 1;
       ins_pos.X := xp;
       ins_pos.Y := yp;
-      // Определяем размер вставляемого элемента
-      esize := Sizes[InsType];
-      if (InsRotation in [1,3]) then SwapSize(esize.w, esize.h);
       // Вставляем элемент на поле, если можно
-      if (InsertEnable(field,esize,ins_pos)) then begin
+      if (field[xp,yp].ElemT=EMPTY) or (field[xp,yp].ElemT=RUBSH) then begin
          field[xp,yp].ElemT := InsType;
-         field[xp,yp].rotation := InsRotation;
+         field[xp,yp].Rot := InsRotation;
          case InsType of
             ePYLS: begin
                Inc(pylsc);
                if pylsc=MaxPylsCount then InsertPyls.Enabled := false;
              end;
          end;
-         // Вставляем побочные элементы
-         for i:=ins_pos.X+1 to (ins_pos.X + esize.w -1) do
-            field[i,ins_pos.Y].ElemT := InsType + Offset;
-         for j:=ins_pos.Y+1 to (ins_pos.Y + esize.h -1) do
-            field[ins_pos.X,j].ElemT := InsType + Offset;
-         for i:=ins_pos.X+1 to (ins_pos.X + esize.w -1) do
-            for j:=ins_pos.Y+1 to (ins_pos.Y + esize.h -1) do begin
-               field[i,j].ElemT := InsType + Offset;
-            end;
          // Перерисуем поле
          DrawField;
       end;
       // Сбросим режим вставки
       InsMode := false;
       InsType := EMPTY;
-      InsRotation := 0;
+      InsRotation := 1;
    end;
 end;
 
@@ -336,11 +301,14 @@ end;
 // Создание нового поля
 procedure TForm1.N2Click(Sender: TObject);
 begin
-   // Заполним поле пустотой
-   FillChar(field,SizeOf(field),0);
+   // Заполним поле мусором
+   FillChar(field,SizeOf(field),1);
+   pylsc := 0;
+   InsertPyls.Enabled := true;
    // Разбираемся с режимом вставки
    InsMode := false;
    InsType := EMPTY;
+   InsRotation := 1;
    // Нарисуем поле
    DrawField;
 end;
@@ -359,8 +327,8 @@ begin
             Write(field_file,fsize_w,fsize_h);
             for i:=1 to fsize_w do
                for j:=1 to fsize_h do begin
-                  // Записываем идентификатор элемента и угол поворота
-                  Write(field_file,field[i,j].ElemT,field[i,j].rotation);
+                  // Записываем идентификатор элемента
+                  Write(field_file,field[i,j].ElemT,field[i,j].Rot);
                end;
             CloseFile(field_file);
          end;   
@@ -386,10 +354,10 @@ begin
                   // Читаем данные во временные переменные
                   Read(field_file,temp_ElemT,temp_rotation);
                   // Проверяем на соответствие типов
-                  if (temp_ElemT in [EMPTY..eSHKAF+Offset]) then
+                  if (temp_ElemT in [EMPTY..eSHKAF]) then
                      field[i,j].ElemT := TElem(temp_ElemT);
                   if (temp_rotation in [0..3]) then
-                     field[i,j].rotation := TRotation(temp_rotation);   
+                     field[i,j].Rot := TRotation(temp_rotation);   
                end;
             CloseFile(field_file);
          end;   
@@ -407,6 +375,12 @@ end;
 procedure TForm1.N6Click(Sender: TObject);
 begin
    Form2.ShowModal;
+end;
+
+procedure TForm1.FieldBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+begin
+   StatusBar1.Panels[0].Text := IntToStr(Y div 24 + 1)+':'+IntToStr(X div 24 + 1) + ' - ' + IntToStr(InsRotation);
 end;
 
 // Хитрая процедура поворота...
