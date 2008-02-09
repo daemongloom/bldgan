@@ -19,7 +19,7 @@ object Form1: TForm1
   TextHeight = 13
   object Panel1: TPanel
     Left = 8
-    Top = 64
+    Top = 136
     Width = 41
     Height = 41
     Color = clMedGray
@@ -44,7 +44,7 @@ object Form1: TForm1
   end
   object GroupBox2: TGroupBox
     Left = 8
-    Top = 120
+    Top = 8
     Width = 385
     Height = 113
     Align = alCustom
@@ -99,11 +99,12 @@ object Form1: TForm1
   end
   object GroupBox3: TGroupBox
     Left = 8
-    Top = 0
+    Top = 368
     Width = 441
     Height = 49
     Caption = #1056#1072#1079#1084#1077#1088#1099' '#1087#1086#1083#1103
     TabOrder = 3
+    Visible = False
     object Label2: TLabel
       Left = 160
       Top = 21
@@ -212,8 +213,8 @@ object Form1: TForm1
     TabOrder = 5
   end
   object MainMenu1: TMainMenu
-    Left = 56
-    Top = 64
+    Left = 64
+    Top = 272
     object N1: TMenuItem
       Caption = #1055#1086#1083#1077
       object N2: TMenuItem
@@ -244,18 +245,18 @@ object Form1: TForm1
   object SaveDialog1: TSaveDialog
     DefaultExt = '*.pf'
     Filter = #1055#1086#1083#1103' '#1055#1099#1083#1077#1089#1086#1089#1080#1082#1072' (*.pf)|*.pf'
-    Left = 88
-    Top = 64
+    Left = 96
+    Top = 272
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = '*.pf'
     Filter = #1055#1086#1083#1103' '#1055#1099#1083#1077#1089#1086#1089#1080#1082#1072' (*.pf)|*.pf'
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
-    Left = 120
-    Top = 64
+    Left = 128
+    Top = 272
   end
   object XPManifest1: TXPManifest
-    Left = 152
-    Top = 64
+    Left = 160
+    Top = 272
   end
 end
