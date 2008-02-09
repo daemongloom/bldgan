@@ -3,7 +3,7 @@
 {= Графический исполнитель "Пылесосик"         =}
 {=  Главный модуль программы                   =}
 {= Авторы: Николай Трубинов (NT)...            =}
-{= Дата: 2008.02.08                            =}
+{= Дата: 2008.02.09                            =}
 {===============================================}
 
 unit Unit1;
@@ -137,9 +137,6 @@ procedure TForm1.DrawField;
 var i,j: integer;
     r: TRotation;
 begin
-   // Определяем размеры поля
-   fsize_w := StrToInt(FieldW.Text);
-   fsize_h := StrToInt(FieldH.Text);
    Panel1.Width := fsize_w*asize + 1;
    Panel1.Height := fsize_h*asize + 1;
    FieldBox.Width := Panel1.Width;
@@ -174,6 +171,9 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 var k: TRotation;
 begin
+   // Инициализируем размеры поля
+   fsize_w := 10;
+   fsize_h := 10;
    // Поставим ProgressBar1 в нужное место
    ProgressBar1.Parent := StatusBar1;
    ProgressBar1.Top := 1;
@@ -211,8 +211,6 @@ begin
    InsRotation := 0;
    // Нарисуем поле
    DrawField;
-   // Поставим панель редиктирования под поле
-   GroupBox2.Top := Panel1.Top + Panel1.Height + 15;
    // Настройка диалогов
    SaveDialog1.InitialDir := ExtractFilePath(Application.ExeName);
    OpenDialog1.InitialDir := ExtractFilePath(Application.ExeName);
@@ -345,8 +343,6 @@ begin
    InsType := EMPTY;
    // Нарисуем поле
    DrawField;
-   // Поставим панель редиктирования под поле
-   GroupBox2.Top := Panel1.Top + Panel1.Height + 15;
 end;
 
 // Сохранение поля
