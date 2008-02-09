@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 192
   Top = 123
   Width = 895
-  Height = 522
+  Height = 527
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -31,13 +31,14 @@ object Form1: TForm1
       Height = 39
       Align = alClient
       OnMouseDown = FieldBoxMouseDown
+      OnMouseMove = FieldBoxMouseMove
     end
   end
   object GroupBox1: TGroupBox
-    Left = 464
+    Left = 481
     Top = 0
     Width = 398
-    Height = 449
+    Height = 452
     Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     TabOrder = 1
@@ -193,10 +194,14 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 449
-    Width = 862
+    Top = 452
+    Width = 879
     Height = 19
     Panels = <
+      item
+        Alignment = taCenter
+        Width = 50
+      end
       item
         Text = #1055#1088#1086#1094#1077#1089#1089':'
         Width = 60
