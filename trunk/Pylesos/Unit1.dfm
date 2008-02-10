@@ -18,8 +18,8 @@ object Form1: TForm1
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
-    Left = 8
-    Top = 136
+    Left = 24
+    Top = 152
     Width = 41
     Height = 41
     Color = clMedGray
@@ -46,7 +46,7 @@ object Form1: TForm1
   object GroupBox2: TGroupBox
     Left = 8
     Top = 8
-    Width = 385
+    Width = 241
     Height = 113
     Align = alCustom
     Caption = #1069#1083#1077#1084#1077#1085#1090#1099
@@ -240,6 +240,19 @@ object Form1: TForm1
       object N5: TMenuItem
         Caption = #1042#1099#1093#1086#1076
         OnClick = N5Click
+      end
+    end
+    object N8: TMenuItem
+      Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
+      Enabled = False
+      object N9: TMenuItem
+        Caption = #1053#1086#1074#1072#1103
+      end
+      object N10: TMenuItem
+        Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
+      end
+      object N11: TMenuItem
+        Caption = #1047#1072#1075#1088#1091#1079#1080#1090#1100
       end
     end
     object N6: TMenuItem

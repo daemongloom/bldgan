@@ -12,7 +12,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit;
+  Dialogs, StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit,
+  ToolWin;
 
 type
   TForm1 = class(TForm)
@@ -46,6 +47,10 @@ type
     N6: TMenuItem;
     N7: TMenuItem;
     ProgressBar1: TProgressBar;
+    N8: TMenuItem;
+    N9: TMenuItem;
+    N10: TMenuItem;
+    N11: TMenuItem;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -122,6 +127,16 @@ begin
    Panel1.Height := fsize_h*asize + 1;
    FieldBox.Width := Panel1.Width;
    FieldBox.Height := Panel1.Height;
+   // Выводим буковки и циферки
+   Form1.Canvas.Font.Color := clGreen;
+   for i:=1 to fsize_w do
+      with Form1.Canvas do begin
+         TextOut(Panel1.Left + (i-1)*asize + asize div 2,Panel1.Top-15,Chr(Ord('А')+(i-1)));
+      end;
+   for i:=1 to fsize_h do
+      with Form1.Canvas do begin
+         TextOut(Panel1.Left - 15,Panel1.Top + (i-1)*asize + asize div 2,IntToStr(i));
+      end;
    // Заливаем фон
    FieldBox.Canvas.Brush.Color := clBlack;
    FieldBox.Canvas.Rectangle(0,0,FieldBox.Width,FieldBox.Height);
@@ -377,10 +392,14 @@ begin
    Form2.ShowModal;
 end;
 
+// Когда мышкой водят по полю
 procedure TForm1.FieldBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 begin
-   StatusBar1.Panels[0].Text := IntToStr(Y div 24 + 1)+':'+IntToStr(X div 24 + 1) + ' - ' + IntToStr(InsRotation);
+   if InsMode then
+      StatusBar1.Panels[0].Text := IntToStr(Y div 24 + 1)+':'+IntToStr(X div 24 + 1) + ';' + IntToStr(InsRotation)
+   else
+      StatusBar1.Panels[0].Text := IntToStr(Y div 24 + 1)+':'+IntToStr(X div 24 + 1);   
 end;
 
 // Хитрая процедура поворота...
