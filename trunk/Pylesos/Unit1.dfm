@@ -1,8 +1,9 @@
 object Form1: TForm1
-  Left = 192
-  Top = 123
+  Left = 177
+  Top = 81
   Width = 895
   Height = 527
+  AutoSize = True
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -12,7 +13,6 @@ object Form1: TForm1
   Font.Style = []
   Menu = MainMenu1
   OldCreateOrder = False
-  WindowState = wsMaximized
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
@@ -35,10 +35,10 @@ object Form1: TForm1
     end
   end
   object GroupBox1: TGroupBox
-    Left = 481
+    Left = 489
     Top = 0
     Width = 398
-    Height = 452
+    Height = 462
     Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     TabOrder = 1
@@ -194,8 +194,8 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 452
-    Width = 879
+    Top = 462
+    Width = 887
     Height = 19
     Panels = <
       item
