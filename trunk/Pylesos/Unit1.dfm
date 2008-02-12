@@ -1,10 +1,11 @@
 object Form1: TForm1
-  Left = 177
-  Top = 81
-  Width = 895
-  Height = 527
+  Left = 200
+  Top = 127
   AutoSize = True
+  BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
+  ClientHeight = 471
+  ClientWidth = 879
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,7 +20,7 @@ object Form1: TForm1
   TextHeight = 13
   object Panel1: TPanel
     Left = 24
-    Top = 152
+    Top = 112
     Width = 41
     Height = 41
     Color = clMedGray
@@ -35,19 +36,96 @@ object Form1: TForm1
     end
   end
   object GroupBox1: TGroupBox
-    Left = 489
+    Left = 424
     Top = 0
-    Width = 398
-    Height = 462
+    Width = 455
+    Height = 452
     Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
+    Enabled = False
     TabOrder = 1
+    object SpeedButton1: TSpeedButton
+      Left = 8
+      Top = 16
+      Width = 65
+      Height = 25
+      Caption = #1042#1087#1077#1088#1077#1076
+      OnClick = SpeedButton1Click
+    end
+    object SpeedButton2: TSpeedButton
+      Left = 80
+      Top = 16
+      Width = 73
+      Height = 25
+      Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1090#1100
+      OnClick = SpeedButton2Click
+    end
+    object SpeedButton3: TSpeedButton
+      Left = 160
+      Top = 16
+      Width = 81
+      Height = 25
+      Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1090#1100'+'
+      OnClick = SpeedButton3Click
+    end
+    object SpeedButton4: TSpeedButton
+      Left = 248
+      Top = 16
+      Width = 73
+      Height = 25
+      Caption = #1055#1086#1074#1086#1088#1086#1090
+      OnClick = SpeedButton4Click
+    end
+    object SpeedButton5: TSpeedButton
+      Left = 8
+      Top = 48
+      Width = 65
+      Height = 25
+      Caption = #1045#1089#1083#1080
+      OnClick = SpeedButton5Click
+    end
+    object SpeedButton6: TSpeedButton
+      Left = 80
+      Top = 48
+      Width = 73
+      Height = 25
+      Caption = #1055#1086#1082#1072
+      OnClick = SpeedButton6Click
+    end
+    object SpeedButton7: TSpeedButton
+      Left = 160
+      Top = 48
+      Width = 81
+      Height = 25
+      Caption = #1055#1086#1074#1090#1086#1088#1103#1081
+      OnClick = SpeedButton7Click
+    end
+    object ListBox1: TListBox
+      Left = 2
+      Top = 80
+      Width = 451
+      Height = 370
+      Align = alBottom
+      ItemHeight = 13
+      TabOrder = 0
+      OnClick = ListBox1Click
+    end
+    object Edit1: TEdit
+      Left = 160
+      Top = 72
+      Width = 81
+      Height = 21
+      TabOrder = 1
+      Text = '1'
+      Visible = False
+      OnKeyUp = Edit1KeyUp
+    end
   end
   object GroupBox2: TGroupBox
     Left = 8
-    Top = 8
-    Width = 241
-    Height = 113
+    Top = 0
+    Width = 409
+    Height = 73
     Align = alCustom
     Caption = #1069#1083#1077#1084#1077#1085#1090#1099
     TabOrder = 2
@@ -61,8 +139,8 @@ object Form1: TForm1
       OnClick = InsertPylsClick
     end
     object InsertStul: TSpeedButton
-      Left = 8
-      Top = 64
+      Left = 248
+      Top = 24
       Width = 65
       Height = 31
       Caption = #1057#1090#1091#1083
@@ -79,8 +157,8 @@ object Form1: TForm1
       OnClick = InsertStolClick
     end
     object InsertShkaf: TSpeedButton
-      Left = 88
-      Top = 64
+      Left = 328
+      Top = 24
       Width = 65
       Height = 31
       Caption = #1064#1082#1072#1092
@@ -100,9 +178,9 @@ object Form1: TForm1
   end
   object GroupBox3: TGroupBox
     Left = 8
-    Top = 368
-    Width = 441
-    Height = 49
+    Top = 336
+    Width = 313
+    Height = 81
     Caption = #1056#1072#1079#1084#1077#1088#1099' '#1087#1086#1083#1103
     TabOrder = 3
     Visible = False
@@ -133,8 +211,8 @@ object Form1: TForm1
       ParentFont = False
     end
     object Button1: TButton
-      Left = 312
-      Top = 16
+      Left = 8
+      Top = 48
       Width = 113
       Height = 25
       Caption = #1055#1077#1088#1077#1088#1080#1089#1086#1074#1072#1090#1100' '#1087#1086#1083#1077
@@ -194,8 +272,8 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 462
-    Width = 887
+    Top = 452
+    Width = 879
     Height = 19
     Panels = <
       item
@@ -244,15 +322,21 @@ object Form1: TForm1
     end
     object N8: TMenuItem
       Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
-      Enabled = False
       object N9: TMenuItem
         Caption = #1053#1086#1074#1072#1103
+        OnClick = N9Click
       end
       object N10: TMenuItem
         Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
       end
       object N11: TMenuItem
         Caption = #1047#1072#1075#1088#1091#1079#1080#1090#1100
+      end
+      object N12: TMenuItem
+        Caption = '-'
+      end
+      object N13: TMenuItem
+        Caption = #1042#1099#1087#1086#1083#1085#1080#1090#1100
       end
     end
     object N6: TMenuItem
@@ -276,5 +360,45 @@ object Form1: TForm1
   object XPManifest1: TXPManifest
     Left = 160
     Top = 272
+  end
+  object ConditionsPopup: TPopupMenu
+    Left = 440
+    Top = 96
+    object N14: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1089#1090#1091#1083
+    end
+    object N15: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1089#1090#1086#1083
+    end
+    object N16: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1096#1082#1072#1092
+    end
+    object N17: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1076#1080#1074#1072#1085
+    end
+    object N18: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1085#1077' '#1089#1090#1091#1083
+    end
+    object N19: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1085#1077' '#1089#1090#1086#1083
+    end
+    object N20: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1085#1077' '#1096#1082#1072#1092
+    end
+    object N21: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1085#1077' '#1076#1080#1074#1072#1085
+    end
+    object N22: TMenuItem
+      Caption = #1095#1080#1089#1090#1086
+    end
+    object N23: TMenuItem
+      Caption = #1095#1080#1089#1090#1086'+'
+    end
+    object N24: TMenuItem
+      Caption = #1075#1088#1103#1079#1085#1086
+    end
+    object N25: TMenuItem
+      Caption = #1075#1088#1103#1079#1085#1086'+'
+    end
   end
 end

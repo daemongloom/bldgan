@@ -13,7 +13,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit,
-  ToolWin;
+  ToolWin, NewPrgUnit;
 
 type
   TForm1 = class(TForm)
@@ -51,6 +51,30 @@ type
     N9: TMenuItem;
     N10: TMenuItem;
     N11: TMenuItem;
+    ListBox1: TListBox;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
+    N12: TMenuItem;
+    N13: TMenuItem;
+    SpeedButton4: TSpeedButton;
+    SpeedButton5: TSpeedButton;
+    SpeedButton6: TSpeedButton;
+    SpeedButton7: TSpeedButton;
+    ConditionsPopup: TPopupMenu;
+    N14: TMenuItem;
+    N15: TMenuItem;
+    N16: TMenuItem;
+    N17: TMenuItem;
+    N18: TMenuItem;
+    N19: TMenuItem;
+    N20: TMenuItem;
+    N21: TMenuItem;
+    N22: TMenuItem;
+    N23: TMenuItem;
+    N24: TMenuItem;
+    N25: TMenuItem;
+    Edit1: TEdit;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -68,6 +92,19 @@ type
     procedure N6Click(Sender: TObject);
     procedure FieldBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
+    procedure N9Click(Sender: TObject);
+    procedure ListBox1Click(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
+    procedure SpeedButton3Click(Sender: TObject);
+    procedure SpeedButton4Click(Sender: TObject);
+    procedure CPClick1(Sender: TObject);
+    procedure SpeedButton5Click(Sender: TObject);
+    procedure CPClick2(Sender: TObject);
+    procedure SpeedButton6Click(Sender: TObject);
+    procedure SpeedButton7Click(Sender: TObject);
+    procedure Edit1KeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     { Private declarations }
     procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
@@ -81,6 +118,7 @@ const WheelUp = 120;
 
 var
   Form1: TForm1;
+  ProgName: string = '';
 
 implementation
 
@@ -94,7 +132,7 @@ end;
 
 const Offset = 6; // Константа смещения для частей мебели
       EMPTY = 0;  // Пусто
-      RUBSH = 1;// Мусор
+      RUBSH = 1;  // Мусор
       ePYLS = 2;  // Пылесос
       eSTUL = 3;  // Стул
       eSTOL = 4;  // Стол
@@ -123,6 +161,10 @@ var asize: integer = 24;      // Размер клетки в пикселах
     field_file: file of byte; // Файл поля
     ffname: string;           // Имя файла поля для сохранения или загрузки
     pylsc: integer;           // Количество пылесосов на поле
+    pylpos: record            // Положение пылесоса на поле
+       x,y: integer;
+       rot: TRotation;
+    end;
 
 procedure TForm1.DrawField;
 var i,j: integer;
@@ -209,6 +251,7 @@ procedure TForm1.Button1Click(Sender: TObject);
 begin
    DrawField;
 end;
+
 procedure TForm1.FormCreate(Sender: TObject);
 begin
    // Инициализируем размеры поля
@@ -279,6 +322,9 @@ begin
             ePYLS: begin
                Inc(pylsc);
                if pylsc=MaxPylsCount then InsertPyls.Enabled := false;
+               pylpos.x := xp;
+               pylpos.y := yp;
+               pylpos.rot := InsRotation;
              end;
          end;
          // Перерисуем поле
@@ -420,6 +466,100 @@ begin
          WheelUp: if InsRotation=3 then InsRotation := 0 else Inc(InsRotation);
          WheelDown: if InsRotation=0 then InsRotation := 3 else Dec(InsRotation);
       end;
+end;
+
+procedure TForm1.N9Click(Sender: TObject);
+begin
+   // Создадим новую программу
+   ProgName := '';
+   Form3.ShowModal;
+   if ProgName='' then exit;
+   ListBox1.Clear;
+   ListBox1.Items.Add('Программа '+ProgName+';');
+   ListBox1.Items.Add('Конец программы.');
+   ListBox1.ItemIndex := 1;
+   GroupBox1.Enabled := true;
+end;
+
+// Клик мышкой на ListBox'e
+procedure TForm1.ListBox1Click(Sender: TObject);
+begin
+   if ListBox1.ItemIndex=0 then ListBox1.ItemIndex := 1;
+end;
+
+procedure TForm1.SpeedButton1Click(Sender: TObject);
+begin
+   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ВПЕРЕД');
+end;
+
+procedure TForm1.SpeedButton2Click(Sender: TObject);
+begin
+   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ПЫЛЕСОСИТЬ');
+end;
+
+procedure TForm1.SpeedButton3Click(Sender: TObject);
+begin
+   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ПЫЛЕСОСИТЬ+');
+end;
+
+procedure TForm1.SpeedButton4Click(Sender: TObject);
+begin
+   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ПОВОРОТ');
+end;
+
+// Обрабатываем кнопочку ЕСЛИ
+procedure TForm1.CPClick1(Sender: TObject);
+begin
+   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ЕСЛИ '+(Sender as TMenuItem).Caption+' ТО');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ИНАЧЕ');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,'  КОНЕЦ ЕСЛИ');
+end;
+
+procedure TForm1.SpeedButton5Click(Sender: TObject);
+var i: integer;
+    MyComp: TComponent;
+begin
+   ConditionsPopup.Popup(Form1.Left+GroupBox1.Left+SpeedButton5.Left,
+     Form1.Top+SpeedButton5.Top+SpeedButton5.Height+5);
+   for i:=14 to 25 do begin
+      MyComp := FindComponent('N'+IntToStr(i)) as TMenuItem;
+      TMenuItem(MyComp).OnClick := CPClick1;
+   end;
+end;
+
+// Обрабатываем кнопку Пока
+procedure TForm1.CPClick2(Sender: TObject);
+begin
+   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ПОКА '+(Sender as TMenuItem).Caption+' ДЕЛАЙ');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,'  КОНЕЦ ПОКА');
+end;
+
+procedure TForm1.SpeedButton6Click(Sender: TObject);
+var i: integer;
+    MyComp: TComponent;
+begin
+   ConditionsPopup.Popup(Form1.Left+GroupBox1.Left+SpeedButton6.Left,
+     Form1.Top+SpeedButton6.Top+SpeedButton6.Height+5);
+   for i:=14 to 25 do begin
+      MyComp := FindComponent('N'+IntToStr(i)) as TMenuItem;
+      TMenuItem(MyComp).OnClick := CPClick2;
+   end;
+end;
+
+// Обрабатываем Повторяй
+procedure TForm1.SpeedButton7Click(Sender: TObject);
+begin
+   Edit1.Visible := true;
+end;
+
+procedure TForm1.Edit1KeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   if Key=13 then begin
+      ListBox1.Items.Insert(ListBox1.ItemIndex,'  ПОВТОРИ '+Edit1.Text);
+      ListBox1.Items.Insert(ListBox1.ItemIndex,'  КОНЕЦ ПОВТОРИ');
+      Edit1.Visible := false;
+   end;   
 end;
 
 end.
