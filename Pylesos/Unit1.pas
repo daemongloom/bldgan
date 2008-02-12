@@ -84,7 +84,13 @@ var
 
 implementation
 
-{$R *.dfm}
+{$R *.dfm}   
+
+function MAX(a,b:integer):integer;
+begin
+  if a>b then max:=a else max:=b;
+end;
+
 
 const Offset = 6; // Константа смещения для частей мебели
       EMPTY = 0;  // Пусто
@@ -124,9 +130,12 @@ var i,j: integer;
 begin
    // Устанавливаем размеры
    Panel1.Width := fsize_w*asize + 1;
+   form1.autosize:=false;
    Panel1.Height := fsize_h*asize + 1;
    FieldBox.Width := Panel1.Width;
    FieldBox.Height := Panel1.Height;
+   groupbox1.Left:=max(GroupBox2.Width,panel1.Width)+6;
+   form1.autosize:=true;
    // Выводим буковки и циферки
    Form1.Canvas.Font.Color := clGreen;
    for i:=1 to fsize_w do
@@ -200,7 +209,6 @@ procedure TForm1.Button1Click(Sender: TObject);
 begin
    DrawField;
 end;
-
 procedure TForm1.FormCreate(Sender: TObject);
 begin
    // Инициализируем размеры поля
