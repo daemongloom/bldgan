@@ -34,6 +34,7 @@ object Form1: TForm1
       Align = alClient
       OnMouseDown = FieldBoxMouseDown
       OnMouseMove = FieldBoxMouseMove
+      OnMouseUp = FieldBoxMouseUp
     end
   end
   object GroupBox1: TGroupBox
@@ -74,7 +75,7 @@ object Form1: TForm1
       Top = 16
       Width = 73
       Height = 25
-      Caption = #1055#1086#1074#1086#1088#1086#1090
+      Caption = #1042#1083#1077#1074#1086
       OnClick = SpeedButton4Click
     end
     object SpeedButton5: TSpeedButton
@@ -123,6 +124,14 @@ object Form1: TForm1
         00E33777777777777733EEEEEEEEEEEEEEE33333333333333333}
       NumGlyphs = 2
       OnClick = SpeedButton8Click
+    end
+    object SpeedButton9: TSpeedButton
+      Left = 328
+      Top = 16
+      Width = 65
+      Height = 25
+      Caption = #1042#1087#1088#1072#1074#1086
+      OnClick = SpeedButton9Click
     end
     object ListBox1: TListBox
       Left = 2

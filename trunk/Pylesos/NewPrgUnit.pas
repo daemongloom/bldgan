@@ -14,6 +14,7 @@ type
     BitBtn2: TBitBtn;
     procedure BitBtn1Click(Sender: TObject);
     procedure BitBtn2Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -39,6 +40,11 @@ procedure TForm3.BitBtn2Click(Sender: TObject);
 begin
    ProgName := '###NewProgramCanceled';
    Form3.Close;
+end;
+
+procedure TForm3.FormCreate(Sender: TObject);
+begin
+   ProgName := '###NewProgramCanceled';
 end;
 
 end.
