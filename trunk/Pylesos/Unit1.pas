@@ -277,6 +277,12 @@ begin
    // Настройка диалогов
    SaveDialog1.InitialDir := ExtractFilePath(Application.ExeName);
    OpenDialog1.InitialDir := ExtractFilePath(Application.ExeName);
+   // Создадим новую программу
+   ListBox1.Clear;
+   ListBox1.Items.Add('Программа');
+   ListBox1.Items.Add('Конец программы.');
+   ListBox1.ItemIndex := 1;
+   GroupBox1.Enabled := true;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -334,6 +340,12 @@ begin
       InsMode := false;
       InsType := EMPTY;
       InsRotation := 1;
+      // Поднимем кнопки
+      InsertPyls.Down:=false;
+      InsertStul.Down:=false;
+      InsertStol.Down:=false;
+      InsertShkaf.Down:=false;
+      InsertDivan.Down:=false;
    end;
 end;
 
@@ -341,30 +353,35 @@ procedure TForm1.InsertPylsClick(Sender: TObject);
 begin
    InsMode := true;
    InsType := ePYLS;
+   (Sender as TSpeedButton).Down:=true;
 end;
 
 procedure TForm1.InsertStulClick(Sender: TObject);
 begin
    InsMode := true;
-   InsType := eSTUL;
+   InsType := eSTUL; 
+   (Sender as TSpeedButton).Down:=true;
 end;
 
 procedure TForm1.InsertStolClick(Sender: TObject);
 begin
    InsMode := true;
-   InsType := eSTOL;
+   InsType := eSTOL;  
+   (Sender as TSpeedButton).Down:=true;
 end;
 
 procedure TForm1.InsertShkafClick(Sender: TObject);
 begin
    InsMode := true;
-   InsType := eSHKAF;
+   InsType := eSHKAF; 
+   (Sender as TSpeedButton).Down:=true;
 end;
 
 procedure TForm1.InsertDivanClick(Sender: TObject);
 begin
    InsMode := true;
-   InsType := eDIVAN;
+   InsType := eDIVAN;  
+   (Sender as TSpeedButton).Down:=true;
 end;
 
 // Создание нового поля
@@ -473,7 +490,7 @@ begin
    // Создадим новую программу
    ProgName := '';
    Form3.ShowModal;
-   if ProgName='' then exit;
+   if ProgName='###NewProgramCanceled' then exit;
    ListBox1.Clear;
    ListBox1.Items.Add('Программа '+ProgName+';');
    ListBox1.Items.Add('Конец программы.');
