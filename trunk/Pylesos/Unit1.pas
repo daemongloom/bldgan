@@ -106,6 +106,7 @@ type
     procedure SpeedButton7Click(Sender: TObject);
     procedure Edit1KeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure SpeedButton8Click(Sender: TObject);
   private
     { Private declarations }
     procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
@@ -568,6 +569,11 @@ end;
 procedure TForm1.SpeedButton7Click(Sender: TObject);
 begin
    Edit1.Visible := true;
+end;
+
+procedure TForm1.SpeedButton8Click(Sender: TObject);
+begin
+  {};
 end;
 
 procedure TForm1.Edit1KeyUp(Sender: TObject; var Key: Word;

@@ -106,6 +106,7 @@ object Form1: TForm1
       Top = 48
       Width = 73
       Height = 25
+      Cursor = crHandPoint
       Caption = #1047#1072#1087#1091#1089#1082
       Glyph.Data = {
         76010000424D7601000000000000760000002800000020000000100000000100
@@ -121,7 +122,7 @@ object Form1: TForm1
         70E337F33333333337F3E0FFFFFFFFFFF0E337FFFFFFFFFFF7F3E00000000000
         00E33777777777777733EEEEEEEEEEEEEEE33333333333333333}
       NumGlyphs = 2
-      OnClick = SpeedButton3Click
+      OnClick = SpeedButton8Click
     end
     object ListBox1: TListBox
       Left = 2
@@ -391,8 +392,9 @@ object Form1: TForm1
     Top = 272
   end
   object ConditionsPopup: TPopupMenu
-    Left = 440
-    Top = 96
+    MenuAnimation = [maTopToBottom]
+    Left = 192
+    Top = 272
     object N14: TMenuItem
       Caption = #1074#1087#1077#1088#1077#1076#1080' '#1089#1090#1091#1083
     end
