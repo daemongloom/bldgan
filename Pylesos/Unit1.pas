@@ -76,6 +76,7 @@ type
     N25: TMenuItem;
     Edit1: TEdit;
     SpeedButton8: TSpeedButton;
+    SpeedButton9: TSpeedButton;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -107,6 +108,9 @@ type
     procedure Edit1KeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure SpeedButton8Click(Sender: TObject);
+    procedure SpeedButton9Click(Sender: TObject);
+    procedure FieldBoxMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   private
     { Private declarations }
     procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
@@ -120,7 +124,7 @@ const WheelUp = 120;
 
 var
   Form1: TForm1;
-  ProgName: string = '';
+  ProgName: string;
 
 implementation
 
@@ -131,6 +135,12 @@ begin
   if a>b then max:=a else max:=b;
 end;
 
+procedure SwapValues(var a,b: integer);
+begin
+   a := a xor b;
+   b := a xor b;
+   a := a xor b;
+end;
 
 const Offset = 6; // Константа смещения для частей мебели
       EMPTY = 0;  // Пусто
@@ -167,6 +177,7 @@ var asize: integer = 24;      // Размер клетки в пикселах
        x,y: integer;
        rot: TRotation;
     end;
+    startpoint, finpoint: TPoint;
 
 procedure TForm1.DrawField;
 var i,j: integer;
@@ -281,7 +292,7 @@ begin
    OpenDialog1.InitialDir := ExtractFilePath(Application.ExeName);
    // Создадим новую программу
    ListBox1.Clear;
-   ListBox1.Items.Add('Программа');
+   ListBox1.Items.Add('Программа НОВАЯ_ПРОГРАММА');
    ListBox1.Items.Add('Конец программы.');
    ListBox1.ItemIndex := 1;
    GroupBox1.Enabled := true;
@@ -309,46 +320,39 @@ begin
    end;
 end;
 
-// Нажимается кнопка на поле
-procedure TForm1.FieldBoxMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-var xp,yp: integer;
-    ins_pos: TPoint;   // Позиция для вставки
+function InsertElement(xp,yp: integer;ElemT: TElem;Rot: TRotation): boolean;
+var ins_pos: TPoint;
 begin
+   Result := false;
    // Проверим на режим вставки
    if InsMode then begin
       // Определяем координаты
-      xp := X div 24 + 1;
-      yp := Y div 24 + 1;
       ins_pos.X := xp;
       ins_pos.Y := yp;
       // Вставляем элемент на поле, если можно
       if (field[xp,yp].ElemT=EMPTY) or (field[xp,yp].ElemT=RUBSH) then begin
-         field[xp,yp].ElemT := InsType;
-         field[xp,yp].Rot := InsRotation;
-         case InsType of
+         field[xp,yp].ElemT := ElemT;
+         field[xp,yp].Rot := Rot;
+         case ElemT of
             ePYLS: begin
                Inc(pylsc);
-               if pylsc=MaxPylsCount then InsertPyls.Enabled := false;
                pylpos.x := xp;
                pylpos.y := yp;
                pylpos.rot := InsRotation;
              end;
          end;
-         // Перерисуем поле
-         DrawField;
       end;
-      // Сбросим режим вставки
-      InsMode := false;
-      InsType := EMPTY;
-      InsRotation := 1;
-      // Поднимем кнопки
-      InsertPyls.Down:=false;
-      InsertStul.Down:=false;
-      InsertStol.Down:=false;
-      InsertShkaf.Down:=false;
-      InsertDivan.Down:=false;
+      // Вернем результат
+      Result := true;
    end;
+end;
+
+// Нажимается кнопка на поле
+procedure TForm1.FieldBoxMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+   startpoint.X := X div 24 +1;
+   startpoint.Y := Y div 24 +1;
 end;
 
 procedure TForm1.InsertPylsClick(Sender: TObject);
@@ -490,11 +494,10 @@ end;
 procedure TForm1.N9Click(Sender: TObject);
 begin
    // Создадим новую программу
-   ProgName := '';
    Form3.ShowModal;
    if ProgName='###NewProgramCanceled' then exit;
    ListBox1.Clear;
-   ListBox1.Items.Add('Программа '+ProgName+';');
+   ListBox1.Items.Add('Программа '+ProgName);
    ListBox1.Items.Add('Конец программы.');
    ListBox1.ItemIndex := 1;
    GroupBox1.Enabled := true;
@@ -523,7 +526,7 @@ end;
 
 procedure TForm1.SpeedButton4Click(Sender: TObject);
 begin
-   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ПОВОРОТ');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ВЛЕВО');
 end;
 
 // Обрабатываем кнопочку ЕСЛИ
@@ -584,6 +587,57 @@ begin
       ListBox1.Items.Insert(ListBox1.ItemIndex,'  КОНЕЦ ПОВТОРИ');
       Edit1.Visible := false;
    end;   
+end;
+
+procedure TForm1.SpeedButton9Click(Sender: TObject);
+begin
+   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ВПРАВО');
+end;
+
+procedure TForm1.FieldBoxMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var i,j: integer;
+    inserted: boolean;
+begin
+   finpoint.X := X div 24 +1;
+   finpoint.Y := Y div 24 +1;
+   if InsType<>ePYLS then begin
+      if startpoint.X>finpoint.X then SwapValues(startpoint.X,finpoint.X);
+      if startpoint.Y>finpoint.Y then SwapValues(startpoint.Y,finpoint.Y);
+      inserted := false;
+      for i:=startpoint.X to finpoint.X do
+         for j:=startpoint.Y to finpoint.Y do
+            inserted := InsertElement(i,j,InsType,InsRotation);
+      if inserted then begin
+         // Перерисуем поле
+         DrawField;
+         // Сбросим режим вставки
+         InsMode := false;
+         InsType := EMPTY;
+         InsRotation := 1;
+         // Поднимем кнопки
+         InsertPyls.Down:=false;
+         InsertStul.Down:=false;
+         InsertStol.Down:=false;
+         InsertShkaf.Down:=false;
+         InsertDivan.Down:=false;
+      end;
+   end else begin
+      if InsertElement(startpoint.X,startpoint.Y,InsType,InsRotation) then begin
+         // Перерисуем поле
+         DrawField;
+         // Сбросим режим вставки
+         InsMode := false;
+         InsType := EMPTY;
+         InsRotation := 1;
+         // Поднимем кнопки
+         InsertPyls.Down:=false;
+         InsertStul.Down:=false;
+         InsertStol.Down:=false;
+         InsertShkaf.Down:=false;
+         InsertDivan.Down:=false;
+      end;
+   end;      
 end;
 
 end.
