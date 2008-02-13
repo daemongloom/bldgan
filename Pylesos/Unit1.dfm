@@ -2,6 +2,7 @@ object Form1: TForm1
   Left = 200
   Top = 127
   AutoSize = True
+  BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
   ClientHeight = 471
@@ -106,6 +107,7 @@ object Form1: TForm1
       Width = 451
       Height = 370
       Align = alBottom
+      ExtendedSelect = False
       ItemHeight = 13
       TabOrder = 0
       OnClick = ListBox1Click
@@ -134,6 +136,7 @@ object Form1: TForm1
       Top = 24
       Width = 65
       Height = 31
+      AllowAllUp = True
       Caption = #1055#1099#1083#1077#1089#1086#1089
       Transparent = False
       OnClick = InsertPylsClick
@@ -143,6 +146,7 @@ object Form1: TForm1
       Top = 24
       Width = 65
       Height = 31
+      AllowAllUp = True
       Caption = #1057#1090#1091#1083
       Transparent = False
       OnClick = InsertStulClick
@@ -152,6 +156,7 @@ object Form1: TForm1
       Top = 24
       Width = 65
       Height = 31
+      AllowAllUp = True
       Caption = #1057#1090#1086#1083
       Transparent = False
       OnClick = InsertStolClick
@@ -161,6 +166,7 @@ object Form1: TForm1
       Top = 24
       Width = 65
       Height = 31
+      AllowAllUp = True
       Caption = #1064#1082#1072#1092
       Transparent = False
       OnClick = InsertShkafClick
@@ -170,6 +176,7 @@ object Form1: TForm1
       Top = 24
       Width = 65
       Height = 31
+      AllowAllUp = True
       Caption = #1044#1080#1074#1072#1085
       Layout = blGlyphTop
       NumGlyphs = 2

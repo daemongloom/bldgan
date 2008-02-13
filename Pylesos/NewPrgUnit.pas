@@ -11,7 +11,9 @@ type
     Label1: TLabel;
     Edit1: TEdit;
     BitBtn1: TBitBtn;
+    BitBtn2: TBitBtn;
     procedure BitBtn1Click(Sender: TObject);
+    procedure BitBtn2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -30,6 +32,12 @@ uses Unit1;
 procedure TForm3.BitBtn1Click(Sender: TObject);
 begin
    ProgName := Edit1.Text;
+   Form3.Close;
+end;
+
+procedure TForm3.BitBtn2Click(Sender: TObject);
+begin
+   ProgName := '###NewProgramCanceled';
    Form3.Close;
 end;
 
