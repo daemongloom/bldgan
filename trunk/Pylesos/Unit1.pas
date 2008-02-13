@@ -75,6 +75,7 @@ type
     N24: TMenuItem;
     N25: TMenuItem;
     Edit1: TEdit;
+    SpeedButton8: TSpeedButton;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
