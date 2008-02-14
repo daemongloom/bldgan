@@ -117,6 +117,8 @@ type
   public
     { Public declarations }
     procedure DrawField;
+    procedure MoveForward;
+    procedure Rotate(angle: integer);
   end;
 
 const WheelUp = 120;
@@ -162,6 +164,10 @@ type TElem = EMPTY..eSHKAF; // Тип элемента
        ElemT: TElem;        // Тип элемента
        Rot: TRotation;      // Поворот (для пылесоса)
      end;
+     TPylsPos = record            // Положение пылесоса на поле
+        x,y: integer;
+        rot: TRotation;
+     end;
      TField = array [1..25,1..25] of TFieldElem;
 
 var asize: integer = 24;      // Размер клетки в пикселах
@@ -173,10 +179,7 @@ var asize: integer = 24;      // Размер клетки в пикселах
     field_file: file of byte; // Файл поля
     ffname: string;           // Имя файла поля для сохранения или загрузки
     pylsc: integer;           // Количество пылесосов на поле
-    pylpos: record            // Положение пылесоса на поле
-       x,y: integer;
-       rot: TRotation;
-    end;
+    pylpos: TPylsPos;         // Положение пылесоса на поле
     startpoint, finpoint: TPoint;
 
 procedure TForm1.DrawField;
@@ -575,8 +578,16 @@ begin
 end;
 
 procedure TForm1.SpeedButton8Click(Sender: TObject);
+var k: integer;
 begin
-  {};
+  k := 1;
+  while k<ListBox1.Items.Count do begin
+     ListBox1.ItemIndex := k;
+     if (ListBox1.Items.ValueFromIndex[k] = ' ВПЕРЕД') then MoveForward;
+     if (ListBox1.Items.ValueFromIndex[k] = ' ВПРАВО') then Rotate(1);
+     if (ListBox1.Items.ValueFromIndex[k] = ' ВЛЕВО') then Rotate(-1);
+     Inc(k);
+  end;
 end;
 
 procedure TForm1.Edit1KeyUp(Sender: TObject; var Key: Word;
@@ -626,6 +637,8 @@ begin
       if InsertElement(startpoint.X,startpoint.Y,InsType,InsRotation) then begin
          // Перерисуем поле
          DrawField;
+         // Отслеживаем количество пылесосов
+         if pylsc>=MaxPylsCount then InsertPyls.Enabled := false;
          // Сбросим режим вставки
          InsMode := false;
          InsType := EMPTY;
@@ -638,6 +651,36 @@ begin
          InsertDivan.Down:=false;
       end;
    end;      
+end;
+
+procedure TForm1.MoveForward;
+var oldpos: TPylsPos;
+begin
+   // Двигаемся вперед
+   oldpos := pylpos;
+   case pylpos.rot of
+      0: if pylpos.y>1 then Dec(pylpos.y) else ShowMessage('Error!');
+      1: if pylpos.x<fsize_w then Inc(pylpos.x) else ShowMessage('Error!');
+      2: if pylpos.y<fsize_h then Inc(pylpos.y) else ShowMessage('Error!');
+      3: if pylpos.x>1 then Dec(pylpos.x) else ShowMessage('Error!');
+   end;
+   field[oldpos.x,oldpos.y].ElemT := EMPTY;
+   field[pylpos.x,pylpos.y].ElemT := ePYLS;
+   field[pylpos.x,pylpos.y].Rot := pylpos.rot;
+   DrawField;
+end;
+
+procedure TForm1.Rotate(angle: integer);
+var rot: integer;
+begin
+   // Поворот
+   rot := pylpos.rot;
+   rot := rot+angle;
+   if rot<0 then rot:=3 else
+      if rot>3 then rot:=0;
+   pylpos.rot := rot;   
+   field[pylpos.x,pylpos.y].Rot := pylpos.rot;
+   DrawField;   
 end;
 
 end.
