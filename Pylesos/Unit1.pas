@@ -689,8 +689,14 @@ begin
       2: if pylpos.y<fsize_h then Inc(pylpos.y) else ShowMessage('Error!');
       3: if pylpos.x>1 then Dec(pylpos.x) else ShowMessage('Error!');
    end;
-   field[oldpos.x,oldpos.y].ElemT := EMPTY;
-   field[pylpos.x,pylpos.y].ElemT := ePYLS;
+   if field[oldpos.x,oldpos.y].ElemT=ePYLS+Offset then
+     field[oldpos.x,oldpos.y].ElemT := RUBSH else
+        if field[oldpos.x,oldpos.y].ElemT=ePYLS then
+          field[oldpos.x,oldpos.y].ElemT := EMPTY;
+   if field[pylpos.x,pylpos.y].ElemT=RUBSH then
+     field[pylpos.x,pylpos.y].ElemT := ePYLS+Offset else
+        if field[pylpos.x,pylpos.y].ElemT=EMPTY then
+          field[pylpos.x,pylpos.y].ElemT := ePYLS; 
    field[pylpos.x,pylpos.y].Rot := pylpos.rot;
    DrawField;
 end;
