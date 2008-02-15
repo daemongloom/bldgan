@@ -274,7 +274,7 @@ begin
          end;     
       end;
    end;
-   Form1.Refresh;
+   FieldBox.Refresh;
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
