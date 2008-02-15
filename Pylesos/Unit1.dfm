@@ -384,9 +384,11 @@ object Form1: TForm1
       end
       object N10: TMenuItem
         Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
+        OnClick = N10Click
       end
       object N11: TMenuItem
         Caption = #1047#1072#1075#1088#1091#1079#1080#1090#1100
+        OnClick = N11Click
       end
       object N12: TMenuItem
         Caption = '-'
@@ -457,5 +459,18 @@ object Form1: TForm1
     object N25: TMenuItem
       Caption = #1075#1088#1103#1079#1085#1086'+'
     end
+  end
+  object SaveDialog2: TSaveDialog
+    DefaultExt = '*.pp'
+    Filter = #1055#1088#1086#1075#1088#1072#1084#1084#1072' '#1055#1099#1083#1077#1089#1086#1089#1080#1082#1072' (*.pp)|*.pp'
+    Left = 96
+    Top = 240
+  end
+  object OpenDialog2: TOpenDialog
+    DefaultExt = '*.pp'
+    Filter = #1055#1088#1086#1075#1088#1072#1084#1084#1072' '#1055#1099#1083#1077#1089#1086#1089#1080#1082#1072' (*.pp)|*.pp'
+    Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
+    Left = 128
+    Top = 240
   end
 end
