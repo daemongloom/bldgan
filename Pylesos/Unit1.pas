@@ -138,6 +138,7 @@ type
     procedure MoveForward;
     procedure Rotate(angle: integer);
     procedure Clean(plus: boolean);
+    procedure AddToComandList(var head: TComandList; k: integer);
   end;
 
 const WheelUp = 120;
@@ -550,14 +551,23 @@ end;
 procedure TForm1.ListBox1KeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);                                       
 var i:integer;
+    str: string;
 begin
    i:=ListBox1.ItemIndex; // ÒÓı‡ÌËÏ ÔÓÁËˆË˛ ÍÛÒÓ‡
-   if Key=46 then
-        if (ListBox1.ItemIndex in [1..ListBox1.Items.count-2] ) then
-          begin
+   str := ListBox1.Items.Strings[i];
+   if Key=46 then begin
+      if (ListBox1.ItemIndex in [1..ListBox1.Items.count-2]) then begin
+         if (pos('»Õ¿◊≈',str)>0) or (pos(' ŒÕ≈÷ ≈—À»',str)>0) then {nothing} else begin
             ListBox1.Items.Delete(ListBox1.ItemIndex);
+            if (pos('≈—À»',str)>0) and (pos(' ŒÕ≈÷',str)<=0) then begin
+               while pos(' ŒÕ≈÷ ≈—À»',ListBox1.Items.Strings[i])<=0 do
+                  ListBox1.Items.Delete(i);
+               ListBox1.Items.Delete(i);
+            end;
             ListBox1.ItemIndex:=i;
-          end;
+         end;
+      end;
+   end;   
 end;
 
 procedure TForm1.SpeedButton1Click(Sender: TObject);
@@ -814,6 +824,26 @@ begin
          Edit1.Visible := false;
          Edit1.Text := '0';
       end;   
+end;
+
+procedure TForm1.AddToComandList(var head: TComandList;k: integer);
+var newc,tek: TComandList;
+    str: string;
+begin
+   if k<ListBox1.Items.Count then begin
+      str := ListBox1.Items.Strings[k];
+      New(newc);
+      newc^.text := str;
+      newc^.next := nil;
+      newc^.vlozh := nil;
+      if head=nil then head:=newc else begin
+         tek := head;
+         while tek<>nil do tek:=tek^.next;
+         tek:=newc;
+      end;
+      if pos('≈—À»',str)>0 then AddToComandList(newc^.vlozh,k+1) else
+         AddToComandList(head^.next,k+1);
+   end;   
 end;
 
 end.
