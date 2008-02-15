@@ -268,6 +268,7 @@ begin
          end;     
       end;
    end;
+   Form1.Refresh;
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
