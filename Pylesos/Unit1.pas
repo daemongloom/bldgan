@@ -4,7 +4,7 @@
 {=  Главный модуль программы                   =}
 {= Авторы: Николай Трубинов                    =}
 {=         Николай Козаченко                   =}
-{= Дата: 2008.02.09                            =}
+{= Дата: 2008.02.15                            =}
 {===============================================}
 
 unit Unit1;
@@ -17,6 +17,13 @@ uses
   ToolWin, NewPrgUnit;
 
 type
+  // Команды
+  TComandList = ^TComanda;
+  TComanda = record
+     text: string;
+     vlozh: TComandList;
+     next: TComandList;
+  end;
   TForm1 = class(TForm)
     Button1: TButton;
     FieldBox: TImage;
@@ -121,6 +128,7 @@ type
       Y: Integer);
     procedure N10Click(Sender: TObject);
     procedure N11Click(Sender: TObject);
+    procedure Edit1KeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
@@ -192,6 +200,7 @@ var asize: integer = 24;      // Размер клетки в пикселах
     pylsc: integer;           // Количество пылесосов на поле
     pylpos: TPylsPos;         // Положение пылесоса на поле
     startpoint, finpoint: TPoint;
+    chead: TComandList;      // Список команд
 
 procedure TForm1.DrawField;
 var i,j: integer;
@@ -315,10 +324,19 @@ begin
    ListBox1.Items.Add('Конец программы.');
    ListBox1.ItemIndex := 1;
    GroupBox1.Enabled := true;
+
+   //
+   chead := nil;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
+var d: TComandList;
 begin
+   while chead<>nil do begin
+      d := chead;
+      chead := chead^.next;
+      Dispose(d);
+   end;
 end;
 
 // Проверяет возможность вставки
@@ -615,11 +633,11 @@ begin
   while k<ListBox1.Items.Count do begin
      ListBox1.ItemIndex := k;
      sleep(1000-trackbar1.Position*10);
-     if (ListBox1.Items.ValueFromIndex[k] = ' ВПЕРЕД') then MoveForward;
-     if (ListBox1.Items.ValueFromIndex[k] = ' ВПРАВО') then Rotate(1);
-     if (ListBox1.Items.ValueFromIndex[k] = ' ВЛЕВО') then Rotate(-1);
-     if (ListBox1.Items.ValueFromIndex[k] = ' ПЫЛЕСОСИТЬ') then Clean(false);
-     if (ListBox1.Items.ValueFromIndex[k] = ' ПЫЛЕСОСИТЬ+') then Clean(true);
+     if (ListBox1.Items.Strings[k] = '  ВПЕРЕД') then MoveForward;
+     if (ListBox1.Items.Strings[k] = '  ВПРАВО') then Rotate(1);
+     if (ListBox1.Items.Strings[k] = '  ВЛЕВО') then Rotate(-1);
+     if (ListBox1.Items.Strings[k] = '  ПЫЛЕСОСИТЬ') then Clean(false);
+     if (ListBox1.Items.Strings[k] = '  ПЫЛЕСОСИТЬ+') then Clean(true);
      ProgressBar1.Position := Round(100*k/(ListBox1.Items.Count-2));
      Inc(k);
   end;
@@ -786,6 +804,16 @@ begin
             ListBox1.Items.LoadFromFile(FileName);
             ListBox1.ItemIndex := 1;
          end;
+end;
+
+// Ограничение на ввод исключительно циферок!
+procedure TForm1.Edit1KeyPress(Sender: TObject; var Key: Char);
+begin
+   if not(Key in ['0'..'9',#8,#13,#27]) then Key := #0 else
+      if Key=#27 then begin
+         Edit1.Visible := false;
+         Edit1.Text := '0';
+      end;   
 end;
 
 end.

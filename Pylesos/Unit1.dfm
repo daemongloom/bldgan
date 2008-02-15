@@ -153,8 +153,9 @@ object Form1: TForm1
       Width = 81
       Height = 21
       TabOrder = 1
-      Text = '1'
+      Text = '0'
       Visible = False
+      OnKeyPress = Edit1KeyPress
       OnKeyUp = Edit1KeyUp
     end
   end
@@ -395,6 +396,7 @@ object Form1: TForm1
       end
       object N13: TMenuItem
         Caption = #1042#1099#1087#1086#1083#1085#1080#1090#1100
+        Enabled = False
       end
     end
     object N6: TMenuItem
