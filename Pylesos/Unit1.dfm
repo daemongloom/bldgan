@@ -47,7 +47,6 @@ object Form1: TForm1
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     Enabled = False
     TabOrder = 1
-    ExplicitLeft = 424
     object SpeedButton1: TSpeedButton
       Left = 8
       Top = 16
@@ -329,7 +328,6 @@ object Form1: TForm1
       item
         Width = 0
       end>
-    ExplicitWidth = 879
   end
   object ProgressBar1: TProgressBar
     Left = 8

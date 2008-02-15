@@ -220,13 +220,15 @@ begin
          case field[i,j].ElemT of
            EMPTY: FieldBox.Canvas.Brush.Color := clGreen;
            RUBSH: FieldBox.Canvas.Brush.Color := clGray;
-           ePYLS: FieldBox.Canvas.Brush.Color := clRed;
-           eSTUL: FieldBox.Canvas.Brush.Color := clLime;
-           eSTOL: FieldBox.Canvas.Brush.Color := clBlue;
-           eDIVAN: FieldBox.Canvas.Brush.Color := clAqua;
-           eSHKAF: FieldBox.Canvas.Brush.Color := clTeal;
+           ePYLS,ePYLS+Offset: FieldBox.Canvas.Brush.Color := clRed;
+           eSTUL,eSTUL+Offset: FieldBox.Canvas.Brush.Color := clLime;
+           eSTOL,eSTOL+Offset: FieldBox.Canvas.Brush.Color := clBlue;
+           eDIVAN,eDIVAN+Offset: FieldBox.Canvas.Brush.Color := clAqua;
+           eSHKAF,eSHKAF+Offset: FieldBox.Canvas.Brush.Color := clTeal;
          end;
-         if field[i,j].ElemT<>ePYLS then FieldBox.Canvas.Rectangle((i-1)*asize,(j-1)*asize,i*asize,j*asize) else begin
+         if (field[i,j].ElemT<>ePYLS) and (field[i,j].ElemT<>ePYLS+Offset)
+          then FieldBox.Canvas.Rectangle((i-1)*asize,(j-1)*asize,i*asize,j*asize)
+         else begin
             case field[i,j].Rot of
               // тут надо нарисовать треугольники
               0: begin
@@ -339,7 +341,8 @@ begin
       ins_pos.Y := yp;
       // Вставляем элемент на поле, если можно
       if (field[xp,yp].ElemT=EMPTY) or (field[xp,yp].ElemT=RUBSH) then begin
-         field[xp,yp].ElemT := ElemT;
+         if field[xp,yp].ElemT=RUBSH then field[xp,yp].ElemT := ElemT+Offset
+            else field[xp,yp].ElemT := ElemT;
          field[xp,yp].Rot := Rot;
          case ElemT of
             ePYLS: begin
@@ -402,7 +405,7 @@ end;
 procedure TForm1.N2Click(Sender: TObject);
 begin
    // Заполним поле мусором
-   FillChar(field,SizeOf(field),1);
+   FillChar(field,SizeOf(field),RUBSH);
    pylsc := 0;
    InsertPyls.Enabled := true;
    // Разбираемся с режимом вставки
@@ -736,6 +739,7 @@ begin
          eSHKAF,eDIVAN,eSHKAF+Offset,eDIVAN+Offset:
             ShowMessage('Нельзя пылесосить под шкафом и под диваном!');
       end;
+      DrawField;
    end;
 end;
 
