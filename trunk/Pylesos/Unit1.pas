@@ -79,6 +79,8 @@ type
     SpeedButton8: TSpeedButton;
     SpeedButton9: TSpeedButton;
     TrackBar1: TTrackBar;
+    SaveDialog2: TSaveDialog;
+    OpenDialog2: TOpenDialog;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -117,6 +119,8 @@ type
       Shift: TShiftState);
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
+    procedure N10Click(Sender: TObject);
+    procedure N11Click(Sender: TObject);
   private
     { Private declarations }
     procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
@@ -303,6 +307,8 @@ begin
    // Настройка диалогов
    SaveDialog1.InitialDir := ExtractFilePath(Application.ExeName);
    OpenDialog1.InitialDir := ExtractFilePath(Application.ExeName);
+   SaveDialog2.InitialDir := ExtractFilePath(Application.ExeName);
+   OpenDialog2.InitialDir := ExtractFilePath(Application.ExeName);
    // Создадим новую программу
    ListBox1.Clear;
    ListBox1.Items.Add('Программа НОВАЯ_ПРОГРАММА');
@@ -528,11 +534,11 @@ procedure TForm1.ListBox1KeyDown(Sender: TObject; var Key: Word;
 var i:integer;
 begin
    i:=ListBox1.ItemIndex; // сохраним позицию курсора
-   if key=46 then
+   if Key=46 then
         if (ListBox1.ItemIndex in [1..ListBox1.Items.count-2] ) then
           begin
             ListBox1.Items.Delete(ListBox1.ItemIndex);
-            ListBox1.ItemIndex:=i-1;
+            ListBox1.ItemIndex:=i;
           end;
 end;
 
@@ -757,6 +763,27 @@ procedure TForm1.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 begin
    StatusBar1.Panels[0].Text := '';
+end;
+
+// Сохранить программу
+procedure TForm1.N10Click(Sender: TObject);
+begin
+   with SaveDialog2 do
+      if Execute then
+         if FileName<>'' then begin
+            ListBox1.Items.SaveToFile(FileName);
+         end;   
+end;
+
+// Загрузить программу
+procedure TForm1.N11Click(Sender: TObject);
+begin
+   with OpenDialog2 do
+      if Execute then
+         if FileName<>'' then begin
+            ListBox1.Items.LoadFromFile(FileName);
+            ListBox1.ItemIndex := 1;
+         end;
 end;
 
 end.
