@@ -119,6 +119,7 @@ type
     procedure DrawField;
     procedure MoveForward;
     procedure Rotate(angle: integer);
+    procedure Clean(plus: boolean);
   end;
 
 const WheelUp = 120;
@@ -146,15 +147,15 @@ end;
 
 const Offset = 6; // Константа смещения для частей мебели
       EMPTY = 0;  // Пусто
-      RUBSH = 1;  // Мусор
-      ePYLS = 2;  // Пылесос
-      eSTUL = 3;  // Стул
-      eSTOL = 4;  // Стол
-      eDIVAN = 5; // Диван
-      eSHKAF = 6; // Шкаф
+      ePYLS = 1;  // Пылесос
+      eSTUL = 2;  // Стул
+      eSTOL = 3;  // Стол
+      eDIVAN = 4; // Диван
+      eSHKAF = 5; // Шкаф
+      RUBSH = 6;  // Мусор
       MaxPylsCount = 1; // Максимальное количество пылесосов на поле
 
-type TElem = EMPTY..eSHKAF; // Тип элемента
+type TElem = EMPTY..eSHKAF+Offset; // Тип элемента
      // Размеры элементов мебели
      TElemSize = record
         w,h : integer;
@@ -282,7 +283,7 @@ begin
    ProgressBar1.Width := StatusBar1.Panels[2].Width - 2;
    ProgressBar1.Position := 15;
    // Заполним поле мусором
-   FillChar(field,SizeOf(field),1);
+   FillChar(field,SizeOf(field),RUBSH);
    pylsc := 0;
    // Разбираемся с режимом вставки
    InsMode := false;
@@ -586,6 +587,8 @@ begin
      if (ListBox1.Items.ValueFromIndex[k] = ' ВПЕРЕД') then MoveForward;
      if (ListBox1.Items.ValueFromIndex[k] = ' ВПРАВО') then Rotate(1);
      if (ListBox1.Items.ValueFromIndex[k] = ' ВЛЕВО') then Rotate(-1);
+     if (ListBox1.Items.ValueFromIndex[k] = ' ПЫЛЕСОСИТЬ') then Clean(false);
+     if (ListBox1.Items.ValueFromIndex[k] = ' ПЫЛЕСОСИТЬ+') then Clean(true);
      Inc(k);
   end;
 end;
@@ -681,6 +684,42 @@ begin
    pylpos.rot := rot;   
    field[pylpos.x,pylpos.y].Rot := pylpos.rot;
    DrawField;   
+end;
+
+procedure TForm1.Clean(plus: boolean);
+var ppos_x,ppos_y: integer; // Где пылесосить
+begin
+   // Пылесосить, Пылесосить+
+   ppos_x := pylpos.x;
+   ppos_y := pylpos.y;
+   // Определили где пылесосить
+   if plus then begin
+      case pylpos.rot of
+         0: ppos_y := ppos_y-2;
+         1: ppos_x := ppos_x+2;
+         2: ppos_y := ppos_y+2;
+         3: ppos_x := ppos_x-2;
+      end;
+   end else begin
+      case pylpos.rot of
+         0: ppos_y := ppos_y-1;
+         1: ppos_x := ppos_x+1;
+         2: ppos_y := ppos_y+1;
+         3: ppos_x := ppos_x-1;
+      end;
+   end;
+   if ((not(ppos_x in [1..fsize_w])) and (not(ppos_y in [1..fsize_h]))) then
+      ShowMessage('Нельзя пылесосить за границей поля!')
+   else begin
+      case field[ppos_x,ppos_y].ElemT of
+         RUBSH: field[ppos_x,ppos_y].ElemT := EMPTY;
+         ePYLS: ShowMessage('Не умею пылесосить пылесос!');
+         eSTOL,eSTUL: {nothing};
+         eSTOL+Offset,eSTUL+Offset: Dec(field[ppos_x,ppos_y].ElemT,Offset);
+         eSHKAF,eDIVAN,eSHKAF+Offset,eDIVAN+Offset:
+            ShowMessage('Нельзя пылесосить под шкафом и под диваном!');
+      end;
+   end;
 end;
 
 end.
