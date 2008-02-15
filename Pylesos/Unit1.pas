@@ -557,12 +557,24 @@ begin
    str := ListBox1.Items.Strings[i];
    if Key=46 then begin
       if (ListBox1.ItemIndex in [1..ListBox1.Items.count-2]) then begin
-         if (pos('хмюве',str)>0) or (pos('йнмеж еякх',str)>0) then {nothing} else begin
+         if (pos('хмюве',str)>0) or (pos('йнмеж еякх',str)>0) or
+          (pos('йнмеж онбрнпх',str)>0) or (pos('йнмеж онйю',str)>0)
+         then {nothing} else begin
             ListBox1.Items.Delete(ListBox1.ItemIndex);
             if (pos('еякх',str)>0) and (pos('йнмеж',str)<=0) then begin
                while pos('йнмеж еякх',ListBox1.Items.Strings[i])<=0 do
                   ListBox1.Items.Delete(i);
                ListBox1.Items.Delete(i);
+            end;
+            if (pos('онбрнпх',str)>0) and (pos('йнмеж',str)<=0) then begin
+               while pos('йнмеж онбрнпх',ListBox1.Items.Strings[i])<=0 do
+                  ListBox1.Items.Delete(i);
+               ListBox1.Items.Delete(i);   
+            end;
+            if (pos('онйю',str)>0) and (pos('йнмеж',str)<=0) then begin
+               while pos('йнмеж онйю',ListBox1.Items.Strings[i])<=0 do
+                  ListBox1.Items.Delete(i);
+               ListBox1.Items.Delete(i);   
             end;
             ListBox1.ItemIndex:=i;
          end;

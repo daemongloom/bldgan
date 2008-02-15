@@ -466,13 +466,13 @@ object Form1: TForm1
     DefaultExt = '*.pp'
     Filter = #1055#1088#1086#1075#1088#1072#1084#1084#1072' '#1055#1099#1083#1077#1089#1086#1089#1080#1082#1072' (*.pp)|*.pp'
     Left = 96
-    Top = 240
+    Top = 304
   end
   object OpenDialog2: TOpenDialog
     DefaultExt = '*.pp'
     Filter = #1055#1088#1086#1075#1088#1072#1084#1084#1072' '#1055#1099#1083#1077#1089#1086#1089#1080#1082#1072' (*.pp)|*.pp'
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
     Left = 128
-    Top = 240
+    Top = 304
   end
 end
