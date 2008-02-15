@@ -199,12 +199,12 @@ var i,j: integer;
 begin
    // Устанавливаем размеры
    Panel1.Width := fsize_w*asize + 1;
-   form1.autosize:=false;
+   Form1.autosize:=false;
    Panel1.Height := fsize_h*asize + 1;
    FieldBox.Width := Panel1.Width;
    FieldBox.Height := Panel1.Height;
-   groupbox1.Left:=max(GroupBox2.Width,panel1.Width)+6;
-   form1.autosize:=true;
+   GroupBox1.Left:=max(GroupBox2.Width,Panel1.Width)+6;
+   Form1.Autosize:=true;
    // Выводим буковки и циферки
    Form1.Canvas.Font.Color := clGreen;
    for i:=1 to fsize_w do
@@ -294,7 +294,7 @@ begin
    ProgressBar1.Height := StatusBar1.Height - 2;
    StatusBar1.Panels[2].Width := StatusBar1.Width - ProgressBar1.Left;
    ProgressBar1.Width := StatusBar1.Panels[2].Width - 2;
-   ProgressBar1.Position := 15;
+   ProgressBar1.Position := 0;
    // Заполним поле мусором
    FillChar(field,SizeOf(field),RUBSH);
    pylsc := 0;
@@ -611,6 +611,7 @@ procedure TForm1.SpeedButton8Click(Sender: TObject);
 var k: integer;
 begin
   k := 1;
+  ProgressBar1.Position := 0;
   while k<ListBox1.Items.Count do begin
      ListBox1.ItemIndex := k;
      sleep(1000-trackbar1.Position*10);
@@ -619,6 +620,7 @@ begin
      if (ListBox1.Items.ValueFromIndex[k] = ' ВЛЕВО') then Rotate(-1);
      if (ListBox1.Items.ValueFromIndex[k] = ' ПЫЛЕСОСИТЬ') then Clean(false);
      if (ListBox1.Items.ValueFromIndex[k] = ' ПЫЛЕСОСИТЬ+') then Clean(true);
+     ProgressBar1.Position := Round(100*k/(ListBox1.Items.Count-2));
      Inc(k);
   end;
 end;
