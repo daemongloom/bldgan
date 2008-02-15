@@ -6,7 +6,7 @@ object Form1: TForm1
   BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
   ClientHeight = 471
-  ClientWidth = 879
+  ClientWidth = 900
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -32,13 +32,14 @@ object Form1: TForm1
       Width = 39
       Height = 39
       Align = alClient
+      Stretch = True
       OnMouseDown = FieldBoxMouseDown
       OnMouseMove = FieldBoxMouseMove
       OnMouseUp = FieldBoxMouseUp
     end
   end
   object GroupBox1: TGroupBox
-    Left = 424
+    Left = 445
     Top = 0
     Width = 455
     Height = 452
@@ -46,6 +47,7 @@ object Form1: TForm1
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     Enabled = False
     TabOrder = 1
+    ExplicitLeft = 424
     object SpeedButton1: TSpeedButton
       Left = 8
       Top = 16
@@ -143,6 +145,7 @@ object Form1: TForm1
       ItemHeight = 13
       TabOrder = 0
       OnClick = ListBox1Click
+      OnKeyDown = ListBox1KeyDown
     end
     object Edit1: TEdit
       Left = 160
@@ -312,7 +315,7 @@ object Form1: TForm1
   object StatusBar1: TStatusBar
     Left = 0
     Top = 452
-    Width = 879
+    Width = 900
     Height = 19
     Panels = <
       item
@@ -326,13 +329,25 @@ object Form1: TForm1
       item
         Width = 0
       end>
+    ExplicitWidth = 879
   end
   object ProgressBar1: TProgressBar
-    Left = 0
-    Top = 432
+    Left = 8
+    Top = 429
     Width = 150
     Height = 17
     TabOrder = 5
+  end
+  object TrackBar1: TTrackBar
+    Left = 766
+    Top = 47
+    Width = 72
+    Height = 27
+    Max = 100
+    Min = 10
+    Frequency = 10
+    Position = 10
+    TabOrder = 6
   end
   object MainMenu1: TMainMenu
     Left = 64

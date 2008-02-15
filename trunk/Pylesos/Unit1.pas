@@ -2,7 +2,8 @@
 {= Пермский Государственный Университет        =}
 {= Графический исполнитель "Пылесосик"         =}
 {=  Главный модуль программы                   =}
-{= Авторы: Николай Трубинов (NT)...            =}
+{= Авторы: Николай Трубинов                    =}
+{=         Николай Козаченко                   =}
 {= Дата: 2008.02.09                            =}
 {===============================================}
 
@@ -77,6 +78,7 @@ type
     Edit1: TEdit;
     SpeedButton8: TSpeedButton;
     SpeedButton9: TSpeedButton;
+    TrackBar1: TTrackBar;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -111,6 +113,8 @@ type
     procedure SpeedButton9Click(Sender: TObject);
     procedure FieldBoxMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure ListBox1KeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     { Private declarations }
     procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
@@ -513,6 +517,19 @@ begin
    if ListBox1.ItemIndex=0 then ListBox1.ItemIndex := 1;
 end;
 
+procedure TForm1.ListBox1KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);                                       
+var i:integer;
+begin
+   i:=ListBox1.ItemIndex; // сохраним позицию курсора
+   if key=46 then
+        if (ListBox1.ItemIndex in [2..ListBox1.Items.count-1] ) then
+          begin
+            ListBox1.Items.Delete(ListBox1.ItemIndex);
+            ListBox1.ItemIndex:=i-1;
+          end;
+end;
+
 procedure TForm1.SpeedButton1Click(Sender: TObject);
 begin
    ListBox1.Items.Insert(ListBox1.ItemIndex,'  ВПЕРЕД');
@@ -590,6 +607,7 @@ begin
      if (ListBox1.Items.ValueFromIndex[k] = ' ПЫЛЕСОСИТЬ') then Clean(false);
      if (ListBox1.Items.ValueFromIndex[k] = ' ПЫЛЕСОСИТЬ+') then Clean(true);
      Inc(k);
+     sleep(1000-trackbar1.Position*10);
   end;
 end;
 
@@ -679,11 +697,10 @@ begin
    // Поворот
    rot := pylpos.rot;
    rot := rot+angle;
-   if rot<0 then rot:=3 else
-      if rot>3 then rot:=0;
-   pylpos.rot := rot;   
+   rot:=(rot+4)mod 4;
+   pylpos.rot := rot;
    field[pylpos.x,pylpos.y].Rot := pylpos.rot;
-   DrawField;   
+   DrawField;
 end;
 
 procedure TForm1.Clean(plus: boolean);
