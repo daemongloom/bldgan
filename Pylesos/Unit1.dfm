@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 200
-  Top = 127
+  Left = 192
+  Top = 122
   AutoSize = True
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
@@ -17,6 +17,7 @@ object Form1: TForm1
   OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnMouseMove = FormMouseMove
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel

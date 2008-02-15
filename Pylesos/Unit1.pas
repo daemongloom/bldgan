@@ -115,6 +115,8 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure ListBox1KeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
   private
     { Private declarations }
     procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
@@ -605,13 +607,13 @@ begin
   k := 1;
   while k<ListBox1.Items.Count do begin
      ListBox1.ItemIndex := k;
+     sleep(1000-trackbar1.Position*10);
      if (ListBox1.Items.ValueFromIndex[k] = ' ÂÏÅÐÅÄ') then MoveForward;
      if (ListBox1.Items.ValueFromIndex[k] = ' ÂÏÐÀÂÎ') then Rotate(1);
      if (ListBox1.Items.ValueFromIndex[k] = ' ÂËÅÂÎ') then Rotate(-1);
      if (ListBox1.Items.ValueFromIndex[k] = ' ÏÛËÅÑÎÑÈÒÜ') then Clean(false);
      if (ListBox1.Items.ValueFromIndex[k] = ' ÏÛËÅÑÎÑÈÒÜ+') then Clean(true);
      Inc(k);
-     sleep(1000-trackbar1.Position*10);
   end;
 end;
 
@@ -707,7 +709,7 @@ begin
    // Ïîâîðîò
    rot := pylpos.rot;
    rot := rot+angle;
-   rot:=(rot+4)mod 4;
+   rot := (rot+4) mod 4;
    pylpos.rot := rot;
    field[pylpos.x,pylpos.y].Rot := pylpos.rot;
    DrawField;
@@ -748,6 +750,13 @@ begin
       end;
       DrawField;
    end;
+end;
+
+// Ìûøêà áåãàåò ïî ôîðìå
+procedure TForm1.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+begin
+   StatusBar1.Panels[0].Text := '';
 end;
 
 end.
