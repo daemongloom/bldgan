@@ -523,7 +523,7 @@ var i:integer;
 begin
    i:=ListBox1.ItemIndex; // сохраним позицию курсора
    if key=46 then
-        if (ListBox1.ItemIndex in [2..ListBox1.Items.count-1] ) then
+        if (ListBox1.ItemIndex in [1..ListBox1.Items.count-2] ) then
           begin
             ListBox1.Items.Delete(ListBox1.ItemIndex);
             ListBox1.ItemIndex:=i-1;
