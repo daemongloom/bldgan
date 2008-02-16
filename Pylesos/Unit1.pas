@@ -349,21 +349,12 @@ begin
 end;
 
 // Проверяет возможность вставки
-function InsertEnable(f: TField; esize: TElemSize; ins_pos: TPoint): boolean;
-var i,j: integer;
+function InsertEnable(f: TField; x,y: integer): boolean;
 begin
    Result := false;
-   if (ins_pos.X + esize.w -1 <= fsize_w) and
-    (ins_pos.Y + esize.h -1 <=fsize_h) then begin
-      // По размерам входит в поле
-      // Продолжаем проверку
+   if (f[x,y].ElemT = EMPTY) or
+    (f[x,y].ElemT = RUBSH) then
       Result := true;
-      for i:=ins_pos.X to (ins_pos.X + esize.w -1) do
-         for j:=ins_pos.Y to (ins_pos.Y + esize.h -1) do begin
-            // В какой-то клетке не пусто, вставка невозможна!
-            if f[i,j].ElemT <> EMPTY then Result := false;
-         end;
-   end;
 end;
 
 function InsertElement(xp,yp: integer;ElemT: TElem;Rot: TRotation): boolean;
@@ -659,7 +650,6 @@ procedure TForm1.SpeedButton8Click(Sender: TObject);
 var k: integer;
 begin
   k := 1;
-  ProgressBar1.Position := 0;
   while k<ListBox1.Items.Count do begin
      ListBox1.ItemIndex := k;
      sleep(1000-trackbar1.Position*10);
@@ -668,8 +658,8 @@ begin
      if (ListBox1.Items.Strings[k] = '  ВЛЕВО') then Rotate(-1);
      if (ListBox1.Items.Strings[k] = '  ПЫЛЕСОСИТЬ') then Clean(false);
      if (ListBox1.Items.Strings[k] = '  ПЫЛЕСОСИТЬ+') then Clean(true);
-     ProgressBar1.Position := Round(100*k/(ListBox1.Items.Count-2));
      Inc(k);
+     Application.ProcessMessages;
   end;
 end;
 
@@ -742,21 +732,26 @@ begin
    // Двигаемся вперед
    oldpos := pylpos;
    case pylpos.rot of
-      0: if pylpos.y>1 then Dec(pylpos.y) else ShowMessage('Error!');
-      1: if pylpos.x<fsize_w then Inc(pylpos.x) else ShowMessage('Error!');
-      2: if pylpos.y<fsize_h then Inc(pylpos.y) else ShowMessage('Error!');
-      3: if pylpos.x>1 then Dec(pylpos.x) else ShowMessage('Error!');
+      0: if pylpos.y>1 then Dec(pylpos.y) else ShowMessage('Нельзя выезжать за поле!');
+      1: if pylpos.x<fsize_w then Inc(pylpos.x) else ShowMessage('Нельзя выезжать за поле!');
+      2: if pylpos.y<fsize_h then Inc(pylpos.y) else ShowMessage('Нельзя выезжать за поле!');
+      3: if pylpos.x>1 then Dec(pylpos.x) else ShowMessage('Нельзя выезжать за поле!');
    end;
-   if field[oldpos.x,oldpos.y].ElemT=ePYLS+Offset then
-     field[oldpos.x,oldpos.y].ElemT := RUBSH else
-        if field[oldpos.x,oldpos.y].ElemT=ePYLS then
+   if InsertEnable(field,pylpos.x,pylpos.y) then begin
+      if field[oldpos.x,oldpos.y].ElemT=ePYLS+Offset then
+       field[oldpos.x,oldpos.y].ElemT := RUBSH else
+         if field[oldpos.x,oldpos.y].ElemT=ePYLS then
           field[oldpos.x,oldpos.y].ElemT := EMPTY;
-   if field[pylpos.x,pylpos.y].ElemT=RUBSH then
-     field[pylpos.x,pylpos.y].ElemT := ePYLS+Offset else
-        if field[pylpos.x,pylpos.y].ElemT=EMPTY then
-          field[pylpos.x,pylpos.y].ElemT := ePYLS; 
-   field[pylpos.x,pylpos.y].Rot := pylpos.rot;
-   DrawField;
+      if field[pylpos.x,pylpos.y].ElemT=RUBSH then
+       field[pylpos.x,pylpos.y].ElemT := ePYLS+Offset else
+         if field[pylpos.x,pylpos.y].ElemT=EMPTY then
+          field[pylpos.x,pylpos.y].ElemT := ePYLS;
+      field[pylpos.x,pylpos.y].Rot := pylpos.rot;
+      DrawField;
+   end else begin
+      pylpos := oldpos;
+      ShowMessage('Нельзя!');
+   end;
 end;
 
 procedure TForm1.Rotate(angle: integer);
