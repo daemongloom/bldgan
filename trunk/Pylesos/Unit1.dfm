@@ -341,7 +341,7 @@ object Form1: TForm1
   object TrackBar1: TTrackBar
     Left = 766
     Top = 47
-    Width = 72
+    Width = 75
     Height = 27
     Hint = #1057#1082#1086#1088#1086#1089#1090#1100' '#1074#1099#1087#1086#1083#1085#1077#1085#1080#1103' '#1087#1088#1086#1075#1088#1072#1084#1084#1099'. '#1063#1077#1084' '#1087#1088#1072#1074#1077#1077' '#1087#1086#1083#1079#1091#1085#1086#1082' - '#1090#1077#1084' '#1073#1099#1089#1090#1088#1077#1077
     Max = 100
@@ -399,9 +399,16 @@ object Form1: TForm1
         Enabled = False
       end
     end
-    object N6: TMenuItem
-      Caption = #1054' '#1087#1088#1086#1075#1088#1072#1084#1084#1077
-      OnClick = N6Click
+    object N28: TMenuItem
+      Caption = #1055#1086#1084#1086#1097#1100
+      object N29: TMenuItem
+        Caption = #1057#1087#1088#1072#1074#1082#1072
+        OnClick = N29Click
+      end
+      object N6: TMenuItem
+        Caption = #1054' '#1087#1088#1086#1075#1088#1072#1084#1084#1077
+        OnClick = N6Click
+      end
     end
   end
   object SaveDialog1: TSaveDialog
@@ -448,6 +455,12 @@ object Form1: TForm1
     end
     object N21: TMenuItem
       Caption = #1074#1087#1077#1088#1077#1076#1080' '#1085#1077' '#1076#1080#1074#1072#1085
+    end
+    object N26: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1082#1088#1072#1081
+    end
+    object N27: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1085#1077' '#1082#1088#1072#1081
     end
     object N22: TMenuItem
       Caption = #1095#1080#1089#1090#1086

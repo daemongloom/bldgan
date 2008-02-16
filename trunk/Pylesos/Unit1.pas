@@ -4,7 +4,7 @@
 {=  Главный модуль программы                   =}
 {= Авторы: Николай Трубинов                    =}
 {=         Николай Козаченко                   =}
-{= Дата: 2008.02.15                            =}
+{= Дата: 2008.02.16                            =}
 {===============================================}
 
 unit Unit1;
@@ -14,7 +14,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit,
-  ToolWin, NewPrgUnit;
+  ToolWin, NewPrgUnit, ShellAPI;
 
 type
   // Команды
@@ -88,6 +88,10 @@ type
     TrackBar1: TTrackBar;
     SaveDialog2: TSaveDialog;
     OpenDialog2: TOpenDialog;
+    N26: TMenuItem;
+    N27: TMenuItem;
+    N28: TMenuItem;
+    N29: TMenuItem;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -129,6 +133,7 @@ type
     procedure N10Click(Sender: TObject);
     procedure N11Click(Sender: TObject);
     procedure Edit1KeyPress(Sender: TObject; var Key: Char);
+    procedure N29Click(Sender: TObject);
   private
     { Private declarations }
     procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
@@ -236,7 +241,6 @@ begin
          case field[i,j].ElemT of
            EMPTY: FieldBox.Canvas.Brush.Color := clGreen;
            RUBSH: FieldBox.Canvas.Brush.Color := clGray;
-           ePYLS,ePYLS+Offset: FieldBox.Canvas.Brush.Color := clRed;
            eSTUL,eSTUL+Offset: FieldBox.Canvas.Brush.Color := clLime;
            eSTOL,eSTOL+Offset: FieldBox.Canvas.Brush.Color := clBlue;
            eDIVAN,eDIVAN+Offset: FieldBox.Canvas.Brush.Color := clAqua;
@@ -245,25 +249,12 @@ begin
          if (field[i,j].ElemT<>ePYLS) and (field[i,j].ElemT<>ePYLS+Offset)
           then FieldBox.Canvas.Rectangle((i-1)*asize,(j-1)*asize,i*asize,j*asize)
          else begin
+            if field[i,j].ElemT=ePYLS then FieldBox.Canvas.Brush.Color := clGreen
+               else FieldBox.Canvas.Brush.Color := clGray;
+            FieldBox.Canvas.Rectangle((i-1)*asize,(j-1)*asize,i*asize,j*asize);
             case field[i,j].Rot of
               // тут надо нарисовать треугольники
               0: begin
-                 p[1].X := (i-1)*asize;
-                 p[1].Y := (j-1)*asize;
-                 p[2].X := i*asize;
-                 p[2].Y := (j-1)*asize;
-                 p[3].X := (i-1)*asize + asize div 2;
-                 p[3].Y := j*asize;
-              end;
-              1: begin
-                 p[1].X := i*asize;
-                 p[1].Y := (j-1)*asize;
-                 p[2].X := i*asize;
-                 p[2].Y := j*asize;
-                 p[3].X := (i-1)*asize;
-                 p[3].Y := (j-1)*asize + asize div 2;
-              end;
-              2: begin
                  p[1].X := i*asize;
                  p[1].Y := j*asize;
                  p[2].X := (i-1)*asize;
@@ -271,7 +262,7 @@ begin
                  p[3].X := (i-1)*asize + asize div 2;
                  p[3].Y := (j-1)*asize;
               end;
-              3: begin
+              1: begin
                  p[1].X := (i-1)*asize;
                  p[1].Y := (j-1)*asize;
                  p[2].X := i*asize;
@@ -279,7 +270,24 @@ begin
                  p[3].X := (i-1)*asize;
                  p[3].Y := j*asize;
               end;
+              2: begin
+                 p[1].X := (i-1)*asize;
+                 p[1].Y := (j-1)*asize;
+                 p[2].X := i*asize;
+                 p[2].Y := (j-1)*asize;
+                 p[3].X := (i-1)*asize + asize div 2;
+                 p[3].Y := j*asize;
+              end;
+              3: begin
+                 p[1].X := i*asize;
+                 p[1].Y := (j-1)*asize;
+                 p[2].X := i*asize;
+                 p[2].Y := j*asize;
+                 p[3].X := (i-1)*asize;
+                 p[3].Y := (j-1)*asize + asize div 2;
+              end;
             end;
+            FieldBox.Canvas.Brush.Color := clRed;
             FieldBox.Canvas.Polygon(p);
          end;     
       end;
@@ -616,7 +624,7 @@ var i: integer;
 begin
    ConditionsPopup.Popup(Form1.Left+GroupBox1.Left+SpeedButton5.Left,
      Form1.Top+SpeedButton5.Top+SpeedButton5.Height+5);
-   for i:=14 to 25 do begin
+   for i:=14 to 27 do begin
       MyComp := FindComponent('N'+IntToStr(i)) as TMenuItem;
       TMenuItem(MyComp).OnClick := CPClick1;
    end;
@@ -635,7 +643,7 @@ var i: integer;
 begin
    ConditionsPopup.Popup(Form1.Left+GroupBox1.Left+SpeedButton6.Left,
      Form1.Top+SpeedButton6.Top+SpeedButton6.Height+5);
-   for i:=14 to 25 do begin
+   for i:=14 to 27 do begin
       MyComp := FindComponent('N'+IntToStr(i)) as TMenuItem;
       TMenuItem(MyComp).OnClick := CPClick2;
    end;
@@ -856,6 +864,11 @@ begin
       if pos('ЕСЛИ',str)>0 then AddToComandList(newc^.vlozh,k+1) else
          AddToComandList(head^.next,k+1);
    end;   
+end;
+
+procedure TForm1.N29Click(Sender: TObject);
+begin
+   ShellExecute(0,nil,'help.mht',nil,nil,0);
 end;
 
 end.
