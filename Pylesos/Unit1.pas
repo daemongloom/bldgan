@@ -208,6 +208,72 @@ var asize: integer = 24;      // Размер клетки в пикселах
     startpoint, finpoint: TPoint;
     chead: TComandList;      // Список команд
 
+// Выдает значение логического выражения для конструкций ЕСЛИ и ПОКА 
+function ExpressionResult(exp: string): boolean;
+var x,y: integer;
+    e: TElem;
+
+ // Впереди край?
+ function Kray: boolean;
+ begin
+    Result := (((pylpos.x=1) and (pylpos.rot=3)) or
+     ((pylpos.x=fsize_w) and (pylpos.rot=1)) or
+     ((pylpos.y=1) and (pylpos.rot=0)) or
+     ((pylpos.y=fsize_h) and (pylpos.rot=2)));
+ end;
+
+ // Чисто ли в x,y?
+ function Chisto(x,y: integer): boolean;
+ var t: integer;
+     e: TElem;
+ begin
+    e := field[x,y].ElemT;
+    t:=e-Offset;
+    Result := ((-Offset<=t) and (t<=eSHKAF));
+ end;
+
+begin
+   x:=pylpos.x;
+   y:=pylpos.y;
+   Result := false;
+   if exp='впереди край' then Result := Kray else
+    if exp='впереди не край' then Result := not Kray else begin
+       if (not Kray) then begin
+          case pylpos.rot of
+             0: Dec(y);
+             1: Inc(x);
+             2: Inc(y);
+             3: Dec(x);
+          end;
+          e := field[x,y].ElemT;
+          if ((exp='впереди стул') and (e=eSTUL)) or
+           ((exp='впереди стол') and (e=eSTOL)) or
+           ((exp='впереди диван') and (e=eDIVAN)) or
+           ((exp='впереди шкаф') and (e=eSHKAF)) then
+             Result := true;
+          if ((exp='впереди не стул') and (e<>eSTUL)) or
+           ((exp='впереди не стол') and (e<>eSTOL)) or
+           ((exp='впереди не диван') and (e<>eDIVAN)) or
+           ((exp='впереди не шкаф') and (e<>eSHKAF)) then
+             Result := true;
+          if (exp='чисто') then Result := Chisto(x,y) else
+           if exp='грязно' then Result := not Chisto(x,y) else begin
+              case pylpos.rot of
+                 0: Dec(y);
+                 1: Inc(x);
+                 2: Inc(y);
+                 3: Dec(x);
+              end;
+              if (x in [1..fsize_w]) and (y in [1..fsize_h]) then begin
+               if exp='чисто+' then Result := Chisto(x,y) else
+                if exp='грязно+' then Result := not Chisto(x,y);
+              end else
+                 ShowMessage('Нельзя выходить за пределы поля!'); 
+           end;
+       end;
+    end;   
+end;
+
 procedure TForm1.DrawField;
 var i,j: integer;
     p: array [1..3] of TPoint;
@@ -352,9 +418,10 @@ end;
 function InsertEnable(f: TField; x,y: integer): boolean;
 begin
    Result := false;
-   if (f[x,y].ElemT = EMPTY) or
-    (f[x,y].ElemT = RUBSH) then
-      Result := true;
+   if (x in [1..fsize_w]) and (y in [1..fsize_h]) then
+      if (f[x,y].ElemT = EMPTY) or
+       (f[x,y].ElemT = RUBSH) then
+         Result := true;
 end;
 
 function InsertElement(xp,yp: integer;ElemT: TElem;Rot: TRotation): boolean;
@@ -524,8 +591,8 @@ begin
       {nothing}
    else
       case Message.WParamHi of
-         WheelUp: if InsRotation=3 then InsRotation := 0 else Inc(InsRotation);
-         WheelDown: if InsRotation=0 then InsRotation := 3 else Dec(InsRotation);
+         WheelUp: if InsRotation=0 then InsRotation := 3 else Dec(InsRotation);
+         WheelDown: if InsRotation=3 then InsRotation := 0 else Inc(InsRotation);
       end;
 end;
 
@@ -732,10 +799,10 @@ begin
    // Двигаемся вперед
    oldpos := pylpos;
    case pylpos.rot of
-      0: if pylpos.y>1 then Dec(pylpos.y) else ShowMessage('Нельзя выезжать за поле!');
-      1: if pylpos.x<fsize_w then Inc(pylpos.x) else ShowMessage('Нельзя выезжать за поле!');
-      2: if pylpos.y<fsize_h then Inc(pylpos.y) else ShowMessage('Нельзя выезжать за поле!');
-      3: if pylpos.x>1 then Dec(pylpos.x) else ShowMessage('Нельзя выезжать за поле!');
+      0: Dec(pylpos.y);
+      1: Inc(pylpos.x);
+      2: Inc(pylpos.y);
+      3: Dec(pylpos.x);
    end;
    if InsertEnable(field,pylpos.x,pylpos.y) then begin
       if field[oldpos.x,oldpos.y].ElemT=ePYLS+Offset then
