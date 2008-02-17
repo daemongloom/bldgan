@@ -140,9 +140,11 @@ type
   public
     { Public declarations }
     procedure DrawField;
+    procedure DoComand(str: string; var k: integer);
     procedure MoveForward;
     procedure Rotate(angle: integer);
     procedure Clean(plus: boolean);
+    procedure RepeatN(var k: integer);
     procedure AddToComandList(var head: TComandList; k: integer);
   end;
 
@@ -713,18 +715,24 @@ begin
    Edit1.Visible := true;
 end;
 
+procedure TForm1.DoComand(str: string; var k: integer);
+begin
+   ListBox1.ItemIndex := k;
+   sleep(1000-trackbar1.Position*10);
+   if (str = '  ВПЕРЕД') then MoveForward;
+   if (str = '  ВПРАВО') then Rotate(1);
+   if (str = '  ВЛЕВО') then Rotate(-1);
+   if (str = '  ПЫЛЕСОСИТЬ') then Clean(false);
+   if (str = '  ПЫЛЕСОСИТЬ+') then Clean(true);
+   if (pos('ПОВТОРИ',str)>0) and (pos('КОНЕЦ',str)<=0) then RepeatN(k);
+end;
+
 procedure TForm1.SpeedButton8Click(Sender: TObject);
 var k: integer;
 begin
   k := 1;
   while k<ListBox1.Items.Count do begin
-     ListBox1.ItemIndex := k;
-     sleep(1000-trackbar1.Position*10);
-     if (ListBox1.Items.Strings[k] = '  ВПЕРЕД') then MoveForward;
-     if (ListBox1.Items.Strings[k] = '  ВПРАВО') then Rotate(1);
-     if (ListBox1.Items.Strings[k] = '  ВЛЕВО') then Rotate(-1);
-     if (ListBox1.Items.Strings[k] = '  ПЫЛЕСОСИТЬ') then Clean(false);
-     if (ListBox1.Items.Strings[k] = '  ПЫЛЕСОСИТЬ+') then Clean(true);
+     DoComand(ListBox1.Items.Strings[k],k);
      Inc(k);
      Application.ProcessMessages;
   end;
@@ -868,6 +876,39 @@ begin
       end;
       DrawField;
    end;
+end;
+
+// Цикл Повтори
+procedure TForm1.RepeatN(var k: integer);
+var i: integer;
+    j: integer;
+    n: integer;
+    m: integer;
+    str: string;
+    cmds: TStringList;
+    tk: integer;
+begin
+   str := ListBox1.Items.Strings[k];
+   Delete(str,1,10);
+   n := StrToInt(str);
+   i := 0;
+   // Сформируем список команд в цикле
+   cmds := TStringList.Create;
+   Inc(k);
+   tk:=k;
+   while ListBox1.Items.Strings[k]<>'  КОНЕЦ ПОВТОРИ' do begin
+      cmds.Add(ListBox1.Items.Strings[k]);
+      Inc(k);
+   end;
+   // Собственно выполнение цикла
+   while i<n do begin
+      for j:=0 to cmds.Count-1 do begin
+         m:=j+tk;
+         DoComand(cmds.Strings[j],m);
+      end;   
+      Inc(i);
+   end;
+   cmds.Destroy;
 end;
 
 // Мышка бегает по форме
