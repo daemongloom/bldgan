@@ -92,6 +92,7 @@ type
     N27: TMenuItem;
     N28: TMenuItem;
     N29: TMenuItem;
+    SpeedButton10: TSpeedButton;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -718,7 +719,7 @@ end;
 procedure TForm1.DoComand(str: string; var k: integer);
 begin
    ListBox1.ItemIndex := k;
-   sleep(1000-trackbar1.Position*10);
+   sleep(1000-(110-trackbar1.Position)*10);
    if (str = '  боепед') then MoveForward;
    if (str = '  бопюбн') then Rotate(1);
    if (str = '  бкебн') then Rotate(-1);
