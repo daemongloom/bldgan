@@ -826,7 +826,7 @@ begin
       DrawField;
    end else begin
       pylpos := oldpos;
-      ShowMessage('Нельзя!');
+      ShowMessage('Передвижение невозможно!'); // Нельзя!
    end;
 end;
 
@@ -905,8 +905,9 @@ begin
    while i<n do begin
       for j:=0 to cmds.Count-1 do begin
          m:=j+tk;
-         DoComand(cmds.Strings[j],m);
-      end;   
+         DoComand(cmds.Strings[j],m); 
+         Application.ProcessMessages;
+      end;
       Inc(i);
    end;
    cmds.Destroy;
