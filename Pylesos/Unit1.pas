@@ -135,6 +135,7 @@ type
     procedure N11Click(Sender: TObject);
     procedure Edit1KeyPress(Sender: TObject; var Key: Char);
     procedure N29Click(Sender: TObject);
+    procedure SpeedButton10Click(Sender: TObject);
   private
     { Private declarations }
     procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
@@ -198,18 +199,18 @@ type TElem = EMPTY..eSHKAF+Offset; // Тип элемента
      end;
      TField = array [1..25,1..25] of TFieldElem;
 
-var asize: integer = 24;      // Размер клетки в пикселах
-    fsize_h, fsize_w: byte;   // Размер поля в клетках
-    field: TField;            // Поле
-    InsMode: boolean;         // Выполняется ли вставка
-    InsType: TElem;           // Что вставлять
-    InsRotation: TRotation;   // Поворот
-    field_file: file of byte; // Файл поля
-    ffname: string;           // Имя файла поля для сохранения или загрузки
-    pylsc: integer;           // Количество пылесосов на поле
-    pylpos: TPylsPos;         // Положение пылесоса на поле
+var asize: integer = 24;              // Размер клетки в пикселах
+    fsize_h, fsize_w: byte;           // Размер поля в клетках
+    field, backup_field: TField;      // Поле
+    InsMode: boolean;                 // Выполняется ли вставка
+    InsType: TElem;                   // Что вставлять
+    InsRotation: TRotation;           // Поворот
+    field_file: file of byte;         // Файл поля
+    ffname: string;                   // Имя файла поля для сохранения или загрузки
+    pylsc: integer;                   // Количество пылесосов на поле
+    pylpos, backup_pylpos: TPylsPos;  // Положение пылесоса на поле
     startpoint, finpoint: TPoint;
-    chead: TComandList;      // Список команд
+    chead: TComandList;               // Список команд
 
 // Выдает значение логического выражения для конструкций ЕСЛИ и ПОКА 
 function ExpressionResult(exp: string): boolean;
@@ -732,6 +733,8 @@ procedure TForm1.SpeedButton8Click(Sender: TObject);
 var k: integer;
 begin
   k := 1;
+  backup_pylpos := pylpos;
+  backup_field := field;
   while k<ListBox1.Items.Count do begin
      DoComand(ListBox1.Items.Strings[k],k);
      Inc(k);
@@ -974,6 +977,13 @@ end;
 procedure TForm1.N29Click(Sender: TObject);
 begin
    ShellExecute(0,nil,'help.mht',nil,nil,0);
+end;
+
+procedure TForm1.SpeedButton10Click(Sender: TObject);
+begin
+   pylpos := backup_pylpos;
+   field := backup_field;
+   DrawField;
 end;
 
 end.
