@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 192
-  Top = 122
+  Left = 193
+  Top = 114
   AutoSize = True
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
@@ -141,6 +141,7 @@ object Form1: TForm1
       Width = 65
       Height = 25
       Caption = #1057#1073#1088#1086#1089
+      OnClick = SpeedButton10Click
     end
     object ListBox1: TListBox
       Left = 2
