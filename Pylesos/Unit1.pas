@@ -149,6 +149,7 @@ type
     procedure RepeatN(var k: integer);
     procedure WhileHandler(var k: integer);
     procedure AddToComandList(var head: TComandList; k: integer);
+    procedure SetButtonsState(state:boolean);
   end;
 
 const WheelUp = 120;
@@ -290,7 +291,7 @@ begin
    Panel1.Height := fsize_h*asize + 1;
    FieldBox.Width := Panel1.Width;
    FieldBox.Height := Panel1.Height;
-   GroupBox1.Left:=max(GroupBox2.Width,Panel1.Width)+6;
+//   GroupBox1.Left:=max(GroupBox2.Width,Panel1.Width)+6;
    Form1.Autosize:=true;
    // Выводим буковки и циферки
    Form1.Canvas.Font.Color := clGreen;
@@ -361,7 +362,7 @@ begin
             end;
             FieldBox.Canvas.Brush.Color := clRed;
             FieldBox.Canvas.Polygon(p);
-         end;     
+         end;
       end;
    end;
    FieldBox.Refresh;
@@ -499,7 +500,7 @@ end;
 procedure TForm1.InsertDivanClick(Sender: TObject);
 begin
    InsMode := true;
-   InsType := eDIVAN;  
+   InsType := eDIVAN;
    (Sender as TSpeedButton).Down:=true;
 end;
 
@@ -653,7 +654,7 @@ begin
             ListBox1.ItemIndex:=i;
          end;
       end;
-   end;   
+   end;
 end;
 
 procedure TForm1.SpeedButton1Click(Sender: TObject);
@@ -733,6 +734,28 @@ begin
    if (str = '  ПЫЛЕСОСИТЬ+') then Clean(true);
    if (pos('ПОВТОРИ',str)>0) and (pos('КОНЕЦ',str)<=0) then RepeatN(k);
    if (pos('ПОКА',str)>0) and (pos('КОНЕЦ',str)<=0) then WhileHandler(k);
+end;          
+
+
+procedure TForm1.SetButtonsState(state:boolean);
+begin
+  // в(ы)ключаем менюшки
+  n1.Enabled:=state;
+  n8.Enabled:=state;
+  n28.Enabled:=state;
+  insertdivan.enabled:=state;
+  insertstul.enabled:=state;
+  insertstol.enabled:=state;
+  insertshkaf.enabled:=state;
+  speedbutton1.Enabled:=state;
+  speedbutton2.Enabled:=state;
+  speedbutton3.Enabled:=state;
+  speedbutton4.Enabled:=state;
+  speedbutton5.Enabled:=state;
+  speedbutton6.Enabled:=state;
+  speedbutton7.Enabled:=state;
+  speedbutton8.Enabled:=state;
+  speedbutton9.Enabled:=state;
 end;
 
 procedure TForm1.SpeedButton8Click(Sender: TObject);
@@ -741,17 +764,14 @@ begin
   k := 1;
   backup_pylpos := pylpos;
   backup_field := field;
-  execute := true;
-  // выключаем менюшки
-  groupbox2.Enabled:=false;
-  n1.Enabled:=false;
-  n8.Enabled:=false;
-  n28.Enabled:=false;
+  execute := true;     
+  SetButtonsState(false);
   while (k<ListBox1.Items.Count) and execute do begin
      DoComand(ListBox1.Items.Strings[k],k);
      Inc(k);
      Application.ProcessMessages;
   end;
+  SetButtonsState(true);
 end;
 
 procedure TForm1.Edit1KeyUp(Sender: TObject; var Key: Word;
@@ -1023,7 +1043,8 @@ begin
 end;
 
 procedure TForm1.SpeedButton10Click(Sender: TObject);
-begin
+begin      
+  SetButtonsState(true);
    if execute then execute:=false else begin
       pylpos := backup_pylpos;
       field := backup_field;
