@@ -147,6 +147,7 @@ type
     procedure Rotate(angle: integer);
     procedure Clean(plus: boolean);
     procedure RepeatN(var k: integer);
+    procedure WhileHandler(var k: integer);
     procedure AddToComandList(var head: TComandList; k: integer);
   end;
 
@@ -211,6 +212,7 @@ var asize: integer = 24;              // Размер клетки в пикселах
     pylpos, backup_pylpos: TPylsPos;  // Положение пылесоса на поле
     startpoint, finpoint: TPoint;
     chead: TComandList;               // Список команд
+    execute: boolean;                 // Выполняется ли программа
 
 // Выдает значение логического выражения для конструкций ЕСЛИ и ПОКА 
 function ExpressionResult(exp: string): boolean;
@@ -404,8 +406,10 @@ begin
    ListBox1.ItemIndex := 1;
    GroupBox1.Enabled := true;
 
-   //
-   chead := nil;
+   // Сохраним поле
+   backup_field := field;
+   // Сбросим флаг выполнения программы
+   execute := false;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -719,6 +723,7 @@ end;
 
 procedure TForm1.DoComand(str: string; var k: integer);
 begin
+   if not execute then exit;
    ListBox1.ItemIndex := k;
    sleep(1000-(110-trackbar1.Position)*10);
    if (str = '  ВПЕРЕД') then MoveForward;
@@ -727,6 +732,7 @@ begin
    if (str = '  ПЫЛЕСОСИТЬ') then Clean(false);
    if (str = '  ПЫЛЕСОСИТЬ+') then Clean(true);
    if (pos('ПОВТОРИ',str)>0) and (pos('КОНЕЦ',str)<=0) then RepeatN(k);
+   if (pos('ПОКА',str)>0) and (pos('КОНЕЦ',str)<=0) then WhileHandler(k);
 end;
 
 procedure TForm1.SpeedButton8Click(Sender: TObject);
@@ -735,7 +741,13 @@ begin
   k := 1;
   backup_pylpos := pylpos;
   backup_field := field;
-  while k<ListBox1.Items.Count do begin
+  execute := true;
+  // выключаем менюшки
+  groupbox2.Enabled:=false;
+  n1.Enabled:=false;
+  n8.Enabled:=false;
+  n28.Enabled:=false;
+  while (k<ListBox1.Items.Count) and execute do begin
      DoComand(ListBox1.Items.Strings[k],k);
      Inc(k);
      Application.ProcessMessages;
@@ -908,10 +920,41 @@ begin
    while i<n do begin
       for j:=0 to cmds.Count-1 do begin
          m:=j+tk;
-         DoComand(cmds.Strings[j],m); 
+         DoComand(cmds.Strings[j],m);
          Application.ProcessMessages;
       end;
       Inc(i);
+   end;
+   cmds.Destroy;
+end;
+
+{Обработчик цикла ПОКА}
+procedure TForm1.WhileHandler(var k: integer);
+var j: integer;
+    m: integer;
+    str: string;
+    cmds: TStringList;
+    tk: integer;
+begin
+   str := ListBox1.Items.Strings[k];
+   // выделим условие
+   Delete(str,1,7);
+   Delete(str,length(str)-5,6);
+   // Сформируем список команд в цикле
+   cmds := TStringList.Create;
+   Inc(k);
+   tk:=k;
+   while ListBox1.Items.Strings[k]<>'  КОНЕЦ ПОКА' do begin
+      cmds.Add(ListBox1.Items.Strings[k]);
+      Inc(k);
+   end;
+   // Собственно выполнение цикла
+   while (ExpressionResult(str)) and (execute) do begin
+      for j:=0 to cmds.Count-1 do begin
+         m:=j+tk;
+         DoComand(cmds.Strings[j],m);
+         Application.ProcessMessages;
+      end;
    end;
    cmds.Destroy;
 end;
@@ -981,9 +1024,11 @@ end;
 
 procedure TForm1.SpeedButton10Click(Sender: TObject);
 begin
-   pylpos := backup_pylpos;
-   field := backup_field;
-   DrawField;
+   if execute then execute:=false else begin
+      pylpos := backup_pylpos;
+      field := backup_field;
+      DrawField;
+   end;
 end;
 
 end.
