@@ -1,7 +1,6 @@
 object Form1: TForm1
   Left = 193
   Top = 114
-  AutoSize = True
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
@@ -44,7 +43,6 @@ object Form1: TForm1
     Top = 0
     Width = 476
     Height = 452
-    Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     Enabled = False
     TabOrder = 1
