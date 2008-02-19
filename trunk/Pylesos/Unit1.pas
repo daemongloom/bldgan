@@ -899,7 +899,7 @@ begin
          3: ppos_x := ppos_x-1;
       end;
    end;
-   if ((not(ppos_x in [1..fsize_w])) and (not(ppos_y in [1..fsize_h]))) then
+   if ((not(ppos_x in [1..fsize_w])) or (not(ppos_y in [1..fsize_h]))) then      // or а не and!!!
       ShowMessage('Ќельз€ пылесосить за границей пол€!')
    else begin
       case field[ppos_x,ppos_y].ElemT of
