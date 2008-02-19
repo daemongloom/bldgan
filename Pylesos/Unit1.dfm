@@ -40,9 +40,9 @@ object Form1: TForm1
     end
   end
   object GroupBox1: TGroupBox
-    Left = 445
+    Left = 424
     Top = 0
-    Width = 455
+    Width = 476
     Height = 452
     Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
@@ -146,7 +146,7 @@ object Form1: TForm1
     object ListBox1: TListBox
       Left = 2
       Top = 80
-      Width = 451
+      Width = 472
       Height = 370
       Align = alBottom
       ExtendedSelect = False
@@ -347,7 +347,7 @@ object Form1: TForm1
     TabOrder = 5
   end
   object TrackBar1: TTrackBar
-    Left = 844
+    Left = 828
     Top = 17
     Width = 27
     Height = 57
