@@ -259,13 +259,13 @@ begin
            ((exp='впереди стол') and (e=eSTOL)) or
            ((exp='впереди диван') and (e=eDIVAN)) or
            ((exp='впереди шкаф') and (e=eSHKAF)) then
-             Result := true;
+             Result := true else
           // Впереди не мебель
           if ((exp='впереди не стул') and (e<>eSTUL)) or
            ((exp='впереди не стол') and (e<>eSTOL)) or
            ((exp='впереди не диван') and (e<>eDIVAN)) or
            ((exp='впереди не шкаф') and (e<>eSHKAF)) then
-             Result := true;
+             Result := true else
           if (exp='чисто') then Result := Chisto(x,y) else
            if exp='грязно' then Result := not Chisto(x,y) else begin
               case pylpos.rot of
