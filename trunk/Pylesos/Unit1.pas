@@ -252,11 +252,15 @@ begin
              3: Dec(x);
           end;
           e := field[x,y].ElemT;
+          // Отбросим мусор
+          e := (e+Offset) mod Offset;   
+          // Впереди мебель
           if ((exp='впереди стул') and (e=eSTUL)) or
            ((exp='впереди стол') and (e=eSTOL)) or
            ((exp='впереди диван') and (e=eDIVAN)) or
            ((exp='впереди шкаф') and (e=eSHKAF)) then
              Result := true;
+          // Впереди не мебель
           if ((exp='впереди не стул') and (e<>eSTUL)) or
            ((exp='впереди не стол') and (e<>eSTOL)) or
            ((exp='впереди не диван') and (e<>eDIVAN)) or
