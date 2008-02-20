@@ -35,7 +35,6 @@ object Form1: TForm1
       Stretch = True
       OnMouseDown = FieldBoxMouseDown
       OnMouseMove = FieldBoxMouseMove
-      OnMouseUp = FieldBoxMouseUp
     end
   end
   object GroupBox1: TGroupBox

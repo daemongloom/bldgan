@@ -125,8 +125,6 @@ type
       Shift: TShiftState);
     procedure SpeedButton8Click(Sender: TObject);
     procedure SpeedButton9Click(Sender: TObject);
-    procedure FieldBoxMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
     procedure ListBox1KeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -214,6 +212,7 @@ var asize: integer = 24;              // Размер клетки в пикселах
     startpoint, finpoint: TPoint;
     chead: TComandList;               // Список команд
     execute: boolean;                 // Выполняется ли программа
+    ifstart: boolean;                 // Для расстановки мебели 
 
 // Выдает значение логического выражения для конструкций ЕСЛИ и ПОКА 
 function ExpressionResult(exp: string): boolean;
@@ -464,36 +463,89 @@ end;
 // Нажимается кнопка на поле
 procedure TForm1.FieldBoxMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
+var i,j: integer;
+    inserted: boolean;
 begin
-   startpoint.X := X div 24 +1;
-   startpoint.Y := Y div 24 +1;
+   if ifstart then begin
+      startpoint.X := X div 24 +1;
+      startpoint.Y := Y div 24 +1;
+      ifstart := false;
+   end else begin
+      finpoint.X := X div 24 +1;
+      finpoint.Y := Y div 24 +1;
+      
+      if InsType<>ePYLS then begin
+         if startpoint.X>finpoint.X then SwapValues(startpoint.X,finpoint.X);
+         if startpoint.Y>finpoint.Y then SwapValues(startpoint.Y,finpoint.Y);
+         inserted := false;
+         for i:=startpoint.X to finpoint.X do
+            for j:=startpoint.Y to finpoint.Y do
+               inserted := InsertElement(i,j,InsType,InsRotation);
+         if inserted then begin
+            // Перерисуем поле
+            DrawField;
+            // Сбросим режим вставки
+            InsMode := false;
+            InsType := EMPTY;
+            InsRotation := 1;
+            // Поднимем кнопки
+            InsertPyls.Down:=false;
+            InsertStul.Down:=false;
+            InsertStol.Down:=false;
+            InsertShkaf.Down:=false;
+            InsertDivan.Down:=false;
+         end;
+      end else begin
+         if InsertElement(startpoint.X,startpoint.Y,InsType,InsRotation) then begin
+            // Перерисуем поле
+            DrawField;
+            // Отслеживаем количество пылесосов
+            if pylsc>=MaxPylsCount then InsertPyls.Enabled := false;
+            // Сбросим режим вставки
+            InsMode := false;
+            InsType := EMPTY;
+            InsRotation := 1;
+            // Поднимем кнопки
+            InsertPyls.Down:=false;
+            InsertStul.Down:=false;
+            InsertStol.Down:=false;
+            InsertShkaf.Down:=false;
+            InsertDivan.Down:=false;
+         end;
+      end;
+
+   end;
 end;
 
 procedure TForm1.InsertPylsClick(Sender: TObject);
 begin
    InsMode := true;
    InsType := ePYLS;
+   ifstart := true;
    (Sender as TSpeedButton).Down:=true;
 end;
 
 procedure TForm1.InsertStulClick(Sender: TObject);
 begin
    InsMode := true;
-   InsType := eSTUL; 
+   InsType := eSTUL;
+   ifstart := true;
    (Sender as TSpeedButton).Down:=true;
 end;
 
 procedure TForm1.InsertStolClick(Sender: TObject);
 begin
    InsMode := true;
-   InsType := eSTOL;  
+   InsType := eSTOL;
+   ifstart := true;
    (Sender as TSpeedButton).Down:=true;
 end;
 
 procedure TForm1.InsertShkafClick(Sender: TObject);
 begin
    InsMode := true;
-   InsType := eSHKAF; 
+   InsType := eSHKAF;
+   ifstart := true;
    (Sender as TSpeedButton).Down:=true;
 end;
 
@@ -501,6 +553,7 @@ procedure TForm1.InsertDivanClick(Sender: TObject);
 begin
    InsMode := true;
    InsType := eDIVAN;
+   ifstart := true;
    (Sender as TSpeedButton).Down:=true;
 end;
 
@@ -764,8 +817,7 @@ begin
   k := 1;
   backup_pylpos := pylpos;
   backup_field := field;
-  execute := true;     
-  SetButtonsState(false);
+  execute := true;
   while (k<ListBox1.Items.Count) and execute do begin
      DoComand(ListBox1.Items.Strings[k],k);
      Inc(k);
@@ -787,54 +839,6 @@ end;
 procedure TForm1.SpeedButton9Click(Sender: TObject);
 begin
    ListBox1.Items.Insert(ListBox1.ItemIndex,'  ВПРАВО');
-end;
-
-procedure TForm1.FieldBoxMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-var i,j: integer;
-    inserted: boolean;
-begin
-   finpoint.X := X div 24 +1;
-   finpoint.Y := Y div 24 +1;
-   if InsType<>ePYLS then begin
-      if startpoint.X>finpoint.X then SwapValues(startpoint.X,finpoint.X);
-      if startpoint.Y>finpoint.Y then SwapValues(startpoint.Y,finpoint.Y);
-      inserted := false;
-      for i:=startpoint.X to finpoint.X do
-         for j:=startpoint.Y to finpoint.Y do
-            inserted := InsertElement(i,j,InsType,InsRotation);
-      if inserted then begin
-         // Перерисуем поле
-         DrawField;
-         // Сбросим режим вставки
-         InsMode := false;
-         InsType := EMPTY;
-         InsRotation := 1;
-         // Поднимем кнопки
-         InsertPyls.Down:=false;
-         InsertStul.Down:=false;
-         InsertStol.Down:=false;
-         InsertShkaf.Down:=false;
-         InsertDivan.Down:=false;
-      end;
-   end else begin
-      if InsertElement(startpoint.X,startpoint.Y,InsType,InsRotation) then begin
-         // Перерисуем поле
-         DrawField;
-         // Отслеживаем количество пылесосов
-         if pylsc>=MaxPylsCount then InsertPyls.Enabled := false;
-         // Сбросим режим вставки
-         InsMode := false;
-         InsType := EMPTY;
-         InsRotation := 1;
-         // Поднимем кнопки
-         InsertPyls.Down:=false;
-         InsertStul.Down:=false;
-         InsertStol.Down:=false;
-         InsertShkaf.Down:=false;
-         InsertDivan.Down:=false;
-      end;
-   end;      
 end;
 
 procedure TForm1.MoveForward;
@@ -1043,8 +1047,8 @@ begin
 end;
 
 procedure TForm1.SpeedButton10Click(Sender: TObject);
-begin      
-  SetButtonsState(true);
+begin
+   SetButtonsState(true);
    if execute then execute:=false else begin
       pylpos := backup_pylpos;
       field := backup_field;
