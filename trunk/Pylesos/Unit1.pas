@@ -140,11 +140,11 @@ type
   public
     { Public declarations }
     procedure DrawField;
-    procedure DoComand(str: string; var k: integer);
+    procedure DoComand(str: string; k: integer);
     procedure MoveForward;
     procedure Rotate(angle: integer);
     procedure Clean(plus: boolean);
-    procedure RepeatN(var k: integer);
+    procedure RepeatN(k: integer);
     procedure WhileHandler(var k: integer);
     procedure AddToComandList(var head: TComandList; k: integer);
     procedure SetButtonsState(state:boolean);
@@ -779,7 +779,7 @@ begin
    Edit1.Visible := true;
 end;
 
-procedure TForm1.DoComand(str: string; var k: integer);
+procedure TForm1.DoComand(str: string; k: integer);
 begin
    if not execute then exit;
    ListBox1.ItemIndex := k;
@@ -822,6 +822,7 @@ begin
   backup_pylpos := pylpos;
   backup_field := field;
   execute := true;
+  SetButtonsState(false);
   while (k<ListBox1.Items.Count) and execute do begin
      DoComand(ListBox1.Items.Strings[k],k);
      Inc(k);
@@ -923,7 +924,7 @@ begin
 end;
 
 // Цикл Повтори
-procedure TForm1.RepeatN(var k: integer);
+procedure TForm1.RepeatN(k: integer);
 var i: integer;
     j: integer;
     n: integer;
