@@ -236,8 +236,8 @@ var x,y: integer;
      e: TElem;
  begin
     e := field[x,y].ElemT;
-    t:=e-Offset;
-    Result := ((-Offset<=t) and (t<=eSHKAF));
+    t := e-Offset;
+    Result := (-Offset<=t) and (t<=eSHKAF) and (t<>EMPTY);
  end;
 
 begin
@@ -985,7 +985,6 @@ begin
    str := ListBox1.Items.Strings[k];
    Delete(str,1,7);
    Delete(str,length(str)-2,3);
-   form1.caption:='^'+str+'^';
    // обработаем
    if (ExpressionResult(str)) then {ничего не делаем}
                               else begin
