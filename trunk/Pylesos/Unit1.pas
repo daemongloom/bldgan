@@ -140,11 +140,12 @@ type
   public
     { Public declarations }
     procedure DrawField;
-    procedure DoComand(str: string; k: integer);
+    procedure DoComand(str: string; var k: integer);
     procedure MoveForward;
     procedure Rotate(angle: integer);
     procedure Clean(plus: boolean);
-    procedure RepeatN(k: integer);
+    procedure RepeatN(k: integer);       
+    procedure ElseHandler(var k: integer);
     procedure IFHandler(var k: integer);
     procedure WhileHandler(var k: integer);
     procedure AddToComandList(var head: TComandList; k: integer);
@@ -780,7 +781,7 @@ begin
    Edit1.Visible := true;
 end;
 
-procedure TForm1.DoComand(str: string; k: integer);
+procedure TForm1.DoComand(str: string; var k: integer);
 begin
    if not execute then exit;
    ListBox1.ItemIndex := k;
@@ -789,7 +790,8 @@ begin
    if (str = '  ВПРАВО') then Rotate(1);
    if (str = '  ВЛЕВО') then Rotate(-1);
    if (str = '  ПЫЛЕСОСИТЬ') then Clean(false);
-   if (str = '  ПЫЛЕСОСИТЬ+') then Clean(true);                
+   if (str = '  ПЫЛЕСОСИТЬ+') then Clean(true);                       
+   if (pos('ИНАЧЕ',str)>0) then ElseHandler(k);
    if (pos('ЕСЛИ',str)>0) and (pos('КОНЕЦ',str)<=0) then ifHandler(k);
    if (pos('ПОВТОРИ',str)>0) and (pos('КОНЕЦ',str)<=0) then RepeatN(k);
    if (pos('ПОКА',str)>0) and (pos('КОНЕЦ',str)<=0) then WhileHandler(k);
@@ -820,6 +822,8 @@ end;
 procedure TForm1.SpeedButton8Click(Sender: TObject);
 var k: integer;
 begin
+  if InsertPyls.Enabled then exit     // если пылесос не был добавлен, то делать ничего не надо
+  else begin
   k := 1;
   backup_pylpos := pylpos;
   backup_field := field;
@@ -830,7 +834,9 @@ begin
      Inc(k);
      Application.ProcessMessages;
   end;
+  k:=1;
   SetButtonsState(true);
+  end;
 end;
 
 procedure TForm1.Edit1KeyUp(Sender: TObject; var Key: Word;
@@ -959,18 +965,38 @@ begin
    cmds.Destroy;
 end;
 
-{Обработчик ЕСЛИ}
-procedure TForm1.IFHandler(var k: integer); 
+{Обработчики ИНАЧЕ и ЕСЛИ}
+procedure TForm1.ElseHandler(var k: integer);
+var count:integer;
+begin
+  count:=-1;
+  while count<>0 do begin
+    inc(k);
+    if pos('КОНЕЦ ЕСЛИ',ListBox1.Items.Strings[k])<>0 then count:=count+1;
+    if pos('ИНАЧЕ',ListBox1.Items.Strings[k])<>0 then count:=count-1;
+  end;
+end;
+
+procedure TForm1.IFHandler(var k: integer);
 var str: string;
-begin            
-   // выделим условие  
+    count:integer;
+begin
+   // выделим условие
    str := ListBox1.Items.Strings[k];
    Delete(str,1,7);
    Delete(str,length(str)-2,3);
    form1.caption:='^'+str+'^';
    // обработаем
-   if (ExpressionResult(str)) then form1.Caption:=form1.Caption+' TRUE'
-                              else form1.Caption:=form1.Caption+' FALSE';
+   if (ExpressionResult(str)) then {ничего не делаем}
+                              else begin
+                                count:=-1;
+                                while count<>0 do begin
+                                  inc(k);
+                                  if pos('ИНАЧЕ',ListBox1.Items.Strings[k])<>0 then count:=count+1;
+                                  if pos('ЕСЛИ ',ListBox1.Items.Strings[k])<>0 then count:=count-1;
+                                end;
+                              end;
+
 end;
 
 {Обработчик цикла ПОКА}
