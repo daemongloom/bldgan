@@ -145,6 +145,7 @@ type
     procedure Rotate(angle: integer);
     procedure Clean(plus: boolean);
     procedure RepeatN(k: integer);
+    procedure IFHandler(var k: integer);
     procedure WhileHandler(var k: integer);
     procedure AddToComandList(var head: TComandList; k: integer);
     procedure SetButtonsState(state:boolean);
@@ -788,7 +789,8 @@ begin
    if (str = '  ВПРАВО') then Rotate(1);
    if (str = '  ВЛЕВО') then Rotate(-1);
    if (str = '  ПЫЛЕСОСИТЬ') then Clean(false);
-   if (str = '  ПЫЛЕСОСИТЬ+') then Clean(true);
+   if (str = '  ПЫЛЕСОСИТЬ+') then Clean(true);                
+   if (pos('ЕСЛИ',str)>0) and (pos('КОНЕЦ',str)<=0) then ifHandler(k);
    if (pos('ПОВТОРИ',str)>0) and (pos('КОНЕЦ',str)<=0) then RepeatN(k);
    if (pos('ПОКА',str)>0) and (pos('КОНЕЦ',str)<=0) then WhileHandler(k);
 end;          
@@ -955,6 +957,20 @@ begin
       Inc(i);
    end;
    cmds.Destroy;
+end;
+
+{Обработчик ЕСЛИ}
+procedure TForm1.IFHandler(var k: integer); 
+var str: string;
+begin            
+   // выделим условие  
+   str := ListBox1.Items.Strings[k];
+   Delete(str,1,7);
+   Delete(str,length(str)-2,3);
+   form1.caption:='^'+str+'^';
+   // обработаем
+   if (ExpressionResult(str)) then form1.Caption:=form1.Caption+' TRUE'
+                              else form1.Caption:=form1.Caption+' FALSE';
 end;
 
 {Обработчик цикла ПОКА}
