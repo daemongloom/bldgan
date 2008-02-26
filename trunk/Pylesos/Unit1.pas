@@ -473,24 +473,14 @@ procedure TForm1.FieldBoxMouseDown(Sender: TObject; Button: TMouseButton;
 var i,j: integer;
     inserted: boolean;
 begin
-   if ifstart then begin
-      startpoint.X := X div 24 +1;
-      startpoint.Y := Y div 24 +1;
-      ifstart := false;
-   end else begin
-      finpoint.X := X div 24 +1;
-      finpoint.Y := Y div 24 +1;
-      
-      if InsType<>ePYLS then begin
-         if startpoint.X>finpoint.X then SwapValues(startpoint.X,finpoint.X);
-         if startpoint.Y>finpoint.Y then SwapValues(startpoint.Y,finpoint.Y);
-         inserted := false;
-         for i:=startpoint.X to finpoint.X do
-            for j:=startpoint.Y to finpoint.Y do
-               inserted := InsertElement(i,j,InsType,InsRotation);
-         if inserted then begin
+   if (InsType=ePYLS) or (InsType=eSTUL) then begin
+      // Вставляем пылесос или стул
+      if InsertEnable(field,X div 24 +1,Y div 24 +1) then begin
+         if InsertElement(X div 24 +1,Y div 24 +1,InsType,InsRotation) then begin
             // Перерисуем поле
             DrawField;
+            // Отслеживаем количество пылесосов
+            if pylsc>=MaxPylsCount then InsertPyls.Enabled := false;
             // Сбросим режим вставки
             InsMode := false;
             InsType := EMPTY;
@@ -502,12 +492,31 @@ begin
             InsertShkaf.Down:=false;
             InsertDivan.Down:=false;
          end;
+      end else
+         MessageDlg('Не могу!',mtError,[mbOK],0);
+   end else begin
+      // Вставляем не стул и не пылесос
+      if ifstart then begin
+         startpoint.X := X div 24 +1;
+         startpoint.Y := Y div 24 +1;
+         ifstart := false;
       end else begin
-         if InsertElement(startpoint.X,startpoint.Y,InsType,InsRotation) then begin
+         finpoint.X := X div 24 +1;
+         finpoint.Y := Y div 24 +1;
+
+         if startpoint.X>finpoint.X then SwapValues(startpoint.X,finpoint.X);
+         if startpoint.Y>finpoint.Y then SwapValues(startpoint.Y,finpoint.Y);
+         inserted := false;
+         for i:=startpoint.X to finpoint.X do
+            for j:=startpoint.Y to finpoint.Y do begin
+               if InsertEnable(field,i,j) then
+                  inserted := InsertElement(i,j,InsType,InsRotation)
+               else
+                  MessageDlg('Не могу!',mtError,[mbOK],0);
+            end;   
+         if inserted then begin
             // Перерисуем поле
             DrawField;
-            // Отслеживаем количество пылесосов
-            if pylsc>=MaxPylsCount then InsertPyls.Enabled := false;
             // Сбросим режим вставки
             InsMode := false;
             InsType := EMPTY;
@@ -620,7 +629,7 @@ begin
                   // Читаем данные во временные переменные
                   Read(field_file,temp_ElemT,temp_rotation);
                   // Проверяем на соответствие типов
-                  if (temp_ElemT in [EMPTY..eSHKAF]) then
+                  if (temp_ElemT in [EMPTY..eSHKAF+Offset]) then
                      field[i,j].ElemT := TElem(temp_ElemT);
                   if (temp_rotation in [0..3]) then
                      field[i,j].Rot := TRotation(temp_rotation);
