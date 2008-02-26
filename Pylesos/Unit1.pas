@@ -605,6 +605,7 @@ end;
 // Создание нового поля
 procedure TForm1.N2Click(Sender: TObject);
 begin
+   if MessageDlg('Создать новое поле?'+#10#13+'Текущее поле будет удалено!',mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
    // Заполним поле мусором
    FillChar(field,SizeOf(field),RUBSH);
    pylsc := 0;
@@ -705,6 +706,7 @@ end;
 
 procedure TForm1.N9Click(Sender: TObject);
 begin
+   if MessageDlg('Создать новую программу?'+#10#13+'Это приведет к удалению старой!',mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
    // Создадим новую программу
    Form3.ShowModal;
    if ProgName='###NewProgramCanceled' then exit;
