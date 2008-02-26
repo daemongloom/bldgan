@@ -333,35 +333,35 @@ begin
             case field[i,j].Rot of
               // тут надо нарисовать треугольники
               0: begin
-                 p[1].X := i*asize;
-                 p[1].Y := j*asize;
-                 p[2].X := (i-1)*asize;
-                 p[2].Y := j*asize;
+                 p[1].X := i*asize-3;
+                 p[1].Y := j*asize-3;
+                 p[2].X := (i-1)*asize+3;
+                 p[2].Y := j*asize-3;
                  p[3].X := (i-1)*asize + asize div 2;
-                 p[3].Y := (j-1)*asize;
+                 p[3].Y := (j-1)*asize+3;
               end;
               1: begin
-                 p[1].X := (i-1)*asize;
-                 p[1].Y := (j-1)*asize;
-                 p[2].X := i*asize;
+                 p[1].X := (i-1)*asize+3;
+                 p[1].Y := (j-1)*asize+3;
+                 p[2].X := i*asize-3;
                  p[2].Y := (j-1)*asize + asize div 2;
-                 p[3].X := (i-1)*asize;
-                 p[3].Y := j*asize;
+                 p[3].X := (i-1)*asize+3;
+                 p[3].Y := j*asize-3;
               end;
               2: begin
-                 p[1].X := (i-1)*asize;
-                 p[1].Y := (j-1)*asize;
-                 p[2].X := i*asize;
-                 p[2].Y := (j-1)*asize;
+                 p[1].X := (i-1)*asize+3;
+                 p[1].Y := (j-1)*asize+3;
+                 p[2].X := i*asize-3;
+                 p[2].Y := (j-1)*asize+3;
                  p[3].X := (i-1)*asize + asize div 2;
-                 p[3].Y := j*asize;
+                 p[3].Y := j*asize-3;
               end;
               3: begin
-                 p[1].X := i*asize;
-                 p[1].Y := (j-1)*asize;
-                 p[2].X := i*asize;
-                 p[2].Y := j*asize;
-                 p[3].X := (i-1)*asize;
+                 p[1].X := i*asize-3;
+                 p[1].Y := (j-1)*asize+3;
+                 p[2].X := i*asize-3;
+                 p[2].Y := j*asize-3;
+                 p[3].X := (i-1)*asize+3;
                  p[3].Y := (j-1)*asize + asize div 2;
               end;
             end;
