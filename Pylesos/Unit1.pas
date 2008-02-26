@@ -4,7 +4,7 @@
 {=  Главный модуль программы                   =}
 {= Авторы: Николай Трубинов                    =}
 {=         Николай Козаченко                   =}
-{= Дата: 2008.02.16                            =}
+{= Дата: 2008.02.26                            =}
 {===============================================}
 
 unit Unit1;
@@ -96,6 +96,7 @@ type
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure Rotating(x,y: integer);
     procedure Inserting(x,y: integer);
     procedure Deleting(x,y: integer);
     procedure FieldBoxMouseDown(Sender: TObject; Button: TMouseButton;
@@ -139,7 +140,6 @@ type
     procedure Edit1Exit(Sender: TObject);
   private
     { Private declarations }
-    procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
   public
     { Public declarations }
     procedure DrawField;
@@ -154,9 +154,6 @@ type
     procedure AddToComandList(var head: TComandList; k: integer);
     procedure SetButtonsState(state:boolean);
   end;
-
-const WheelUp = 120;
-      WheelDown = 65416;
 
 var
   Form1: TForm1;
@@ -469,6 +466,12 @@ begin
    end;
 end;
 
+procedure TForm1.Rotating(x,y: integer);
+begin
+   field[x,y].Rot := (field[x,y].Rot+1) mod 4;
+   DrawField;
+end;
+
 // Вставляем элемент на поле
 procedure TForm1.Inserting(x,y: integer);
 var i,j: integer;
@@ -560,9 +563,12 @@ end;
 procedure TForm1.FieldBoxMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
+   x := x div 24 +1;
+   y := y div 24 +1;
    case Button of
-      mbLeft: Inserting(X div 24 +1,Y div 24 +1);
-      mbRight: Deleting(X div 24 +1,Y div 24 +1);
+      mbLeft: if (field[X,Y].ElemT=ePYLS) or (field[X,Y].ElemT=ePYLS+Offset) then Rotating(X,Y)
+                 else Inserting(X,Y);
+      mbRight: Deleting(X,Y);
    end;
 end;
 
@@ -686,22 +692,7 @@ end;
 procedure TForm1.FieldBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 begin
-   if InsMode then
-      StatusBar1.Panels[0].Text := IntToStr(Y div 24 + 1)+':'+IntToStr(X div 24 + 1) + ';' + IntToStr(InsRotation)
-   else
-      StatusBar1.Panels[0].Text := IntToStr(Y div 24 + 1)+':'+IntToStr(X div 24 + 1);   
-end;
-
-// Хитрая процедура поворота...
-procedure TForm1.OnMouseWheel;
-begin
-   if not InsMode then
-      {nothing}
-   else
-      case Message.WParamHi of
-         WheelUp: if InsRotation=0 then InsRotation := 3 else Dec(InsRotation);
-         WheelDown: if InsRotation=3 then InsRotation := 0 else Inc(InsRotation);
-      end;
+   StatusBar1.Panels[0].Text := IntToStr(Y div 24 + 1)+':'+IntToStr(X div 24 + 1);   
 end;
 
 procedure TForm1.N9Click(Sender: TObject);
