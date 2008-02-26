@@ -134,6 +134,7 @@ type
     procedure Edit1KeyPress(Sender: TObject; var Key: Char);
     procedure N29Click(Sender: TObject);
     procedure SpeedButton10Click(Sender: TObject);
+    procedure Edit1Exit(Sender: TObject);
   private
     { Private declarations }
     procedure OnMouseWheel(var message: TMessage); message CM_MOUSEWHEEL;
@@ -622,7 +623,7 @@ begin
                   if (temp_ElemT in [EMPTY..eSHKAF]) then
                      field[i,j].ElemT := TElem(temp_ElemT);
                   if (temp_rotation in [0..3]) then
-                     field[i,j].Rot := TRotation(temp_rotation);   
+                     field[i,j].Rot := TRotation(temp_rotation);
                end;
             CloseFile(field_file);
          end;   
@@ -778,7 +779,16 @@ end;
 // Обрабатываем Повторяй
 procedure TForm1.SpeedButton7Click(Sender: TObject);
 begin
-   Edit1.Visible := true;
+   if Edit1.Visible then begin
+      ListBox1.Items.Insert(ListBox1.ItemIndex,'  ПОВТОРИ '+inttostr(strtoint(Edit1.Text)));
+      ListBox1.Items.Insert(ListBox1.ItemIndex,'  КОНЕЦ ПОВТОРИ');
+      Edit1.Visible := false;
+      end
+    else begin
+          Edit1.Visible := true;
+          Edit1.Text:='';
+          Edit1.SetFocus;
+         end;
 end;
 
 procedure TForm1.DoComand(str: string; var k: integer);
@@ -822,7 +832,7 @@ end;
 procedure TForm1.SpeedButton8Click(Sender: TObject);
 var k: integer;
 begin
-  if InsertPyls.Enabled then exit     // если пылесос не был добавлен, то делать ничего не надо
+  if InsertPyls.Enabled then ShowMessage('А вы ничего не забыли? Пылесос например...')     // если пылесос не был добавлен, то делать ничего не надо
   else begin
   k := 1;
   backup_pylpos := pylpos;
@@ -1057,6 +1067,10 @@ begin
          end;
 end;
 
+procedure TForm1.Edit1Exit(Sender: TObject);
+begin
+   Edit1.Visible := false;
+end;
 // Ограничение на ввод исключительно циферок!
 procedure TForm1.Edit1KeyPress(Sender: TObject; var Key: Char);
 begin
@@ -1064,7 +1078,7 @@ begin
       if Key=#27 then begin
          Edit1.Visible := false;
          Edit1.Text := '0';
-      end;   
+      end;
 end;
 
 procedure TForm1.AddToComandList(var head: TComandList;k: integer);
