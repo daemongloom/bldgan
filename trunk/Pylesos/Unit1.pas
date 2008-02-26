@@ -408,6 +408,10 @@ begin
    InsMode := false;
    InsType := EMPTY;
    InsRotation := 1;
+   startpoint.X := 0;
+   startpoint.Y := 0;
+   finpoint.X := 0;
+   finpoint.Y := 0;
    // Нарисуем поле
    DrawField;
    // Настройка диалогов
@@ -517,6 +521,9 @@ begin
       if ifstart then begin
          startpoint.X := x;
          startpoint.Y := y;
+         // Отметим первую точку
+         FieldBox.Canvas.Brush.Color := clWhite;
+         FieldBox.Canvas.Ellipse((x-1)*asize+5,(y-1)*asize+5,x*asize-5,y*asize-5);
          ifstart := false;
       end else begin
          finpoint.X := x;
@@ -555,6 +562,14 @@ end;
 
 procedure TForm1.Deleting(x,y: integer);
 begin
+   // Если удаляем вставку
+   if (startpoint.X=x) and (startpoint.Y=y) then begin
+      ifstart:=true;
+      startpoint.X := 0;
+      startpoint.Y := 0;
+      DrawField;
+   end;
+   // Если удаляем элемент с поля
    if (field[x,y].ElemT=EMPTY) or (field[x,y].ElemT=RUBSH) then exit else begin
       // Если есть что удалять, спрашиваем
       if MessageDlg('Удалить этот элемент?',mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
@@ -1223,7 +1238,6 @@ begin
                fstream.ReadBuffer(field,SizeOf(TField));
                // Программа
                ListBox1.Items.LoadFromStream(fstream);
-               ListBox1.Items.Delete(ListBox1.Count-1);
                // Перерисуем поле
                DrawField;
             except
