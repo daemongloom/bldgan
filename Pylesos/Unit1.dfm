@@ -4,8 +4,8 @@ object Form1: TForm1
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
-  ClientHeight = 471
-  ClientWidth = 900
+  ClientHeight = 506
+  ClientWidth = 827
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -40,8 +40,9 @@ object Form1: TForm1
   object GroupBox1: TGroupBox
     Left = 424
     Top = 0
-    Width = 476
-    Height = 452
+    Width = 403
+    Height = 487
+    Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     Enabled = False
     TabOrder = 1
@@ -102,9 +103,9 @@ object Form1: TForm1
       OnClick = SpeedButton7Click
     end
     object SpeedButton8: TSpeedButton
-      Left = 247
-      Top = 48
-      Width = 73
+      Left = 7
+      Top = 80
+      Width = 66
       Height = 25
       Cursor = crHandPoint
       Caption = #1047#1072#1087#1091#1089#1082
@@ -125,26 +126,44 @@ object Form1: TForm1
       OnClick = SpeedButton8Click
     end
     object SpeedButton9: TSpeedButton
-      Left = 328
-      Top = 16
-      Width = 65
+      Left = 248
+      Top = 48
+      Width = 73
       Height = 25
       Caption = #1042#1087#1088#1072#1074#1086
       OnClick = SpeedButton9Click
     end
     object SpeedButton10: TSpeedButton
-      Left = 328
-      Top = 47
-      Width = 65
+      Left = 160
+      Top = 80
+      Width = 81
       Height = 25
       Caption = #1057#1073#1088#1086#1089
       OnClick = SpeedButton10Click
     end
+    object Label1: TLabel
+      Left = 328
+      Top = 8
+      Width = 73
+      Height = 25
+      Alignment = taCenter
+      AutoSize = False
+      Caption = #1057#1082#1086#1088#1086#1089#1090#1100' '#1074#1099#1087#1086#1083#1085#1077#1085#1080#1103
+      WordWrap = True
+    end
+    object SpeedButton11: TSpeedButton
+      Left = 80
+      Top = 80
+      Width = 73
+      Height = 25
+      Caption = #1064#1072#1075
+      OnClick = SpeedButton11Click
+    end
     object ListBox1: TListBox
       Left = 2
-      Top = 80
-      Width = 472
-      Height = 370
+      Top = 120
+      Width = 399
+      Height = 365
       Align = alBottom
       ExtendedSelect = False
       ItemHeight = 13
@@ -339,8 +358,8 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 452
-    Width = 900
+    Top = 487
+    Width = 827
     Height = 19
     Panels = <
       item
@@ -363,10 +382,10 @@ object Form1: TForm1
     TabOrder = 5
   end
   object TrackBar1: TTrackBar
-    Left = 828
-    Top = 9
-    Width = 27
-    Height = 64
+    Left = 776
+    Top = 34
+    Width = 33
+    Height = 80
     Hint = #1057#1082#1086#1088#1086#1089#1090#1100' '#1074#1099#1087#1086#1083#1085#1077#1085#1080#1103' '#1087#1088#1086#1075#1088#1072#1084#1084#1099'. '#1063#1077#1084' '#1074#1099#1096#1077' '#1087#1086#1083#1079#1091#1085#1086#1082' - '#1090#1077#1084' '#1073#1099#1089#1090#1088#1077#1077
     Max = 100
     Min = 10

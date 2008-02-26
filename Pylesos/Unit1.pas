@@ -93,6 +93,8 @@ type
     InsertDivan: TColorButton;
     InsertStul: TColorButton;
     InsertShkaf: TColorButton;
+    Label1: TLabel;
+    SpeedButton11: TSpeedButton;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -138,6 +140,7 @@ type
     procedure N29Click(Sender: TObject);
     procedure SpeedButton10Click(Sender: TObject);
     procedure Edit1Exit(Sender: TObject);
+    procedure SpeedButton11Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -858,6 +861,7 @@ begin
   speedbutton7.Enabled:=state;
   speedbutton8.Enabled:=state;
   speedbutton9.Enabled:=state;
+  speedbutton11.Enabled:=state;
 end;
 
 procedure TForm1.SpeedButton8Click(Sender: TObject);
@@ -877,6 +881,7 @@ begin
   end;
   k:=1;
   SetButtonsState(true);
+  execute:=false;
   end;
 end;
 
@@ -1145,6 +1150,18 @@ begin
       field := backup_field;
       DrawField;
    end;
+end;
+
+// Пошаговое выполнение
+procedure TForm1.SpeedButton11Click(Sender: TObject);
+var k: integer;
+begin
+   k:=ListBox1.ItemIndex;
+   execute:=true;
+   DoComand(ListBox1.Items.Strings[k],k);
+   execute:=false;
+   Inc(k);
+   ListBox1.ItemIndex := k;
 end;
 
 end.
