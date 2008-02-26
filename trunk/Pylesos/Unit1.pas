@@ -49,7 +49,6 @@ type
     N5: TMenuItem;
     XPManifest1: TXPManifest;
     N6: TMenuItem;
-    N7: TMenuItem;
     ProgressBar1: TProgressBar;
     N8: TMenuItem;
     N9: TMenuItem;
@@ -95,6 +94,12 @@ type
     InsertShkaf: TColorButton;
     Label1: TLabel;
     SpeedButton11: TSpeedButton;
+    N30: TMenuItem;
+    N32: TMenuItem;
+    N33: TMenuItem;
+    N31: TMenuItem;
+    SaveDialog3: TSaveDialog;
+    OpenDialog3: TOpenDialog;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -141,6 +146,8 @@ type
     procedure SpeedButton10Click(Sender: TObject);
     procedure Edit1Exit(Sender: TObject);
     procedure SpeedButton11Click(Sender: TObject);
+    procedure N32Click(Sender: TObject);
+    procedure N31Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -408,6 +415,8 @@ begin
    OpenDialog1.InitialDir := ExtractFilePath(Application.ExeName);
    SaveDialog2.InitialDir := ExtractFilePath(Application.ExeName);
    OpenDialog2.InitialDir := ExtractFilePath(Application.ExeName);
+   SaveDialog3.InitialDir := ExtractFilePath(Application.ExeName);
+   OpenDialog3.InitialDir := ExtractFilePath(Application.ExeName);
    // Создадим новую программу
    ListBox1.Clear;
    ListBox1.Items.Add('Программа НОВАЯ_ПРОГРАММА');
@@ -645,9 +654,9 @@ begin
                   Write(field_file,field[i,j].ElemT,field[i,j].Rot);
                end;
             CloseFile(field_file);
-         end;   
+         end;
       end;
-   end;   
+   end;
 end;
 
 // Загружаем поле из файла
@@ -1162,6 +1171,69 @@ begin
    execute:=false;
    Inc(k);
    ListBox1.ItemIndex := k;
+end;
+
+// Сохранение проекта
+procedure TForm1.N32Click(Sender: TObject);
+var fstream: TFileStream;
+    psc,k: integer;
+    ps: string;
+begin
+   with SaveDialog3 do begin
+      if Execute then begin
+         if FileName<>'' then  begin
+            // Сохраним скопом в файл
+            try
+               fstream := TFileStream.Create(FileName,fmOpenReadWrite);
+            except
+               fstream := TFileStream.Create(FileName,fmCreate);
+            end;
+            // Ширина
+            fstream.WriteBuffer(fsize_w,SizeOf(Byte));
+            // Высота
+            fstream.WriteBuffer(fsize_h,SizeOf(Byte));
+            // Поле
+            fstream.WriteBuffer(field,SizeOf(TField));
+            // Программа
+            ListBox1.Items.SaveToStream(fstream);
+            // Освободим память
+            fstream.Free;
+         end;
+      end;
+   end;
+end;
+
+// Загрузка проекта
+procedure TForm1.N31Click(Sender: TObject);
+var fstream: TFileStream;
+    psc,k: integer;
+    ps: string; 
+begin
+   with OpenDialog3 do begin
+      if Execute then begin
+         if FileName<>'' then  begin
+            try
+               // Сохраним скопом в файл
+               fstream := TFileStream.Create(FileName,fmOpenRead);
+               // Ширина
+               fstream.ReadBuffer(fsize_w,SizeOf(Byte));
+               // Высота
+               fstream.ReadBuffer(fsize_h,SizeOf(Byte));
+               // Поле
+               fstream.ReadBuffer(field,SizeOf(TField));
+               // Программа
+               ListBox1.Items.LoadFromStream(fstream);
+               ListBox1.Items.Delete(ListBox1.Count-1);
+               // Перерисуем поле
+               DrawField;
+            except
+               MessageDlg('Ошибка при открытии файла с проектом',mtError,[mbOK],0);
+            end;
+            // Освободим память
+            fstream.Free;
+         end;
+      end;
+   end;
 end;
 
 end.
