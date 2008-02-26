@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 193
-  Top = 114
+  Left = 95
+  Top = 352
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
@@ -98,7 +98,7 @@ object Form1: TForm1
       Top = 48
       Width = 81
       Height = 25
-      Caption = #1055#1086#1074#1090#1086#1088#1103#1081
+      Caption = #1055#1086#1074#1090#1086#1088#1080
       OnClick = SpeedButton7Click
     end
     object SpeedButton8: TSpeedButton
@@ -157,9 +157,11 @@ object Form1: TForm1
       Top = 72
       Width = 81
       Height = 21
+      Color = clYellow
       TabOrder = 1
       Text = '0'
       Visible = False
+      OnExit = Edit1Exit
       OnKeyPress = Edit1KeyPress
       OnKeyUp = Edit1KeyUp
     end
@@ -364,7 +366,7 @@ object Form1: TForm1
     object N1: TMenuItem
       Caption = #1055#1086#1083#1077
       object N2: TMenuItem
-        Caption = #1057#1086#1079#1076#1072#1090#1100
+        Caption = #1053#1086#1074#1086#1077
         OnClick = N2Click
       end
       object N3: TMenuItem
