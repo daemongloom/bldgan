@@ -14,7 +14,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit,
-  ToolWin, NewPrgUnit, ShellAPI;
+  ToolWin, NewPrgUnit, ShellAPI, ColorButton;
 
 type
   // Команды
@@ -40,13 +40,9 @@ type
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     InsertPyls: TSpeedButton;
-    InsertStul: TSpeedButton;
     GroupBox3: TGroupBox;
     Label2: TLabel;
     Label3: TLabel;
-    InsertStol: TSpeedButton;
-    InsertShkaf: TSpeedButton;
-    InsertDivan: TSpeedButton;
     StatusBar1: TStatusBar;
     SaveDialog1: TSaveDialog;
     OpenDialog1: TOpenDialog;
@@ -93,6 +89,10 @@ type
     N28: TMenuItem;
     N29: TMenuItem;
     SpeedButton10: TSpeedButton;
+    InsertStol: TColorButton;
+    InsertDivan: TColorButton;
+    InsertStul: TColorButton;
+    InsertShkaf: TColorButton;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -487,11 +487,13 @@ begin
             InsType := EMPTY;
             InsRotation := 1;
             // Поднимем кнопки
+            {
             InsertPyls.Down:=false;
             InsertStul.Down:=false;
             InsertStol.Down:=false;
             InsertShkaf.Down:=false;
             InsertDivan.Down:=false;
+            }
          end;
       end else
          MessageDlg('Не могу!',mtError,[mbOK],0);
@@ -523,11 +525,13 @@ begin
             InsType := EMPTY;
             InsRotation := 1;
             // Поднимем кнопки
+            {
             InsertPyls.Down:=false;
             InsertStul.Down:=false;
             InsertStol.Down:=false;
             InsertShkaf.Down:=false;
             InsertDivan.Down:=false;
+            }
          end;
       end;
 
@@ -575,7 +579,6 @@ begin
    InsMode := true;
    InsType := eSTUL;
    ifstart := true;
-   (Sender as TSpeedButton).Down:=true;
 end;
 
 procedure TForm1.InsertStolClick(Sender: TObject);
@@ -583,7 +586,6 @@ begin
    InsMode := true;
    InsType := eSTOL;
    ifstart := true;
-   (Sender as TSpeedButton).Down:=true;
 end;
 
 procedure TForm1.InsertShkafClick(Sender: TObject);
@@ -591,7 +593,6 @@ begin
    InsMode := true;
    InsType := eSHKAF;
    ifstart := true;
-   (Sender as TSpeedButton).Down:=true;
 end;
 
 procedure TForm1.InsertDivanClick(Sender: TObject);
@@ -599,7 +600,6 @@ begin
    InsMode := true;
    InsType := eDIVAN;
    ifstart := true;
-   (Sender as TSpeedButton).Down:=true;
 end;
 
 // Создание нового поля
