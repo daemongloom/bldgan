@@ -184,46 +184,64 @@ object Form1: TForm1
       Transparent = False
       OnClick = InsertPylsClick
     end
-    object InsertStul: TSpeedButton
-      Left = 248
-      Top = 24
-      Width = 65
-      Height = 31
-      AllowAllUp = True
-      Caption = #1057#1090#1091#1083
-      Transparent = False
-      OnClick = InsertStulClick
-    end
-    object InsertStol: TSpeedButton
+    object InsertStol: TColorButton
       Left = 88
       Top = 24
       Width = 65
       Height = 31
-      AllowAllUp = True
       Caption = #1057#1090#1086#1083
-      Transparent = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 0
+      TabStop = False
       OnClick = InsertStolClick
+      ButtonColor = clBlue
     end
-    object InsertShkaf: TSpeedButton
-      Left = 328
-      Top = 24
-      Width = 65
-      Height = 31
-      AllowAllUp = True
-      Caption = #1064#1082#1072#1092
-      Transparent = False
-      OnClick = InsertShkafClick
-    end
-    object InsertDivan: TSpeedButton
+    object InsertDivan: TColorButton
       Left = 168
       Top = 24
       Width = 65
       Height = 31
-      AllowAllUp = True
       Caption = #1044#1080#1074#1072#1085
-      Layout = blGlyphTop
-      NumGlyphs = 2
+      TabOrder = 1
       OnClick = InsertDivanClick
+      ButtonColor = clAqua
+    end
+    object InsertStul: TColorButton
+      Left = 248
+      Top = 24
+      Width = 65
+      Height = 31
+      Caption = #1057#1090#1091#1083
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clDefault
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 2
+      OnClick = InsertStulClick
+      ButtonColor = clLime
+    end
+    object InsertShkaf: TColorButton
+      Left = 328
+      Top = 24
+      Width = 65
+      Height = 31
+      Caption = #1064#1082#1072#1092
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 3
+      OnClick = InsertShkafClick
+      ButtonColor = clTeal
     end
   end
   object GroupBox3: TGroupBox
