@@ -399,6 +399,24 @@ object Form1: TForm1
   object MainMenu1: TMainMenu
     Left = 64
     Top = 272
+    object N30: TMenuItem
+      Caption = #1055#1088#1086#1077#1082#1090
+      object N32: TMenuItem
+        Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
+        OnClick = N32Click
+      end
+      object N31: TMenuItem
+        Caption = #1047#1072#1075#1088#1091#1079#1080#1090#1100
+        OnClick = N31Click
+      end
+      object N33: TMenuItem
+        Caption = '-'
+      end
+      object N5: TMenuItem
+        Caption = #1042#1099#1093#1086#1076
+        OnClick = N5Click
+      end
+    end
     object N1: TMenuItem
       Caption = #1055#1086#1083#1077
       object N2: TMenuItem
@@ -412,13 +430,6 @@ object Form1: TForm1
       object N4: TMenuItem
         Caption = #1047#1072#1075#1088#1091#1079#1080#1090#1100
         OnClick = N4Click
-      end
-      object N7: TMenuItem
-        Caption = '-'
-      end
-      object N5: TMenuItem
-        Caption = #1042#1099#1093#1086#1076
-        OnClick = N5Click
       end
     end
     object N8: TMenuItem
@@ -531,5 +542,18 @@ object Form1: TForm1
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
     Left = 128
     Top = 304
+  end
+  object SaveDialog3: TSaveDialog
+    DefaultExt = '*.prj'
+    Filter = #1055#1088#1086#1077#1082#1090#1099' '#1055#1099#1083#1077#1089#1086#1089#1080#1082#1072' (*.prj)|*.prj'
+    Left = 96
+    Top = 240
+  end
+  object OpenDialog3: TOpenDialog
+    DefaultExt = '*.prj'
+    Filter = #1055#1088#1086#1077#1082#1090#1099' '#1055#1099#1083#1077#1089#1086#1089#1080#1082#1072' (*.prj)|*.prj'
+    Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
+    Left = 128
+    Top = 240
   end
 end
