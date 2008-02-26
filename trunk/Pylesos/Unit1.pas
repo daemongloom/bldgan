@@ -96,6 +96,8 @@ type
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure Inserting(x,y: integer);
+    procedure Deleting(x,y: integer);
     procedure FieldBoxMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure InsertPylsClick(Sender: TObject);
@@ -467,16 +469,15 @@ begin
    end;
 end;
 
-// Нажимается кнопка на поле
-procedure TForm1.FieldBoxMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+// Вставляем элемент на поле
+procedure TForm1.Inserting(x,y: integer);
 var i,j: integer;
     inserted: boolean;
 begin
    if (InsType=ePYLS) or (InsType=eSTUL) then begin
       // Вставляем пылесос или стул
-      if InsertEnable(field,X div 24 +1,Y div 24 +1) then begin
-         if InsertElement(X div 24 +1,Y div 24 +1,InsType,InsRotation) then begin
+      if InsertEnable(field,x,y) then begin
+         if InsertElement(x,y,InsType,InsRotation) then begin
             // Перерисуем поле
             DrawField;
             // Отслеживаем количество пылесосов
@@ -497,12 +498,12 @@ begin
    end else begin
       // Вставляем не стул и не пылесос
       if ifstart then begin
-         startpoint.X := X div 24 +1;
-         startpoint.Y := Y div 24 +1;
+         startpoint.X := x;
+         startpoint.Y := y;
          ifstart := false;
       end else begin
-         finpoint.X := X div 24 +1;
-         finpoint.Y := Y div 24 +1;
+         finpoint.X := x;
+         finpoint.Y := y;
 
          if startpoint.X>finpoint.X then SwapValues(startpoint.X,finpoint.X);
          if startpoint.Y>finpoint.Y then SwapValues(startpoint.Y,finpoint.Y);
@@ -530,6 +531,34 @@ begin
          end;
       end;
 
+   end;
+end;
+
+procedure TForm1.Deleting(x,y: integer);
+begin
+   if (field[x,y].ElemT=EMPTY) or (field[x,y].ElemT=RUBSH) then exit else begin
+      // Если есть что удалять, спрашиваем
+      if MessageDlg('Удалить этот элемент?',mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
+         // Удаляем
+         if field[x,y].ElemT<>ePYLS then begin
+            // удаляем не пылесос
+            if field[x,y].ElemT in [RUBSH..eSHKAF+Offset] then field[x,y].ElemT:=RUBSH else
+               field[x,y].ElemT:=EMPTY;
+            DrawField;
+         end else begin
+            // Удаляем пылесос
+         end;
+      end;
+   end;
+end;
+
+// Нажимается кнопка на поле
+procedure TForm1.FieldBoxMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+   case Button of
+      mbLeft: Inserting(X div 24 +1,Y div 24 +1);
+      mbRight: Deleting(X div 24 +1,Y div 24 +1);
    end;
 end;
 
