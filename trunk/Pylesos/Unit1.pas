@@ -54,7 +54,7 @@ type
     N9: TMenuItem;
     N10: TMenuItem;
     N11: TMenuItem;
-    ListBox1: TListBox;
+    ListBox1: TListBox; 
     SpeedButton1: TSpeedButton;
     SpeedButton2: TSpeedButton;
     SpeedButton3: TSpeedButton;
@@ -101,6 +101,10 @@ type
     OpenDialog3: TOpenDialog;
     ShellResources1: TShellResources;
     Edit1: TSpinEdit;
+    CodePopupMenu1: TPopupMenu;
+    N7: TMenuItem;
+    N34: TMenuItem;
+    BackupListBox: TListBox;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -149,6 +153,9 @@ type
     procedure SpeedButton11Click(Sender: TObject);
     procedure N32Click(Sender: TObject);
     procedure N31Click(Sender: TObject);
+    procedure N7Click(Sender: TObject);
+    procedure N34Click(Sender: TObject);
+    procedure CodePopupMenu1Popup(Sender: TObject);
   private
     { Private declarations }
   public
@@ -422,8 +429,10 @@ begin
    OpenDialog2.InitialDir := ExtractFilePath(Application.ExeName);
    SaveDialog3.InitialDir := ExtractFilePath(Application.ExeName);
    OpenDialog3.InitialDir := ExtractFilePath(Application.ExeName);
-   // Создадим новую программу
+   // Создадим новую программу  
+   BackupListBox.Clear;
    ListBox1.Clear;
+   N7.Enabled:=false;
    ListBox1.Items.Add('Программа НОВАЯ_ПРОГРАММА');
    ListBox1.Items.Add('Конец программы.');
    ListBox1.ItemIndex := 1;
@@ -716,6 +725,13 @@ begin
    Form2.ShowModal;
 end;
 
+procedure TForm1.N7Click(Sender: TObject);
+begin
+  ListBox1.Items:=BackupListBox.Items;
+  ListBox1.ItemIndex:=BackupListBox.ItemIndex;  
+  N7.Enabled:=false;
+end;
+
 // Когда мышкой водят по полю
 procedure TForm1.FieldBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
@@ -743,10 +759,15 @@ begin
 end;
 
 procedure TForm1.ListBox1KeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);                                       
+  Shift: TShiftState);
 var i:integer;
     str: string;
 begin
+   // создаем резервную копию
+   BackupListBox.Items:=ListBox1.Items;
+   BackupListBox.ItemIndex:=ListBox1.ItemIndex; 
+   N7.Enabled:=true;
+
    i:=ListBox1.ItemIndex; // сохраним позицию курсора
    str := ListBox1.Items.Strings[i];
    if Key=46 then begin
@@ -1002,6 +1023,11 @@ begin
    end;
 end;
 
+procedure TForm1.CodePopupMenu1Popup(Sender: TObject);
+begin
+  N34.Enabled:=not( (ListBox1.ItemIndex=0) or (ListBox1.ItemIndex=ListBox1.Items.Count-1));
+end;
+
 // Цикл Повтори
 procedure TForm1.RepeatN(k: integer);
 var i: integer;
@@ -1217,6 +1243,13 @@ begin
          end;
       end;
    end;
+end;
+
+procedure TForm1.N34Click(Sender: TObject);     // удаление
+var key:word;
+begin
+  key:=46;
+  ListBox1KeyDown(Sender,key,[]);
 end;
 
 // Загрузка проекта

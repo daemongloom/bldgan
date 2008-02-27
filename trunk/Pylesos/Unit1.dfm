@@ -4,7 +4,7 @@ object Form1: TForm1
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
-  ClientHeight = 506
+  ClientHeight = 526
   ClientWidth = 827
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -41,11 +41,12 @@ object Form1: TForm1
     Left = 424
     Top = 0
     Width = 403
-    Height = 487
+    Height = 507
     Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     Enabled = False
     TabOrder = 1
+    ExplicitHeight = 487
     object SpeedButton1: TSpeedButton
       Left = 8
       Top = 16
@@ -139,6 +140,20 @@ object Form1: TForm1
       Width = 81
       Height = 25
       Caption = #1057#1073#1088#1086#1089
+      Glyph.Data = {
+        76010000424D7601000000000000760000002800000020000000100000000100
+        04000000000000010000130B0000130B00001000000000000000000000000000
+        800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+        33333333333333333333EEEEEEEEEEEEEEE333FFFFFFFFFFFFF3E00000000000
+        00E337777777777777F3E0F77777777770E337F33333333337F3E0F333333333
+        70E337F33333333337F3E0F33333333370E337F333FFFFF337F3E0F330000033
+        70E337F3377777F337F3E0F33000003370E337F3377777F337F3E0F330000033
+        70E337F3377777F337F3E0F33000003370E337F3377777F337F3E0F330000033
+        70E337F33777773337F3E0F33333333370E337F33333333337F3E0F333333333
+        70E337F33333333337F3E0FFFFFFFFFFF0E337FFFFFFFFFFF7F3E00000000000
+        00E33777777777777733EEEEEEEEEEEEEEE33333333333333333}
+      NumGlyphs = 2
       OnClick = SpeedButton10Click
     end
     object Label1: TLabel
@@ -157,16 +172,31 @@ object Form1: TForm1
       Width = 73
       Height = 25
       Caption = #1064#1072#1075
+      Glyph.Data = {
+        76010000424D7601000000000000760000002800000020000000100000000100
+        04000000000000010000130B0000130B00001000000000000000000000000000
+        800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+        33333333333333333333EEEEEEEEEEEEEEE333FFFFFFFFFFFFF3E00000000000
+        00E337777777777777F3E0F77777777770E337F33333333337F3E0F333333333
+        70E337F33333333337F3E0F33333333370E337F333FF3F3337F3E0F330030333
+        70E337F3377F7FF337F3E0F33003003370E337F3377F77FF37F3E0F330030003
+        70E337F3377F777337F3E0F33003003370E337F3377F773337F3E0F330030333
+        70E337F33773733337F3E0F33333333370E337F33333333337F3E0F333333333
+        70E337F33333333337F3E0FFFFFFFFFFF0E337FFFFFFFFFFF7F3E00000000000
+        00E33777777777777733EEEEEEEEEEEEEEE33333333333333333}
+      NumGlyphs = 2
       OnClick = SpeedButton11Click
     end
     object ListBox1: TListBox
       Left = 2
       Top = 120
       Width = 399
-      Height = 365
+      Height = 385
       Align = alBottom
       ExtendedSelect = False
       ItemHeight = 13
+      PopupMenu = CodePopupMenu1
       TabOrder = 0
       OnClick = ListBox1Click
       OnKeyDown = ListBox1KeyDown
@@ -345,7 +375,7 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 487
+    Top = 507
     Width = 827
     Height = 19
     Panels = <
@@ -360,6 +390,7 @@ object Form1: TForm1
       item
         Width = 0
       end>
+    ExplicitTop = 487
   end
   object ProgressBar1: TProgressBar
     Left = 8
@@ -393,6 +424,22 @@ object Form1: TForm1
     MinValue = 1
     TabOrder = 7
     Value = 0
+    Visible = False
+    OnExit = Edit1Exit
+    OnKeyPress = Edit1KeyPress
+    OnKeyUp = Edit1KeyUp
+  end
+  object BackupListBox: TListBox
+    Left = 129
+    Top = 200
+    Width = 29
+    Height = 33
+    ExtendedSelect = False
+    ItemHeight = 13
+    Items.Strings = (
+      'Bac'
+      'kup')
+    TabOrder = 8
     Visible = False
   end
   object MainMenu1: TMainMenu
@@ -558,5 +605,18 @@ object Form1: TForm1
   object ShellResources1: TShellResources
     Left = 224
     Top = 272
+  end
+  object CodePopupMenu1: TPopupMenu
+    OnPopup = CodePopupMenu1Popup
+    Left = 256
+    Top = 272
+    object N7: TMenuItem
+      Caption = #1054#1090#1084#1077#1085#1080#1090#1100
+      OnClick = N7Click
+    end
+    object N34: TMenuItem
+      Caption = #1059#1076#1072#1083#1080#1090#1100
+      OnClick = N34Click
+    end
   end
 end
