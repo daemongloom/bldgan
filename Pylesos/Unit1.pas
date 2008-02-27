@@ -1225,7 +1225,9 @@ begin
             // Поле
             fstream.WriteBuffer(field,SizeOf(TField));
             // Программа
-            ListBox1.Items.SaveToStream(fstream);
+            ListBox1.Items.SaveToStream(fstream);      
+            // Заголовок
+            Form1.Caption:='Пылесосик'+' - Проект '+ FileName;
             // Освободим память
             fstream.Free;
          end;
@@ -1260,6 +1262,8 @@ begin
                fstream.ReadBuffer(field,SizeOf(TField));
                // Программа
                ListBox1.Items.LoadFromStream(fstream);
+               // Заголовок
+               Form1.Caption:='Пылесосик'+' - Проект '+ FileName;
                // Перерисуем поле
                DrawField;
             except
