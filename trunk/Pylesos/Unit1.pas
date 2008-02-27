@@ -500,7 +500,7 @@ end;
 // Вставляем элемент на поле
 procedure TForm1.Inserting(x,y: integer);
 var i,j: integer;
-    inserted: boolean;
+    inserted,freespaceavail: boolean;
 begin
    if (InsType=ePYLS) or (InsType=eSTUL) then begin
       // Вставляем пылесос или стул
@@ -527,7 +527,7 @@ begin
          MessageDlg('Не могу!',mtError,[mbOK],0);
    end else begin
       // Вставляем не стул и не пылесос
-      if ifstart then begin
+      if (ifstart) then begin
          startpoint.X := x;
          startpoint.Y := y;
          // Отметим первую точку
@@ -541,13 +541,24 @@ begin
          if startpoint.X>finpoint.X then SwapValues(startpoint.X,finpoint.X);
          if startpoint.Y>finpoint.Y then SwapValues(startpoint.Y,finpoint.Y);
          inserted := false;
+         freespaceavail:=true;
+         for i:=startpoint.X to finpoint.X do begin
+            for j:=startpoint.Y to finpoint.Y do begin
+               if InsertEnable(field,i,j)then{}
+               else begin
+                  MessageDlg('Не могу!',mtError,[mbOK],0);
+                  freespaceavail:=false;
+                  inserted:=true; // что бы перерисовалось и сбросилось
+                  break;
+               end;
+            end;
+            if not freespaceavail then break;
+         end;
+         if freespaceavail then
          for i:=startpoint.X to finpoint.X do
             for j:=startpoint.Y to finpoint.Y do begin
-               if InsertEnable(field,i,j) then
                   inserted := InsertElement(i,j,InsType,InsRotation)
-               else
-                  MessageDlg('Не могу!',mtError,[mbOK],0);
-            end;   
+            end;
          if inserted then begin
             // Перерисуем поле
             DrawField;
@@ -609,7 +620,8 @@ begin
 end;
 
 procedure TForm1.InsertPylsClick(Sender: TObject);
-begin
+begin           
+   DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := ePYLS;
    ifstart := true;
@@ -617,7 +629,8 @@ begin
 end;
 
 procedure TForm1.InsertStulClick(Sender: TObject);
-begin
+begin        
+   DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := eSTUL;
    ifstart := true;
@@ -625,20 +638,23 @@ end;
 
 procedure TForm1.InsertStolClick(Sender: TObject);
 begin
+   DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := eSTOL;
    ifstart := true;
 end;
 
 procedure TForm1.InsertShkafClick(Sender: TObject);
-begin
+begin              
+   DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := eSHKAF;
    ifstart := true;
 end;
 
 procedure TForm1.InsertDivanClick(Sender: TObject);
-begin
+begin               
+   DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := eDIVAN;
    ifstart := true;
