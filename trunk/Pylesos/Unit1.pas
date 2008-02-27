@@ -14,7 +14,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit,
-  ToolWin, NewPrgUnit, ShellAPI, ColorButton;
+  ToolWin, NewPrgUnit, ShellAPI, ColorButton, ShellAnimations, Spin;
 
 type
   // Команды
@@ -77,7 +77,6 @@ type
     N23: TMenuItem;
     N24: TMenuItem;
     N25: TMenuItem;
-    Edit1: TEdit;
     SpeedButton8: TSpeedButton;
     SpeedButton9: TSpeedButton;
     TrackBar1: TTrackBar;
@@ -100,6 +99,8 @@ type
     N31: TMenuItem;
     SaveDialog3: TSaveDialog;
     OpenDialog3: TOpenDialog;
+    ShellResources1: TShellResources;
+    Edit1: TSpinEdit;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -844,7 +845,7 @@ begin
       end
     else begin
           Edit1.Visible := true;
-          Edit1.Text:='';
+          Edit1.Text:='1';
           Edit1.SetFocus;
          end;
 end;
@@ -1191,8 +1192,8 @@ end;
 // Сохранение проекта
 procedure TForm1.N32Click(Sender: TObject);
 var fstream: TFileStream;
-    psc,k: integer;
-    ps: string;
+//    psc,k: integer;
+//    ps: string;
 begin
    with SaveDialog3 do begin
       if Execute then begin
@@ -1221,8 +1222,8 @@ end;
 // Загрузка проекта
 procedure TForm1.N31Click(Sender: TObject);
 var fstream: TFileStream;
-    psc,k: integer;
-    ps: string; 
+//    psc,k: integer;
+//    ps: string;
 begin
    with OpenDialog3 do begin
       if Execute then begin
