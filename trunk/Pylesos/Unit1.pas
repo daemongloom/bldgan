@@ -710,7 +710,7 @@ begin
          end;   
       end;
    end;
-   DrawField;   
+   DrawField;
 end;
 
 procedure TForm1.N5Click(Sender: TObject);
@@ -967,7 +967,7 @@ begin
       DrawField;
    end else begin
       pylpos := oldpos;
-      ShowMessage('Передвижение невозможно!'); // Нельзя!
+      if MessageDlg('Передвижение невозможно!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
    end;
 end;
 
@@ -1006,15 +1006,15 @@ begin
       end;
    end;
    if ((not(ppos_x in [1..fsize_w])) or (not(ppos_y in [1..fsize_h]))) then      // or а не and!!!
-      ShowMessage('Нельзя пылесосить за границей поля!')
+      if MessageDlg('Нельзя пылесосить за границей поля!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false
    else begin
       case field[ppos_x,ppos_y].ElemT of
          RUBSH: field[ppos_x,ppos_y].ElemT := EMPTY;
-         ePYLS: ShowMessage('Не умею пылесосить пылесос!');
+         ePYLS: if MessageDlg('Не умею пылесосить пылесос!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
          eSTOL,eSTUL: {nothing};
          eSTOL+Offset,eSTUL+Offset: Dec(field[ppos_x,ppos_y].ElemT,Offset);
          eSHKAF,eDIVAN,eSHKAF+Offset,eDIVAN+Offset:
-            ShowMessage('Нельзя пылесосить под шкафом и под диваном!');
+            if MessageDlg('Нельзя пылесосить под шкафом и под диваном!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
       end;
       DrawField;
    end;
