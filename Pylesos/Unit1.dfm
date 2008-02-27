@@ -171,19 +171,6 @@ object Form1: TForm1
       OnClick = ListBox1Click
       OnKeyDown = ListBox1KeyDown
     end
-    object Edit1: TEdit
-      Left = 160
-      Top = 72
-      Width = 81
-      Height = 21
-      Color = clYellow
-      TabOrder = 1
-      Text = '0'
-      Visible = False
-      OnExit = Edit1Exit
-      OnKeyPress = Edit1KeyPress
-      OnKeyUp = Edit1KeyUp
-    end
   end
   object GroupBox2: TGroupBox
     Left = 8
@@ -396,6 +383,18 @@ object Form1: TForm1
     ShowHint = True
     TabOrder = 6
   end
+  object Edit1: TSpinEdit
+    Left = 585
+    Top = 72
+    Width = 81
+    Height = 22
+    Color = clYellow
+    MaxValue = 999
+    MinValue = 1
+    TabOrder = 7
+    Value = 0
+    Visible = False
+  end
   object MainMenu1: TMainMenu
     Left = 64
     Top = 272
@@ -555,5 +554,9 @@ object Form1: TForm1
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
     Left = 128
     Top = 240
+  end
+  object ShellResources1: TShellResources
+    Left = 224
+    Top = 272
   end
 end
