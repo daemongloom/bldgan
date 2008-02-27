@@ -1,12 +1,13 @@
 object Form1: TForm1
-  Left = 191
-  Top = 113
+  Left = 221
+  Top = 279
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
   ClientHeight = 526
   ClientWidth = 827
   Color = clBtnFace
+  TransparentColorValue = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -14,11 +15,14 @@ object Form1: TForm1
   Font.Style = []
   Menu = MainMenu1
   OldCreateOrder = False
+  Position = poDesktopCenter
+  Visible = True
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnMouseMove = FormMouseMove
   PixelsPerInch = 96
   TextHeight = 13
+  GlassFrame.SheetOfGlass = True
   object Panel1: TPanel
     Left = 24
     Top = 112
@@ -124,6 +128,7 @@ object Form1: TForm1
         70E337F33333333337F3E0FFFFFFFFFFF0E337FFFFFFFFFFF7F3E00000000000
         00E33777777777777733EEEEEEEEEEEEEEE33333333333333333}
       NumGlyphs = 2
+      Transparent = False
       OnClick = SpeedButton8Click
     end
     object SpeedButton9: TSpeedButton
@@ -164,6 +169,7 @@ object Form1: TForm1
       Alignment = taCenter
       AutoSize = False
       Caption = #1057#1082#1086#1088#1086#1089#1090#1100' '#1074#1099#1087#1086#1083#1085#1077#1085#1080#1103
+      Transparent = True
       WordWrap = True
     end
     object SpeedButton11: TSpeedButton
@@ -390,7 +396,6 @@ object Form1: TForm1
       item
         Width = 0
       end>
-    ExplicitTop = 487
   end
   object ProgressBar1: TProgressBar
     Left = 8
@@ -412,6 +417,7 @@ object Form1: TForm1
     Frequency = 20
     Position = 55
     ShowHint = True
+    ShowSelRange = False
     TabOrder = 6
   end
   object Edit1: TSpinEdit
@@ -443,6 +449,8 @@ object Form1: TForm1
     Visible = False
   end
   object MainMenu1: TMainMenu
+    BiDiMode = bdLeftToRight
+    ParentBiDiMode = False
     Left = 64
     Top = 272
     object N30: TMenuItem
