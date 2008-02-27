@@ -50,7 +50,6 @@ object Form1: TForm1
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     Enabled = False
     TabOrder = 1
-    ExplicitHeight = 487
     object SpeedButton1: TSpeedButton
       Left = 8
       Top = 16
@@ -429,7 +428,7 @@ object Form1: TForm1
     MaxValue = 999
     MinValue = 1
     TabOrder = 7
-    Value = 0
+    Value = 1
     Visible = False
     OnExit = Edit1Exit
     OnKeyUp = Edit1KeyUp
