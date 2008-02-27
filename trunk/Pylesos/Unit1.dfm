@@ -432,7 +432,6 @@ object Form1: TForm1
     Value = 0
     Visible = False
     OnExit = Edit1Exit
-    OnKeyPress = Edit1KeyPress
     OnKeyUp = Edit1KeyUp
   end
   object BackupListBox: TListBox

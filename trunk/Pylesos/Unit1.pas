@@ -146,7 +146,6 @@ type
       Y: Integer);
     procedure N10Click(Sender: TObject);
     procedure N11Click(Sender: TObject);
-    procedure Edit1KeyPress(Sender: TObject; var Key: Char);
     procedure N29Click(Sender: TObject);
     procedure SpeedButton10Click(Sender: TObject);
     procedure Edit1Exit(Sender: TObject);
@@ -860,10 +859,12 @@ end;
 procedure TForm1.SpeedButton7Click(Sender: TObject);
 begin
    if Edit1.Visible then begin
-      ListBox1.Items.Insert(ListBox1.ItemIndex,'  ПОВТОРИ '+inttostr(strtoint(Edit1.Text)));
-      ListBox1.Items.Insert(ListBox1.ItemIndex,'  КОНЕЦ ПОВТОРИ');
-      Edit1.Visible := false;
-      end
+          if edit1.Value>max(fsize_w,fsize_h) then
+            ShowMessage('Вы хотите указать количество повторений, большее размера поля. Вы уверены?'+#10#13+#10#13+#10#13+'Вы все еще уверены?');
+          ListBox1.Items.Insert(ListBox1.ItemIndex,'  ПОВТОРИ '+inttostr(strtoint(Edit1.Text)));
+          ListBox1.Items.Insert(ListBox1.ItemIndex,'  КОНЕЦ ПОВТОРИ');
+          Edit1.Visible := false;
+          end
     else begin
           Edit1.Visible := true;
           Edit1.Text:='1';
@@ -934,11 +935,7 @@ end;
 procedure TForm1.Edit1KeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-   if Key=13 then begin
-      ListBox1.Items.Insert(ListBox1.ItemIndex,'  ПОВТОРИ '+Edit1.Text);
-      ListBox1.Items.Insert(ListBox1.ItemIndex,'  КОНЕЦ ПОВТОРИ');
-      Edit1.Visible := false;
-   end;   
+   if Key=13 then SpeedButton7.Click;
 end;
 
 procedure TForm1.SpeedButton9Click(Sender: TObject);
@@ -1157,15 +1154,6 @@ end;
 procedure TForm1.Edit1Exit(Sender: TObject);
 begin
    Edit1.Visible := false;
-end;
-// Ограничение на ввод исключительно циферок!
-procedure TForm1.Edit1KeyPress(Sender: TObject; var Key: Char);
-begin
-   if not(Key in ['0'..'9',#8,#13,#27]) then Key := #0 else
-      if Key=#27 then begin
-         Edit1.Visible := false;
-         Edit1.Text := '0';
-      end;
 end;
 
 procedure TForm1.AddToComandList(var head: TComandList;k: integer);
