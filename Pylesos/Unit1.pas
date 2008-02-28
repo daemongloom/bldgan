@@ -511,6 +511,7 @@ begin
       end else
          MessageDlg('Не могу!',mtError,[mbOK],0);
    end else begin
+      if InsMode=false then exit;
       // Вставляем не стул и не пылесос
       if (ifstart) then begin
          startpoint.X := x;
@@ -576,18 +577,18 @@ begin
    end;
    // Если удаляем элемент с поля
    if (field[x,y].ElemT=EMPTY) or (field[x,y].ElemT=RUBSH) then exit else begin
-      // Если есть что удалять, спрашиваем
-      if MessageDlg('Удалить этот элемент?',mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
-         // Удаляем
-         if field[x,y].ElemT<>ePYLS then begin
+      // Удаляем
+      if (field[x,y].ElemT<>ePYLS) and (field[x,y].ElemT<>ePYLS+Offset) then begin
+         // Если есть что удалять, спрашиваем
+         if MessageDlg('Удалить этот элемент?',mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
             // удаляем не пылесос
             if field[x,y].ElemT in [RUBSH..eSHKAF+Offset] then field[x,y].ElemT:=RUBSH else
                field[x,y].ElemT:=EMPTY;
             DrawField;
-         end else begin
-            // Удаляем пылесос
          end;
-      end;
+      end else begin
+         // Удаляем пылесос
+      end;      
    end;
 end;
 
@@ -609,7 +610,7 @@ begin
    DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := ePYLS;
-   ifstart := true;
+   ifstart := false;
    (Sender as TSpeedButton).Down:=true;
 end;
 
@@ -618,7 +619,7 @@ begin
    DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := eSTUL;
-   ifstart := true;
+   ifstart := false;
 end;
 
 procedure TForm1.InsertStolClick(Sender: TObject);
