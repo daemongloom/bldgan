@@ -942,7 +942,7 @@ end;
 
 procedure TForm1.SpeedButton9Click(Sender: TObject);
 begin
-   ListBox1.Items.Insert(ListBox1.ItemIndex,'  бопюбн');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'бопюбн');
 end;
 
 procedure TForm1.MoveForward;
