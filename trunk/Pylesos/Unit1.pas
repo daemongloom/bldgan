@@ -156,11 +156,12 @@ type
     procedure MoveForward;
     procedure Rotate(angle: integer);
     procedure Clean(plus: boolean);
-    procedure RepeatN(k: integer);       
+    procedure RepeatN(k: integer);
     procedure ElseHandler(var k: integer);
     procedure IFHandler(var k: integer);
     procedure WhileHandler(var k: integer);
     procedure SetButtonsState(state:boolean);
+    function GetSpaces(k: integer): string; 
   end;
 
 var
@@ -798,30 +799,30 @@ end;
 
 procedure TForm1.SpeedButton1Click(Sender: TObject);
 begin
-   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ÂÏÅĞÅÄ');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ÂÏÅĞÅÄ');
 end;
 
 procedure TForm1.SpeedButton2Click(Sender: TObject);
 begin
-   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ÏÛËÅÑÎÑÈÒÜ');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ÏÛËÅÑÎÑÈÒÜ');
 end;
 
 procedure TForm1.SpeedButton3Click(Sender: TObject);
 begin
-   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ÏÛËÅÑÎÑÈÒÜ+');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ÏÛËÅÑÎÑÈÒÜ+');
 end;
 
 procedure TForm1.SpeedButton4Click(Sender: TObject);
 begin
-   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ÂËÅÂÎ');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ÂËÅÂÎ');
 end;
 
 // Îáğàáàòûâàåì êíîïî÷êó ÅÑËÈ
 procedure TForm1.CPClick1(Sender: TObject);
 begin
-   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ÅÑËÈ '+(Sender as TMenuItem).Caption+' ÒÎ');
-   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ÈÍÀ×Å');
-   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ÊÎÍÅÖ ÅÑËÈ');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ÅÑËÈ '+(Sender as TMenuItem).Caption+' ÒÎ');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-2)+'ÈÍÀ×Å');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-3)+'ÊÎÍÅÖ ÅÑËÈ');
 end;
 
 procedure TForm1.SpeedButton5Click(Sender: TObject);
@@ -839,8 +840,8 @@ end;
 // Îáğàáàòûâàåì êíîïêó Ïîêà
 procedure TForm1.CPClick2(Sender: TObject);
 begin
-   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ÏÎÊÀ '+(Sender as TMenuItem).Caption+' ÄÅËÀÉ');
-   ListBox1.Items.Insert(ListBox1.ItemIndex,'  ÊÎÍÅÖ ÏÎÊÀ');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ÏÎÊÀ '+(Sender as TMenuItem).Caption+' ÄÅËÀÉ');
+   ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-2)+'ÊÎÍÅÖ ÏÎÊÀ');
 end;
 
 procedure TForm1.SpeedButton6Click(Sender: TObject);
@@ -861,8 +862,8 @@ begin
    if Edit1.Visible then begin
           if edit1.Value>max(fsize_w,fsize_h) then
             ShowMessage('Âû õîòèòå óêàçàòü êîëè÷åñòâî ïîâòîğåíèé, áîëüøåå ğàçìåğà ïîëÿ. Âû óâåğåíû?'+#10#13+#10#13+#10#13+'Âû âñå åùå óâåğåíû?');
-          ListBox1.Items.Insert(ListBox1.ItemIndex,'  ÏÎÂÒÎĞÈ '+inttostr(strtoint(Edit1.Text)));
-          ListBox1.Items.Insert(ListBox1.ItemIndex,'  ÊÎÍÅÖ ÏÎÂÒÎĞÈ');
+          ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ÏÎÂÒÎĞÈ '+inttostr(strtoint(Edit1.Text)));
+          ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-2)+'ÊÎÍÅÖ ÏÎÂÒÎĞÈ');
           Edit1.Visible := false;
           end
     else begin
@@ -877,9 +878,9 @@ begin
    if not execute then exit;
    ListBox1.ItemIndex := k;
    sleep(1000-(110-trackbar1.Position)*10);
-   if (str = '  ÂÏÅĞÅÄ') then MoveForward;
-   if (str = '  ÂÏĞÀÂÎ') then Rotate(1);
-   if (str = '  ÂËÅÂÎ') then Rotate(-1);
+   if (pos('ÂÏÅĞÅÄ',str)>0) then MoveForward;
+   if (pos('ÂÏĞÀÂÎ',str)>0) then Rotate(1);
+   if (pos('ÂËÅÂÎ',str)>0) then Rotate(-1);
    if (pos('ÏÛËÅÑÎÑÈÒÜ+',str)>0) then Clean(true) else
       if (pos('ÏÛËÅÑÎÑÈÒÜ',str)>0) then Clean(false);
    if (pos('ÈÍÀ×Å',str)>0) then ElseHandler(k);
@@ -1246,14 +1247,38 @@ begin
                Form1.Caption:='Ïûëåñîñèê'+' - Ïğîåêò '+ FileName;
                // Ïåğåğèñóåì ïîëå
                DrawField;
+               // Îñâîáîäèì ïàìÿòü
+               fstream.Free;
             except
                MessageDlg('Îøèáêà ïğè îòêğûòèè ôàéëà ñ ïğîåêòîì',mtError,[mbOK],0);
             end;
-            // Îñâîáîäèì ïàìÿòü
-            fstream.Free;
          end;
       end;
    end;
+end;
+
+function TForm1.GetSpaces(k: integer): string;
+var str: string;
+    predsc: integer;
+    i: integer;
+begin
+   str := ListBox1.Items.Strings[k];
+   if (pos('Ïğîãğàììà',str)>0) then Result:='  ' else
+      if ((pos('ÏÎÂÒÎĞÈ',str)>0) or (pos('ÏÎÊÀ',str)>0) or (pos('ÅÑËÈ',str)>0)
+       or (pos('ÈÍÀ×Å',str)>0)) and (pos('ÊÎÍÅÖ',str)=0) then begin
+         predsc:=max(pos('ÏÎÂÒÎĞÈ',str),pos('ÏÎÊÀ',str));
+         predsc:=max(predsc,pos('ÅÑËÈ',str));
+         predsc:=max(predsc,pos('ÈÍÀ×Å',str));
+         Result:='';
+         for i:=1 to predsc+1 do Result:=Result+' ';
+      end else begin
+         i:=1;
+         Result:='';
+         while str[i]=' ' do begin
+            Result:=Result+' ';
+            Inc(i);
+         end;   
+      end;
 end;
 
 end.
