@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 221
-  Top = 279
+  Left = 195
+  Top = 115
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
@@ -22,7 +22,6 @@ object Form1: TForm1
   OnMouseMove = FormMouseMove
   PixelsPerInch = 96
   TextHeight = 13
-  GlassFrame.SheetOfGlass = True
   object Panel1: TPanel
     Left = 24
     Top = 112
@@ -281,7 +280,7 @@ object Form1: TForm1
       ParentFont = False
       TabOrder = 3
       OnClick = InsertShkafClick
-      ButtonColor = clTeal
+      ButtonColor = clOlive
     end
   end
   object GroupBox3: TGroupBox
@@ -416,7 +415,6 @@ object Form1: TForm1
     Frequency = 20
     Position = 55
     ShowHint = True
-    ShowSelRange = False
     TabOrder = 6
   end
   object Edit1: TSpinEdit
@@ -607,10 +605,6 @@ object Form1: TForm1
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
     Left = 128
     Top = 240
-  end
-  object ShellResources1: TShellResources
-    Left = 224
-    Top = 272
   end
   object CodePopupMenu1: TPopupMenu
     OnPopup = CodePopupMenu1Popup

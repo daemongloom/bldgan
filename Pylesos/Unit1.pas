@@ -14,16 +14,9 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit,
-  ToolWin, NewPrgUnit, ShellAPI, ColorButton, ShellAnimations, Spin;
+  ToolWin, NewPrgUnit, ShellAPI, ColorButton, Spin;
 
 type
-  // Команды
-  TComandList = ^TComanda;
-  TComanda = record
-     text: string;
-     vlozh: TComandList;
-     next: TComandList;
-  end;
   TForm1 = class(TForm)
     Button1: TButton;
     FieldBox: TImage;
@@ -99,7 +92,6 @@ type
     N31: TMenuItem;
     SaveDialog3: TSaveDialog;
     OpenDialog3: TOpenDialog;
-    ShellResources1: TShellResources;
     Edit1: TSpinEdit;
     CodePopupMenu1: TPopupMenu;
     N7: TMenuItem;
@@ -168,7 +160,6 @@ type
     procedure ElseHandler(var k: integer);
     procedure IFHandler(var k: integer);
     procedure WhileHandler(var k: integer);
-    procedure AddToComandList(var head: TComandList; k: integer);
     procedure SetButtonsState(state:boolean);
   end;
 
@@ -229,7 +220,6 @@ var asize: integer = 24;              // Размер клетки в пикселах
     pylsc: integer;                   // Количество пылесосов на поле
     pylpos, backup_pylpos: TPylsPos;  // Положение пылесоса на поле
     startpoint, finpoint: TPoint;
-    chead: TComandList;               // Список команд
     execute: boolean;                 // Выполняется ли программа
     ifstart: boolean;                 // Для расстановки мебели 
 
@@ -339,7 +329,7 @@ begin
            eSTUL,eSTUL+Offset: FieldBox.Canvas.Brush.Color := clLime;
            eSTOL,eSTOL+Offset: FieldBox.Canvas.Brush.Color := clBlue;
            eDIVAN,eDIVAN+Offset: FieldBox.Canvas.Brush.Color := clAqua;
-           eSHKAF,eSHKAF+Offset: FieldBox.Canvas.Brush.Color := clTeal;
+           eSHKAF,eSHKAF+Offset: FieldBox.Canvas.Brush.Color := clOlive;
          end;
          if (field[i,j].ElemT<>ePYLS) and (field[i,j].ElemT<>ePYLS+Offset)
           then FieldBox.Canvas.Rectangle((i-1)*asize,(j-1)*asize,i*asize,j*asize)
@@ -444,13 +434,7 @@ begin
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
-var d: TComandList;
 begin
-   while chead<>nil do begin
-      d := chead;
-      chead := chead^.next;
-      Dispose(d);
-   end;
 end;
 
 // Проверяет возможность вставки
@@ -896,8 +880,8 @@ begin
    if (str = '  ВПЕРЕД') then MoveForward;
    if (str = '  ВПРАВО') then Rotate(1);
    if (str = '  ВЛЕВО') then Rotate(-1);
-   if (str = '  ПЫЛЕСОСИТЬ') then Clean(false);
-   if (str = '  ПЫЛЕСОСИТЬ+') then Clean(true);                       
+   if (pos('ПЫЛЕСОСИТЬ+',str)>0) then Clean(true) else
+      if (pos('ПЫЛЕСОСИТЬ',str)>0) then Clean(false);
    if (pos('ИНАЧЕ',str)>0) then ElseHandler(k);
    if (pos('ЕСЛИ',str)>0) and (pos('КОНЕЦ',str)<=0) then ifHandler(k);
    if (pos('ПОВТОРИ',str)>0) and (pos('КОНЕЦ',str)<=0) then RepeatN(k);
@@ -1021,9 +1005,9 @@ begin
          3: ppos_x := ppos_x-1;
       end;
    end;
-   if ((not(ppos_x in [1..fsize_w])) or (not(ppos_y in [1..fsize_h]))) then      // or а не and!!!
-      if MessageDlg('Нельзя пылесосить за границей поля!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false
-   else begin
+   if ((not(ppos_x in [1..fsize_w])) or (not(ppos_y in [1..fsize_h]))) then begin     // зря begin-end экономишь
+      if MessageDlg('Нельзя пылесосить за границей поля!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
+   end else begin
       case field[ppos_x,ppos_y].ElemT of
          RUBSH: field[ppos_x,ppos_y].ElemT := EMPTY;
          ePYLS: if MessageDlg('Не умею пылесосить пылесос!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
@@ -1170,26 +1154,6 @@ end;
 procedure TForm1.Edit1Exit(Sender: TObject);
 begin
    Edit1.Visible := false;
-end;
-
-procedure TForm1.AddToComandList(var head: TComandList;k: integer);
-var newc,tek: TComandList;
-    str: string;
-begin
-   if k<ListBox1.Items.Count then begin
-      str := ListBox1.Items.Strings[k];
-      New(newc);
-      newc^.text := str;
-      newc^.next := nil;
-      newc^.vlozh := nil;
-      if head=nil then head:=newc else begin
-         tek := head;
-         while tek<>nil do tek:=tek^.next;
-         tek:=newc;
-      end;
-      if pos('ЕСЛИ',str)>0 then AddToComandList(newc^.vlozh,k+1) else
-         AddToComandList(head^.next,k+1);
-   end;   
 end;
 
 procedure TForm1.N29Click(Sender: TObject);
