@@ -479,6 +479,7 @@ end;
 procedure TForm1.Rotating(x,y: integer);
 begin
    field[x,y].Rot := (field[x,y].Rot+1) mod 4;
+   pylpos.rot := field[x,y].Rot;
    DrawField;
 end;
 
