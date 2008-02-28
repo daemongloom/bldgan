@@ -708,6 +708,14 @@ begin
                      field[i,j].ElemT := TElem(temp_ElemT);
                   if (temp_rotation in [0..3]) then
                      field[i,j].Rot := TRotation(temp_rotation);
+                  if (temp_ElemT=ePYLS) or (temp_ElemT=ePYLS+Offset) then begin
+                     pylpos.x:=i;
+                     pylpos.y:=j;
+                     pylpos.rot:=temp_rotation;
+                     // Отслеживаем количество пылесосов
+                     Inc(pylsc);
+                     if pylsc>=MaxPylsCount then InsertPyls.Enabled := false;
+                  end;
                end;
             CloseFile(field_file);
          end;   
@@ -1228,8 +1236,7 @@ end;
 // Загрузка проекта
 procedure TForm1.N31Click(Sender: TObject);
 var fstream: TFileStream;
-//    psc,k: integer;
-//    ps: string;
+    i,j: integer;
 begin
    with OpenDialog3 do begin
       if Execute then begin
@@ -1243,6 +1250,17 @@ begin
                fstream.ReadBuffer(fsize_h,SizeOf(Byte));
                // Поле
                fstream.ReadBuffer(field,SizeOf(TField));
+               for i:=1 to fsize_w do
+                  for j:=1 to fsize_h do begin
+                     // Отслеживаем количество пылесосов
+                     if (field[i,j].ElemT=ePYLS) or (field[i,j].ElemT=ePYLS+Offset) then begin
+                        pylpos.x:=i;
+                        pylpos.y:=j;
+                        pylpos.rot:=field[i,j].Rot;
+                        Inc(pylsc);
+                        if pylsc>=MaxPylsCount then InsertPyls.Enabled := false;
+                     end;
+                  end;   
                // Программа
                ListBox1.Items.LoadFromStream(fstream);
                // Заголовок
