@@ -287,8 +287,7 @@ begin
               if (x in [1..fsize_w]) and (y in [1..fsize_h]) then begin
                if exp='чисто+' then Result := Chisto(x,y) else
                 if exp='гр€зно+' then Result := not Chisto(x,y);
-              end else
-                 ShowMessage('Ќельз€ выходить за пределы пол€!'); 
+              end;
            end;
        end;
     end;   
