@@ -161,7 +161,8 @@ type
     procedure IFHandler(var k: integer);
     procedure WhileHandler(var k: integer);
     procedure SetButtonsState(state:boolean);
-    function GetSpaces(k: integer): string; 
+    function GetSpaces(k: integer): string;
+    function ConfirmDialogEx(str:string):boolean;
   end;
 
 var
@@ -170,6 +171,8 @@ var
   FirstDotColor:TColor;
 
 implementation
+
+uses MessageDialogsEx;
 
 {$R *.dfm}   
 
@@ -581,7 +584,7 @@ begin
       // Удаляем
       if (field[x,y].ElemT<>ePYLS) and (field[x,y].ElemT<>ePYLS+Offset) then begin
          // Если есть что удалять, спрашиваем
-         if MessageDlg('Удалить этот элемент?',mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
+         if ConfirmDialogEx('Удалить этот элемент?') then begin
             // удаляем не пылесос
             if field[x,y].ElemT in [RUBSH..eSHKAF+Offset] then field[x,y].ElemT:=RUBSH else
                field[x,y].ElemT:=EMPTY;
@@ -612,7 +615,7 @@ begin
 end;
 
 procedure TForm1.InsertPylsClick(Sender: TObject);
-begin           
+begin
    DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := ePYLS;
@@ -622,7 +625,7 @@ begin
 end;
 
 procedure TForm1.InsertStulClick(Sender: TObject);
-begin        
+begin
    DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := eSTUL;
@@ -640,7 +643,7 @@ begin
 end;
 
 procedure TForm1.InsertShkafClick(Sender: TObject);
-begin              
+begin
    DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := eSHKAF;
@@ -660,7 +663,7 @@ end;
 // Создание нового поля
 procedure TForm1.N2Click(Sender: TObject);
 begin
-   if MessageDlg('Создать новое поле?'+#10#13+'Текущее поле будет удалено!',mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+   if not ConfirmDialogEx('Создать новое поле?'+#10#13+'Текущее поле будет удалено!') then exit;
    // Заполним поле мусором
    FillChar(field,SizeOf(field),RUBSH);
    pylsc := 0;
@@ -761,7 +764,7 @@ end;
 
 procedure TForm1.N9Click(Sender: TObject);
 begin
-   if MessageDlg('Создать новую программу?'+#10#13+'Это приведет к удалению старой!',mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
+   if not ConfirmDialogEx('Создать новую программу?'+#10#13+'Это приведет к удалению старой!') then exit;
    // Создадим новую программу
    Form3.ShowModal;
    if ProgName='###NewProgramCanceled' then exit;
@@ -912,7 +915,6 @@ begin
    if (pos('ПОКА',str)>0) and (pos('КОНЕЦ',str)<=0) then WhileHandler(k);
 end;          
 
-
 procedure TForm1.SetButtonsState(state:boolean);
 begin
   // в(ы)ключаем менюшки
@@ -991,7 +993,7 @@ begin
       DrawField;
    end else begin
       pylpos := oldpos;
-      if MessageDlg('Передвижение невозможно!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
+      if not ConfirmDialogEx('Передвижение невозможно!'+#10#13+'Продолжить выполнение?') then execute:=false;
    end;
 end;
 
@@ -1312,6 +1314,15 @@ begin
             Inc(i);
          end;   
       end;
+end;
+
+function TForm1.ConfirmDialogEx(str:string):boolean;
+begin             
+  Form4.Label1.Caption:=str;
+  Form4.Left:=form1.Left+form1.width div 2 - form4.width;
+  Form4.Top:=form1.Top+form1.height div 2 - form4.height;
+  Form4.ShowModal;
+  ConfirmDialogEx:=Form4.Result;
 end;
 
 end.
