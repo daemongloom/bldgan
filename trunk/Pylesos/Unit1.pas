@@ -13,8 +13,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit,
-  ToolWin, NewPrgUnit, ShellAPI, ColorButton, Spin;
+  StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit,
+  ToolWin, NewPrgUnit, ShellAPI, ColorButton, Spin, Dialogs;
 
 type
   TForm1 = class(TForm)
@@ -843,6 +843,7 @@ begin
    ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ЕСЛИ '+(Sender as TMenuItem).Caption+' ТО');
    ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-2)+'ИНАЧЕ');
    ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-3)+'КОНЕЦ ЕСЛИ');
+   ListBox1.ItemIndex:=ListBox1.ItemIndex-2;
 end;
 
 procedure TForm1.SpeedButton5Click(Sender: TObject);
@@ -862,6 +863,7 @@ procedure TForm1.CPClick2(Sender: TObject);
 begin
    ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ПОКА '+(Sender as TMenuItem).Caption+' ДЕЛАЙ');
    ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-2)+'КОНЕЦ ПОКА');
+   ListBox1.ItemIndex:=ListBox1.ItemIndex-1;
 end;
 
 procedure TForm1.SpeedButton6Click(Sender: TObject);
@@ -884,6 +886,7 @@ begin
             ShowMessage('Вы хотите указать количество повторений, большее размера поля. Вы уверены?'+#10#13+#10#13+#10#13+'Вы все еще уверены?');
           ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ПОВТОРИ '+inttostr(strtoint(Edit1.Text)));
           ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-2)+'КОНЕЦ ПОВТОРИ');
+          ListBox1.ItemIndex:=ListBox1.ItemIndex-1;
           Edit1.Visible := false;
           end
     else begin
@@ -1064,7 +1067,7 @@ begin
    cmds := TStringList.Create;
    Inc(k);
    tk:=k;
-   while ListBox1.Items.Strings[k]<>'  КОНЕЦ ПОВТОРИ' do begin
+   while pos('КОНЕЦ ПОВТОРИ',ListBox1.Items.Strings[k])=0 do begin
       cmds.Add(ListBox1.Items.Strings[k]);
       Inc(k);
    end;
@@ -1129,7 +1132,7 @@ begin
    cmds := TStringList.Create;
    Inc(k);
    tk:=k;
-   while ListBox1.Items.Strings[k]<>'  КОНЕЦ ПОКА' do begin
+   while pos('КОНЕЦ ПОКА',ListBox1.Items.Strings[k])=0 do begin
       cmds.Add(ListBox1.Items.Strings[k]);
       Inc(k);
    end;
