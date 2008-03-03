@@ -570,6 +570,7 @@ begin
    end;
 end;
 
+// Удаляем элемент с поля
 procedure TForm1.Deleting(x,y: integer);
 begin
    // Если удаляем вставку
@@ -591,10 +592,12 @@ begin
             DrawField;
          end;
       end else begin               
-         // Удаляем пылесос
-          field[x,y].ElemT:=RUBSH; //  За собой пылесос оставит МУСОР
-          InsertPyls.Enabled:=true;   
-            DrawField;
+          if ConfirmDialogEx('Удалить этот элемент?') then begin
+                // Удаляем пылесос
+                field[x,y].ElemT:=RUBSH; //  За собой пылесос оставит МУСОР
+                InsertPyls.Enabled:=true;
+                DrawField;
+                end;
       end;      
    end;
 end;
