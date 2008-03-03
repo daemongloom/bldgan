@@ -195,10 +195,12 @@ object Form1: TForm1
     end
     object ListBox1: TListBox
       Left = 2
-      Top = 120
+      Top = 124
       Width = 399
-      Height = 385
+      Height = 381
       Align = alBottom
+      BevelInner = bvNone
+      BevelOuter = bvNone
       ExtendedSelect = False
       ItemHeight = 13
       PopupMenu = CodePopupMenu1
