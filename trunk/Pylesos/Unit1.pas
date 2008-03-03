@@ -586,8 +586,11 @@ begin
                field[x,y].ElemT:=EMPTY;
             DrawField;
          end;
-      end else begin
+      end else begin               
          // Удаляем пылесос
+          field[x,y].ElemT:=RUBSH; //  За собой пылесос оставит МУСОР
+          InsertPyls.Enabled:=true;   
+            DrawField;
       end;      
    end;
 end;
@@ -600,7 +603,7 @@ begin
    y := y div 24 +1;
    case Button of
       mbLeft: if (field[X,Y].ElemT=ePYLS) or (field[X,Y].ElemT=ePYLS+Offset) then Rotating(X,Y)
-                 else Inserting(X,Y);
+                 else if InsertEnable(Field,X,Y) then Inserting(X,Y) else MessageDlg('Не могу!',mtError,[mbOK],0);
       mbRight: Deleting(X,Y);
    end;
 end;
