@@ -886,15 +886,22 @@ end;
 
 // Обрабатываем Повторяй
 procedure TForm1.SpeedButton7Click(Sender: TObject);
+var tempb:boolean;
 begin
+tempb:=true;
    if Edit1.Visible then begin
           if edit1.Value>max(fsize_w,fsize_h) then
-            ShowMessage('Вы хотите указать количество повторений, большее размера поля. Вы уверены?'+#10#13+#10#13+#10#13+'Вы все еще уверены?');
-          ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ПОВТОРИ '+inttostr(strtoint(Edit1.Text)));
-          ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-2)+'КОНЕЦ ПОВТОРИ');
-          ListBox1.ItemIndex:=ListBox1.ItemIndex-1;
-          Edit1.Visible := false;
-          end
+              tempb:=ConfirmDialogEx('Вы хотите указать количество повторений, большее размера поля.'+#10#13+'Вы уверены?');
+          if tempb then begin
+              ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ПОВТОРИ '+inttostr(strtoint(Edit1.Text)));
+              ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-2)+'КОНЕЦ ПОВТОРИ');
+              ListBox1.ItemIndex:=ListBox1.ItemIndex-1;
+              Edit1.Visible := false;
+              end
+            else begin   
+              Edit1.Visible := false;
+            end;
+         end
     else begin
           Edit1.Visible := true;
           Edit1.Text:='1';

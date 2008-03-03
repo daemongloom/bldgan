@@ -16,11 +16,20 @@ object Form4: TForm4
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
-    Left = 39
-    Top = 24
-    Width = 88
-    Height = 13
+    Left = 23
+    Top = 0
+    Width = 156
+    Height = 65
+    AutoSize = False
+    BiDiMode = bdRightToLeftReadingOnly
     Caption = #1058#1077#1082#1089#1090' '#1089#1086#1086#1073#1097#1077#1085#1080#1103
+    EllipsisPosition = epEndEllipsis
+    ParentBiDiMode = False
+    ParentShowHint = False
+    ShowAccelChar = False
+    ShowHint = False
+    Layout = tlCenter
+    WordWrap = True
   end
   object Button1: TButton
     Left = 104
