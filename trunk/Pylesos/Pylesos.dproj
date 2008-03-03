@@ -32,6 +32,9 @@
     <DCCReference Include="AboutUnit.pas">
       <Form>Form2</Form>
     </DCCReference>
+    <DCCReference Include="MessageDialogsEx.pas">
+      <Form>Form4</Form>
+    </DCCReference>
     <DCCReference Include="NewPrgUnit.pas">
       <Form>Form3</Form>
     </DCCReference>
