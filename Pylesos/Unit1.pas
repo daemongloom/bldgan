@@ -97,6 +97,8 @@ type
     N7: TMenuItem;
     N34: TMenuItem;
     BackupListBox: TListBox;
+    N35: TMenuItem;
+    N36: TMenuItem;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -416,7 +418,7 @@ begin
    // Нарисуем поле
    DrawField;
    // Поставим поле в нужное место
-   panel1.left:=(groupbox2.Width+groupbox2.left) div 2 - (panel1.Width div 2); 
+   panel1.left:=(groupbox2.Width+groupbox2.left) div 2 - (panel1.Width div 2);
    panel1.top:= (Form1.Height - (groupbox2.height+groupbox2.top)) div 2 - (panel1.height div 2);
    // Настройка диалогов
    SaveDialog1.InitialDir := ExtractFilePath(Application.ExeName);
@@ -864,7 +866,11 @@ begin
    for i:=14 to 27 do begin
       MyComp := FindComponent('N'+IntToStr(i)) as TMenuItem;
       TMenuItem(MyComp).OnClick := CPClick1;
-   end;
+   end;           
+      MyComp := FindComponent('N35') as TMenuItem;
+      TMenuItem(MyComp).OnClick := CPClick1;
+      MyComp := FindComponent('N36') as TMenuItem;
+      TMenuItem(MyComp).OnClick := CPClick1;
 end;
 
 // Обрабатываем кнопку Пока
@@ -885,6 +891,10 @@ begin
       MyComp := FindComponent('N'+IntToStr(i)) as TMenuItem;
       TMenuItem(MyComp).OnClick := CPClick2;
    end;
+      MyComp := FindComponent('N35') as TMenuItem;
+      TMenuItem(MyComp).OnClick := CPClick2;
+      MyComp := FindComponent('N36') as TMenuItem;
+      TMenuItem(MyComp).OnClick := CPClick2;
 end;
 
 // Обрабатываем Повторяй

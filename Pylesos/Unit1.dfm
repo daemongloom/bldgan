@@ -4,7 +4,7 @@ object Form1: TForm1
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
-  ClientHeight = 526
+  ClientHeight = 546
   ClientWidth = 827
   Color = clBtnFace
   TransparentColorValue = clBtnFace
@@ -46,11 +46,12 @@ object Form1: TForm1
     Left = 424
     Top = 0
     Width = 403
-    Height = 507
+    Height = 527
     Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     Enabled = False
     TabOrder = 1
+    ExplicitHeight = 507
     object SpeedButton1: TSpeedButton
       Left = 8
       Top = 16
@@ -196,7 +197,7 @@ object Form1: TForm1
     end
     object ListBox1: TListBox
       Left = 2
-      Top = 124
+      Top = 144
       Width = 399
       Height = 381
       Align = alBottom
@@ -208,6 +209,7 @@ object Form1: TForm1
       TabOrder = 0
       OnClick = ListBox1Click
       OnKeyDown = ListBox1KeyDown
+      ExplicitTop = 124
     end
   end
   object GroupBox2: TGroupBox
@@ -383,7 +385,7 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 507
+    Top = 527
     Width = 827
     Height = 19
     Panels = <
@@ -398,6 +400,7 @@ object Form1: TForm1
       item
         Width = 0
       end>
+    ExplicitTop = 507
   end
   object ProgressBar1: TProgressBar
     Left = 8
@@ -544,23 +547,23 @@ object Form1: TForm1
     object N14: TMenuItem
       Caption = #1074#1087#1077#1088#1077#1076#1080' '#1089#1090#1091#1083
     end
-    object N15: TMenuItem
-      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1089#1090#1086#1083
-    end
-    object N16: TMenuItem
-      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1096#1082#1072#1092
-    end
-    object N17: TMenuItem
-      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1076#1080#1074#1072#1085
-    end
     object N18: TMenuItem
       Caption = #1074#1087#1077#1088#1077#1076#1080' '#1085#1077' '#1089#1090#1091#1083
+    end
+    object N15: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1089#1090#1086#1083
     end
     object N19: TMenuItem
       Caption = #1074#1087#1077#1088#1077#1076#1080' '#1085#1077' '#1089#1090#1086#1083
     end
+    object N16: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1096#1082#1072#1092
+    end
     object N20: TMenuItem
       Caption = #1074#1087#1077#1088#1077#1076#1080' '#1085#1077' '#1096#1082#1072#1092
+    end
+    object N17: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1076#1080#1074#1072#1085
     end
     object N21: TMenuItem
       Caption = #1074#1087#1077#1088#1077#1076#1080' '#1085#1077' '#1076#1080#1074#1072#1085
@@ -570,6 +573,12 @@ object Form1: TForm1
     end
     object N27: TMenuItem
       Caption = #1074#1087#1077#1088#1077#1076#1080' '#1085#1077' '#1082#1088#1072#1081
+    end
+    object N35: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1087#1091#1089#1090#1086
+    end
+    object N36: TMenuItem
+      Caption = #1074#1087#1077#1088#1077#1076#1080' '#1085#1077' '#1087#1091#1089#1090#1086
     end
     object N22: TMenuItem
       Caption = #1095#1080#1089#1090#1086
