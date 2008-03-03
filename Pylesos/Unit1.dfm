@@ -23,8 +23,8 @@ object Form1: TForm1
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
-    Left = 24
-    Top = 112
+    Left = 32
+    Top = 96
     Width = 41
     Height = 41
     Color = clMedGray
@@ -38,7 +38,8 @@ object Form1: TForm1
       Stretch = True
       OnMouseDown = FieldBoxMouseDown
       OnMouseMove = FieldBoxMouseMove
-      ExplicitLeft = 0
+      ExplicitLeft = -31
+      ExplicitTop = -23
     end
   end
   object GroupBox1: TGroupBox
@@ -435,10 +436,10 @@ object Form1: TForm1
     OnKeyUp = Edit1KeyUp
   end
   object BackupListBox: TListBox
-    Left = 129
-    Top = 200
-    Width = 29
-    Height = 33
+    Left = 32
+    Top = 240
+    Width = 25
+    Height = 90
     ExtendedSelect = False
     ItemHeight = 13
     Items.Strings = (
@@ -451,7 +452,7 @@ object Form1: TForm1
     BiDiMode = bdLeftToRight
     ParentBiDiMode = False
     Left = 64
-    Top = 272
+    Top = 240
     object N30: TMenuItem
       Caption = #1055#1088#1086#1077#1082#1090
       object N32: TMenuItem
@@ -538,7 +539,7 @@ object Form1: TForm1
   end
   object ConditionsPopup: TPopupMenu
     MenuAnimation = [maTopToBottom]
-    Left = 192
+    Left = 64
     Top = 272
     object N14: TMenuItem
       Caption = #1074#1087#1077#1088#1077#1076#1080' '#1089#1090#1091#1083
@@ -611,8 +612,8 @@ object Form1: TForm1
   end
   object CodePopupMenu1: TPopupMenu
     OnPopup = CodePopupMenu1Popup
-    Left = 256
-    Top = 272
+    Left = 64
+    Top = 304
     object N7: TMenuItem
       Caption = #1054#1090#1084#1077#1085#1080#1090#1100
       OnClick = N7Click

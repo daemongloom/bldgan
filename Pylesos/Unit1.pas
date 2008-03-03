@@ -415,6 +415,9 @@ begin
    finpoint.Y := 0;
    // Нарисуем поле
    DrawField;
+   // Поставим поле в нужное место
+   panel1.left:=(groupbox2.Width+groupbox2.left) div 2 - (panel1.Width div 2); 
+   panel1.top:= (Form1.Height - (groupbox2.height+groupbox2.top)) div 2 - (panel1.height div 2);
    // Настройка диалогов
    SaveDialog1.InitialDir := ExtractFilePath(Application.ExeName);
    OpenDialog1.InitialDir := ExtractFilePath(Application.ExeName);
