@@ -167,6 +167,7 @@ type
 var
   Form1: TForm1;
   ProgName: string;
+  FirstDotColor:TColor;
 
 implementation
 
@@ -517,7 +518,7 @@ begin
          startpoint.X := x;
          startpoint.Y := y;
          // Отметим первую точку
-         FieldBox.Canvas.Brush.Color := clWhite;
+         FieldBox.Canvas.Brush.Color := FirstDotColor;
          FieldBox.Canvas.Ellipse((x-1)*asize+5,(y-1)*asize+5,x*asize-5,y*asize-5);
          ifstart := false;
       end else begin
@@ -603,7 +604,9 @@ begin
    y := y div 24 +1;
    case Button of
       mbLeft: if (field[X,Y].ElemT=ePYLS) or (field[X,Y].ElemT=ePYLS+Offset) then Rotating(X,Y)
-                 else if InsertEnable(Field,X,Y) then Inserting(X,Y) else MessageDlg('Не могу!',mtError,[mbOK],0);
+                 else if InsMode then
+                  if (InsertEnable(Field,X,Y)) then Inserting(X,Y)
+                                               else MessageDlg('Не могу!',mtError,[mbOK],0);
       mbRight: Deleting(X,Y);
    end;
 end;
@@ -614,6 +617,7 @@ begin
    InsMode := true;
    InsType := ePYLS;
    ifstart := false;
+   FirstDotColor:=clWhite;
    (Sender as TSpeedButton).Down:=true;
 end;
 
@@ -622,7 +626,8 @@ begin
    DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := eSTUL;
-   ifstart := false;
+   ifstart := false;   
+   FirstDotColor:=clLime;
 end;
 
 procedure TForm1.InsertStolClick(Sender: TObject);
@@ -631,6 +636,7 @@ begin
    InsMode := true;
    InsType := eSTOL;
    ifstart := true;
+   FirstDotColor:=clBlue;
 end;
 
 procedure TForm1.InsertShkafClick(Sender: TObject);
@@ -638,7 +644,8 @@ begin
    DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := eSHKAF;
-   ifstart := true;
+   ifstart := true;   
+   FirstDotColor:=clOlive;
 end;
 
 procedure TForm1.InsertDivanClick(Sender: TObject);
@@ -646,7 +653,8 @@ begin
    DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := eDIVAN;
-   ifstart := true;
+   ifstart := true;   
+   FirstDotColor:=clAqua;
 end;
 
 // Создание нового поля
