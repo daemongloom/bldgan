@@ -22,6 +22,12 @@ object Form1: TForm1
   OnMouseMove = FormMouseMove
   PixelsPerInch = 96
   TextHeight = 13
+  object Image1: TImage
+    Left = 16
+    Top = 80
+    Width = 57
+    Height = 57
+  end
   object Panel1: TPanel
     Left = 32
     Top = 96
@@ -223,6 +229,12 @@ object Form1: TForm1
       Height = 31
       AllowAllUp = True
       Caption = #1055#1099#1083#1077#1089#1086#1089
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       Transparent = False
       OnClick = InsertPylsClick
     end
@@ -421,7 +433,7 @@ object Form1: TForm1
   end
   object Edit1: TSpinEdit
     Left = 585
-    Top = 72
+    Top = 64
     Width = 80
     Height = 30
     Color = clYellow
@@ -537,10 +549,6 @@ object Form1: TForm1
     Left = 128
     Top = 272
   end
-  object XPManifest1: TXPManifest
-    Left = 160
-    Top = 272
-  end
   object ConditionsPopup: TPopupMenu
     MenuAnimation = [maTopToBottom]
     Left = 64
@@ -632,5 +640,9 @@ object Form1: TForm1
       Caption = #1059#1076#1072#1083#1080#1090#1100
       OnClick = N34Click
     end
+  end
+  object XPManifest1: TXPManifest
+    Left = 160
+    Top = 240
   end
 end
