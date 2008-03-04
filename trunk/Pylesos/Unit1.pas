@@ -40,7 +40,6 @@ type
     SaveDialog1: TSaveDialog;
     OpenDialog1: TOpenDialog;
     N5: TMenuItem;
-    XPManifest1: TXPManifest;
     N6: TMenuItem;
     ProgressBar1: TProgressBar;
     N8: TMenuItem;
@@ -99,6 +98,8 @@ type
     N35: TMenuItem;
     N36: TMenuItem;
     Label1: TLabel;
+    XPManifest1: TXPManifest;
+    Image1: TImage;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -307,24 +308,15 @@ procedure TForm1.DrawField;
 var i,j: integer;
     p: array [1..3] of TPoint;
 begin
-   // Устанавливаем размеры
-   Panel1.Width := fsize_w*asize + 1;
-   Form1.Autosize:=false;
-   Panel1.Height := fsize_h*asize + 1;
-   FieldBox.Width := Panel1.Width;
-   FieldBox.Height := Panel1.Height;
-//   GroupBox1.Left:=max(GroupBox2.Width,Panel1.Width)+6;
    Form1.Autosize:=true;
    // Выводим буковки и циферки
-   Form1.Canvas.Font.Color := clGreen;
-   for i:=1 to fsize_w do
-      with Form1.Canvas do begin
-         TextOut(Panel1.Left + (i-1)*asize + asize div 2-5,Panel1.Top-15,Chr(Ord('А')+(i-1)));
-      end;
-   for i:=1 to fsize_h do
-      with Form1.Canvas do begin
-         TextOut(Panel1.Left - 15,Panel1.Top + (i-1)*asize + asize div 2-5,IntToStr(i));
-      end;
+   with Image1.Canvas do begin
+      Font.Color := clGreen;
+      for i:=1 to fsize_w do
+         TextOut((i-1)*asize+23,0,Chr(Ord('А')+(i-1)));
+      for i:=1 to fsize_h do
+         TextOut(0,(i-1)*asize+23,IntToStr(i));
+   end;
    // Заливаем фон
    FieldBox.Canvas.Brush.Color := clBlack;
    FieldBox.Canvas.Rectangle(0,0,FieldBox.Width,FieldBox.Height);
@@ -396,6 +388,7 @@ begin
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
+var i,j: integer;
 begin
    // Инициализируем размеры поля
    fsize_w := 10;
@@ -419,11 +412,25 @@ begin
    startpoint.Y := 0;
    finpoint.X := 0;
    finpoint.Y := 0;
+   // Устанавливаем размеры
+   Panel1.Width := fsize_w*asize + 1;
+   Form1.Autosize:=false;
+   Panel1.Height := fsize_h*asize + 1;
+   FieldBox.Width := Panel1.Width;
+   FieldBox.Height := Panel1.Height;
+   // Поставим поле в нужное место
+   Panel1.Left:=(groupbox2.Width+groupbox2.left) div 2 - (panel1.Width div 2);
+   Panel1.Top:= (Form1.Height - (groupbox2.height+groupbox2.top)) div 2 - (panel1.height div 2);
+   // Для прорисовки букв
+   Image1.Top := Panel1.Top -15;
+   Image1.Left := Panel1.Left -15;
+   Image1.Height := Panel1.Height +15;
+   Image1.Width := Panel1.Width +15;
+   Image1.Canvas.Brush.Color := Form1.Color;
+   Image1.Canvas.Pen.Color := Form1.Color;
+   Image1.Canvas.Rectangle(0,0,Image1.Width,Image1.Height);
    // Нарисуем поле
    DrawField;
-   // Поставим поле в нужное место
-   panel1.left:=(groupbox2.Width+groupbox2.left) div 2 - (panel1.Width div 2);
-   panel1.top:= (Form1.Height - (groupbox2.height+groupbox2.top)) div 2 - (panel1.height div 2);
    // Настройка диалогов
    SaveDialog1.InitialDir := ExtractFilePath(Application.ExeName);
    OpenDialog1.InitialDir := ExtractFilePath(Application.ExeName);
