@@ -1,6 +1,6 @@
 object Form2: TForm2
-  Left = 204
-  Top = 132
+  Left = 205
+  Top = 126
   BorderStyle = bsToolWindow
   Caption = #1054' '#1087#1088#1086#1075#1088#1072#1084#1084#1077
   ClientHeight = 270
@@ -30,10 +30,10 @@ object Form2: TForm2
     WordWrap = True
   end
   object Label2: TLabel
-    Left = 8
+    Left = 32
     Top = 8
-    Width = 271
-    Height = 15
+    Width = 308
+    Height = 16
     Alignment = taCenter
     Caption = #1055#1045#1056#1052#1057#1050#1048#1049' '#1043#1054#1057#1059#1044#1040#1056#1057#1058#1042#1045#1053#1053#1067#1049' '#1059#1053#1048#1042#1045#1056#1057#1048#1058#1045#1058
     Font.Charset = DEFAULT_CHARSET
@@ -45,11 +45,10 @@ object Form2: TForm2
     WordWrap = True
   end
   object Label3: TLabel
-    Left = 8
-    Top = 24
-    Width = 231
-    Height = 15
-    Alignment = taCenter
+    Left = 72
+    Top = 32
+    Width = 224
+    Height = 16
     Caption = #1052#1077#1093#1072#1085#1080#1082#1086'-'#1084#1072#1090#1077#1084#1072#1090#1080#1095#1077#1089#1082#1080#1081' '#1092#1072#1082#1091#1083#1100#1090#1077#1090
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clPurple
@@ -60,10 +59,9 @@ object Form2: TForm2
   end
   object Memo1: TMemo
     Left = 8
-    Top = 48
+    Top = 56
     Width = 353
-    Height = 137
-    Alignment = taCenter
+    Height = 129
     Color = clInfoBk
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clNavy
@@ -71,7 +69,7 @@ object Form2: TForm2
     Font.Name = 'Arial'
     Font.Style = []
     Lines.Strings = (
-      #1047#1076#1077#1089#1100' '#1085#1072#1087#1080#1096#1077#1084' '#1080#1085#1092#1091' '#1086' '#1087#1088#1086#1075#1088#1072#1084#1084#1077'...')
+      #1043#1088#1072#1092#1080#1095#1077#1089#1082#1080#1081' '#1080#1089#1087#1086#1083#1085#1080#1090#1077#1083#1100' "'#1055#1099#1083#1077#1089#1086#1089#1080#1082'"')
     ParentFont = False
     ReadOnly = True
     TabOrder = 0

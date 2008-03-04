@@ -1,8 +1,9 @@
 object Form4: TForm4
-  Left = 0
-  Top = 0
+  Left = 543
+  Top = 335
   BorderIcons = []
   BorderStyle = bsSingle
+  Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
   ClientHeight = 99
   ClientWidth = 198
   Color = clBtnFace
@@ -12,6 +13,8 @@ object Form4: TForm4
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poMainFormCenter
+  PrintScale = poNone
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -23,7 +26,6 @@ object Form4: TForm4
     AutoSize = False
     BiDiMode = bdRightToLeftReadingOnly
     Caption = #1058#1077#1082#1089#1090' '#1089#1086#1086#1073#1097#1077#1085#1080#1103
-    EllipsisPosition = epEndEllipsis
     ParentBiDiMode = False
     ParentShowHint = False
     ShowAccelChar = False

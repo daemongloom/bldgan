@@ -4,7 +4,7 @@
 {=  Главный модуль программы                   =}
 {= Авторы: Николай Трубинов                    =}
 {=         Николай Козаченко                   =}
-{= Дата: 2008.02.26                            =}
+{= Дата: 2008.03.04                            =}
 {===============================================}
 
 unit Unit1;
@@ -12,9 +12,9 @@ unit Unit1;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
   StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit,
-  ToolWin, NewPrgUnit, ShellAPI, ColorButton, Spin, Dialogs;
+  NewPrgUnit, ShellAPI, ColorButton, Spin, Dialogs;
 
 type
   TForm1 = class(TForm)
@@ -84,7 +84,6 @@ type
     InsertDivan: TColorButton;
     InsertStul: TColorButton;
     InsertShkaf: TColorButton;
-    Label1: TLabel;
     SpeedButton11: TSpeedButton;
     N30: TMenuItem;
     N32: TMenuItem;
@@ -99,6 +98,7 @@ type
     BackupListBox: TListBox;
     N35: TMenuItem;
     N36: TMenuItem;
+    Label1: TLabel;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -282,6 +282,10 @@ begin
            ((exp='впереди не диван') and (e<>eDIVAN)) or
            ((exp='впереди не шкаф') and (e<>eSHKAF)) then
              Result := true else
+          // Впереди пусто-не пусто   
+          if ((exp='впереди пусто') and (e=EMPTY)) or
+           ((exp='впереди не пусто') and (e<>EMPTY)) then
+             Result := true else   
           if (exp='чисто') then Result := Chisto(x,y) else
            if exp='грязно' then Result := not Chisto(x,y) else begin
               case pylpos.rot of
@@ -305,7 +309,7 @@ var i,j: integer;
 begin
    // Устанавливаем размеры
    Panel1.Width := fsize_w*asize + 1;
-   Form1.autosize:=false;
+   Form1.Autosize:=false;
    Panel1.Height := fsize_h*asize + 1;
    FieldBox.Width := Panel1.Width;
    FieldBox.Height := Panel1.Height;
@@ -315,17 +319,17 @@ begin
    Form1.Canvas.Font.Color := clGreen;
    for i:=1 to fsize_w do
       with Form1.Canvas do begin
-         TextOut(Panel1.Left + (i-1)*asize + asize div 2,Panel1.Top-15,Chr(Ord('А')+(i-1)));
+         TextOut(Panel1.Left + (i-1)*asize + asize div 2-5,Panel1.Top-15,Chr(Ord('А')+(i-1)));
       end;
    for i:=1 to fsize_h do
       with Form1.Canvas do begin
-         TextOut(Panel1.Left - 15,Panel1.Top + (i-1)*asize + asize div 2,IntToStr(i));
+         TextOut(Panel1.Left - 15,Panel1.Top + (i-1)*asize + asize div 2-5,IntToStr(i));
       end;
    // Заливаем фон
    FieldBox.Canvas.Brush.Color := clBlack;
    FieldBox.Canvas.Rectangle(0,0,FieldBox.Width,FieldBox.Height);
    // Рисуем сетку и ставим предметы
-   FieldBox.Canvas.Pen.Color := clWhite;
+   FieldBox.Canvas.Pen.Color := clBlack;
    FieldBox.Canvas.Brush.Color := clGreen;
    for i:=1 to fsize_w do begin
       for j:=1 to fsize_h do begin
@@ -508,14 +512,6 @@ begin
             InsMode := false;
             InsType := EMPTY;
             InsRotation := 1;
-            // Поднимем кнопки
-            {
-            InsertPyls.Down:=false;
-            InsertStul.Down:=false;
-            InsertStol.Down:=false;
-            InsertShkaf.Down:=false;
-            InsertDivan.Down:=false;
-            }
          end;
       end else
          MessageDlg('Не могу!',mtError,[mbOK],0);
@@ -1055,15 +1051,15 @@ begin
       end;
    end;
    if ((not(ppos_x in [1..fsize_w])) or (not(ppos_y in [1..fsize_h]))) then begin     // зря begin-end экономишь
-      if MessageDlg('Нельзя пылесосить за границей поля!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
+      if not ConfirmDialogEx('Нельзя пылесосить за границей поля!'+#10#13+'Продолжить выполнение?') then execute:=false;
    end else begin
       case field[ppos_x,ppos_y].ElemT of
          RUBSH: field[ppos_x,ppos_y].ElemT := EMPTY;
-         ePYLS: if MessageDlg('Не умею пылесосить пылесос!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
+         ePYLS: if not ConfirmDialogEx('Не умею пылесосить пылесос!'+#10#13+'Продолжить выполнение?') then execute:=false;
          eSTOL,eSTUL: {nothing};
          eSTOL+Offset,eSTUL+Offset: Dec(field[ppos_x,ppos_y].ElemT,Offset);
          eSHKAF,eDIVAN,eSHKAF+Offset,eDIVAN+Offset:
-            if MessageDlg('Нельзя пылесосить под шкафом и под диваном!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
+            if not ConfirmDialogEx('Нельзя пылесосить под шкафом и под диваном!'+#10#13+'Продолжить выполнение?') then execute:=false;
       end;
       DrawField;
    end;
@@ -1085,7 +1081,7 @@ var i: integer;
     tk: integer;
 begin
    str := ListBox1.Items.Strings[k];
-   Delete(str,1,10);
+   Delete(str,1,pos('ПОВТОРИ',str)+7);
    n := StrToInt(str);
    i := 0;
    // Сформируем список команд в цикле
@@ -1126,7 +1122,7 @@ var str: string;
 begin
    // выделим условие
    str := ListBox1.Items.Strings[k];
-   Delete(str,1,7);
+   Delete(str,1,pos('ЕСЛИ',str)+4);
    Delete(str,length(str)-2,3);
    // обработаем
    if (ExpressionResult(str)) then {ничего не делаем}
@@ -1151,7 +1147,7 @@ var j: integer;
 begin
    str := ListBox1.Items.Strings[k];
    // выделим условие
-   Delete(str,1,7);
+   Delete(str,1,pos('ПОКА',str)+4);
    Delete(str,length(str)-5,6);
    // Сформируем список команд в цикле
    cmds := TStringList.Create;
@@ -1339,11 +1335,9 @@ begin
       end;
 end;
 
-function TForm1.ConfirmDialogEx(str:string):boolean;
-begin             
+function TForm1.ConfirmDialogEx(str: string): boolean;
+begin
   Form4.Label1.Caption:=str;
-  Form4.Left:=form1.Left+form1.width div 2 - form4.width;
-  Form4.Top:=form1.Top+form1.height div 2 - form4.height;
   Form4.ShowModal;
   ConfirmDialogEx:=Form4.Result;
 end;
