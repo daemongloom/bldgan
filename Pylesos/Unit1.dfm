@@ -38,8 +38,6 @@ object Form1: TForm1
       Stretch = True
       OnMouseDown = FieldBoxMouseDown
       OnMouseMove = FieldBoxMouseMove
-      ExplicitLeft = -31
-      ExplicitTop = -23
     end
   end
   object GroupBox1: TGroupBox
@@ -51,7 +49,6 @@ object Form1: TForm1
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     Enabled = False
     TabOrder = 1
-    ExplicitHeight = 507
     object SpeedButton1: TSpeedButton
       Left = 8
       Top = 16
@@ -162,17 +159,6 @@ object Form1: TForm1
       NumGlyphs = 2
       OnClick = SpeedButton10Click
     end
-    object Label1: TLabel
-      Left = 328
-      Top = 8
-      Width = 73
-      Height = 25
-      Alignment = taCenter
-      AutoSize = False
-      Caption = #1057#1082#1086#1088#1086#1089#1090#1100' '#1074#1099#1087#1086#1083#1085#1077#1085#1080#1103
-      Transparent = True
-      WordWrap = True
-    end
     object SpeedButton11: TSpeedButton
       Left = 80
       Top = 80
@@ -195,6 +181,17 @@ object Form1: TForm1
       NumGlyphs = 2
       OnClick = SpeedButton11Click
     end
+    object Label1: TLabel
+      Left = 328
+      Top = 8
+      Width = 73
+      Height = 25
+      Alignment = taCenter
+      AutoSize = False
+      Caption = #1057#1082#1086#1088#1086#1089#1090#1100' '#1074#1099#1087#1086#1083#1085#1077#1085#1080#1103
+      Transparent = True
+      WordWrap = True
+    end
     object ListBox1: TListBox
       Left = 2
       Top = 144
@@ -209,7 +206,6 @@ object Form1: TForm1
       TabOrder = 0
       OnClick = ListBox1Click
       OnKeyDown = ListBox1KeyDown
-      ExplicitTop = 124
     end
   end
   object GroupBox2: TGroupBox
@@ -400,7 +396,6 @@ object Form1: TForm1
       item
         Width = 0
       end>
-    ExplicitTop = 507
   end
   object ProgressBar1: TProgressBar
     Left = 8
@@ -427,11 +422,17 @@ object Form1: TForm1
   object Edit1: TSpinEdit
     Left = 585
     Top = 72
-    Width = 81
-    Height = 22
+    Width = 80
+    Height = 30
     Color = clYellow
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
     MaxValue = 999
     MinValue = 1
+    ParentFont = False
     TabOrder = 7
     Value = 1
     Visible = False
