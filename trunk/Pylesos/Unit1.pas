@@ -165,7 +165,6 @@ type
     procedure WhileHandler(var k: integer);
     procedure SetButtonsState(state:boolean);
     function GetSpaces(k: integer): string;
-    function ConfirmDialogEx(str:string):boolean;
   end;
 
 var
@@ -175,9 +174,7 @@ var
 
 implementation
 
-uses MessageDialogsEx;
-
-{$R *.dfm}   
+{$R *.dfm}
 
 function MAX(a,b:integer):integer;
 begin
@@ -388,7 +385,6 @@ begin
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
-var i,j: integer;
 begin
    // Инициализируем размеры поля
    fsize_w := 10;
@@ -593,19 +589,19 @@ begin
       // Удаляем
       if (field[x,y].ElemT<>ePYLS) and (field[x,y].ElemT<>ePYLS+Offset) then begin
          // Если есть что удалять, спрашиваем
-         if ConfirmDialogEx('Удалить этот элемент?') then begin
+         if MessageDlg('Удалить этот элемент?',mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
             // удаляем не пылесос
             if field[x,y].ElemT in [RUBSH..eSHKAF+Offset] then field[x,y].ElemT:=RUBSH else
                field[x,y].ElemT:=EMPTY;
             DrawField;
          end;
       end else begin               
-          if ConfirmDialogEx('Удалить этот элемент?') then begin
+          if MessageDlg('Удалить этот элемент?',mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
                 // Удаляем пылесос
                 field[x,y].ElemT:=RUBSH; //  За собой пылесос оставит МУСОР
                 InsertPyls.Enabled:=true;
                 DrawField;
-                end;
+          end;
       end;      
    end;
 end;
@@ -674,7 +670,7 @@ end;
 // Создание нового поля
 procedure TForm1.N2Click(Sender: TObject);
 begin
-   if not ConfirmDialogEx('Создать новое поле?'+#10#13+'Текущее поле будет удалено!') then exit;
+   if MessageDlg('Создать новое поле?'+#10#13+'Текущее поле будет удалено!',mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
    // Заполним поле мусором
    FillChar(field,SizeOf(field),RUBSH);
    pylsc := 0;
@@ -775,7 +771,7 @@ end;
 
 procedure TForm1.N9Click(Sender: TObject);
 begin
-   if not ConfirmDialogEx('Создать новую программу?'+#10#13+'Это приведет к удалению старой!') then exit;
+   if MessageDlg('Создать новую программу?'+#10#13+'Это приведет к удалению старой!',mtConfirmation,[mbYes,mbNo],0)<>mrYes then exit;
    // Создадим новую программу
    Form3.ShowModal;
    if ProgName='###NewProgramCanceled' then exit;
@@ -904,25 +900,23 @@ end;
 procedure TForm1.SpeedButton7Click(Sender: TObject);
 var tempb:boolean;
 begin
-tempb:=true;
+   tempb:=true;
    if Edit1.Visible then begin
-          if edit1.Value>max(fsize_w,fsize_h) then
-              tempb:=ConfirmDialogEx('Вы хотите указать количество повторений, большее размера поля.'+#10#13+'Вы уверены?');
-          if tempb then begin
-              ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ПОВТОРИ '+inttostr(strtoint(Edit1.Text)));
-              ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-2)+'КОНЕЦ ПОВТОРИ');
-              ListBox1.ItemIndex:=ListBox1.ItemIndex-1;
-              Edit1.Visible := false;
-              end
-            else begin   
-              Edit1.Visible := false;
-            end;
-         end
-    else begin
-          Edit1.Visible := true;
-          Edit1.Text:='1';
-          Edit1.SetFocus;
-         end;
+      if edit1.Value>max(fsize_w,fsize_h) then
+         tempb:=MessageDlg('Вы хотите указать количество повторений, большее размера поля.'+#10#13+'Вы уверены?',mtConfirmation,[mbYes,mbNo],0)=mrYes;
+      if tempb then begin
+         ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-1)+'ПОВТОРИ '+inttostr(strtoint(Edit1.Text)));
+         ListBox1.Items.Insert(ListBox1.ItemIndex,GetSpaces(ListBox1.ItemIndex-2)+'КОНЕЦ ПОВТОРИ');
+         ListBox1.ItemIndex:=ListBox1.ItemIndex-1;
+         Edit1.Visible := false;
+      end else begin
+         Edit1.Visible := false;
+      end;
+   end else begin
+       Edit1.Visible := true;
+       Edit1.Text:='1';
+       Edit1.SetFocus;
+    end;
 end;
 
 procedure TForm1.DoComand(str: string; var k: integer);
@@ -1019,7 +1013,7 @@ begin
       DrawField;
    end else begin
       pylpos := oldpos;
-      if not ConfirmDialogEx('Передвижение невозможно!'+#10#13+'Продолжить выполнение?') then execute:=false;
+      if MessageDlg('Передвижение невозможно!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
    end;
 end;
 
@@ -1058,15 +1052,15 @@ begin
       end;
    end;
    if ((not(ppos_x in [1..fsize_w])) or (not(ppos_y in [1..fsize_h]))) then begin     // зря begin-end экономишь
-      if not ConfirmDialogEx('Нельзя пылесосить за границей поля!'+#10#13+'Продолжить выполнение?') then execute:=false;
+      if MessageDlg('Нельзя пылесосить за границей поля!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
    end else begin
       case field[ppos_x,ppos_y].ElemT of
          RUBSH: field[ppos_x,ppos_y].ElemT := EMPTY;
-         ePYLS: if not ConfirmDialogEx('Не умею пылесосить пылесос!'+#10#13+'Продолжить выполнение?') then execute:=false;
+         ePYLS: if MessageDlg('Не умею пылесосить пылесос!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
          eSTOL,eSTUL: {nothing};
          eSTOL+Offset,eSTUL+Offset: Dec(field[ppos_x,ppos_y].ElemT,Offset);
          eSHKAF,eDIVAN,eSHKAF+Offset,eDIVAN+Offset:
-            if not ConfirmDialogEx('Нельзя пылесосить под шкафом и под диваном!'+#10#13+'Продолжить выполнение?') then execute:=false;
+            if MessageDlg('Нельзя пылесосить под шкафом и под диваном!'+#10#13+'Продолжить выполнение?',mtError,[mbYes,mbNo],0)<>mrYes then execute:=false;
       end;
       DrawField;
    end;
@@ -1340,13 +1334,6 @@ begin
             Inc(i);
          end;   
       end;
-end;
-
-function TForm1.ConfirmDialogEx(str: string): boolean;
-begin
-  Form4.Label1.Caption:=str;
-  Form4.ShowModal;
-  ConfirmDialogEx:=Form4.Result;
 end;
 
 end.
