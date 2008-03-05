@@ -568,6 +568,7 @@ end;
 
 // Удаляем элемент с поля
 procedure TForm1.Deleting(x,y: integer);
+var p: array [1..5] of TPoint;
 begin
    // Если удаляем вставку
    if (startpoint.X=x) and (startpoint.Y=y) then begin
@@ -578,6 +579,18 @@ begin
    end;
    // Если удаляем элемент с поля
    if (field[x,y].ElemT=EMPTY) or (field[x,y].ElemT=RUBSH) then exit else begin
+      // Рисуем кайму для удаляемого элемента
+      p[1].X:=(x-1)*asize;
+      p[1].Y:=(y-1)*asize;
+      p[2].X:=(x)*asize;
+      p[2].Y:=(y-1)*asize;
+      p[3].X:=(x)*asize;
+      p[3].Y:=(y)*asize;
+      p[4].X:=(x-1)*asize;
+      p[4].Y:=(y)*asize;
+      p[5]:=p[1];
+      FieldBox.Canvas.Pen.Color := clRed;
+      FieldBox.Canvas.Polyline(p);
       // Удаляем
       if (field[x,y].ElemT<>ePYLS) and (field[x,y].ElemT<>ePYLS+Offset) then begin
          // Если есть что удалять, спрашиваем
@@ -585,16 +598,15 @@ begin
             // удаляем не пылесос
             if field[x,y].ElemT in [RUBSH..eSHKAF+Offset] then field[x,y].ElemT:=RUBSH else
                field[x,y].ElemT:=EMPTY;
-            DrawField;
          end;
-      end else begin               
+      end else begin
           if MessageDlg('Удалить этот элемент?',mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
              // Удаляем пылесос
              if field[x,y].ElemT=ePYLS then field[x,y].ElemT:=EMPTY else field[x,y].ElemT:=RUBSH;
              InsertPyls.Enabled:=true;
-             DrawField;
           end;
-      end;      
+      end;
+      DrawField;      
    end;
 end;
 
