@@ -549,10 +549,10 @@ begin
             if not freespaceavail then break;
          end;
          if freespaceavail then
-         for i:=startpoint.X to finpoint.X do
-            for j:=startpoint.Y to finpoint.Y do begin
+            for i:=startpoint.X to finpoint.X do
+               for j:=startpoint.Y to finpoint.Y do begin
                   inserted := InsertElement(i,j,InsType,InsRotation)
-            end;
+               end;
          if inserted then begin
             // Перерисуем поле
             DrawField;
@@ -560,14 +560,6 @@ begin
             InsMode := false;
             InsType := EMPTY;
             InsRotation := 1;
-            // Поднимем кнопки
-            {
-            InsertPyls.Down:=false;
-            InsertStul.Down:=false;
-            InsertStol.Down:=false;
-            InsertShkaf.Down:=false;
-            InsertDivan.Down:=false;
-            }
          end;
       end;
 
@@ -597,10 +589,10 @@ begin
          end;
       end else begin               
           if MessageDlg('Удалить этот элемент?',mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
-                // Удаляем пылесос
-                field[x,y].ElemT:=RUBSH; //  За собой пылесос оставит МУСОР
-                InsertPyls.Enabled:=true;
-                DrawField;
+             // Удаляем пылесос
+             if field[x,y].ElemT=ePYLS then field[x,y].ElemT:=EMPTY else field[x,y].ElemT:=RUBSH;
+             InsertPyls.Enabled:=true;
+             DrawField;
           end;
       end;      
    end;
@@ -614,9 +606,7 @@ begin
    y := y div 24 +1;
    case Button of
       mbLeft: if (field[X,Y].ElemT=ePYLS) or (field[X,Y].ElemT=ePYLS+Offset) then Rotating(X,Y)
-                 else if InsMode then
-                  if (InsertEnable(Field,X,Y)) then Inserting(X,Y)
-                                               else MessageDlg('Не могу!',mtError,[mbOK],0);
+                 else Inserting(X,Y);
       mbRight: Deleting(X,Y);
    end;
 end;
