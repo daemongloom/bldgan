@@ -267,7 +267,7 @@ begin
           end;
           e := field[x,y].ElemT;
           // Отбросим мусор
-          e := (e+Offset) mod Offset;   
+          e := (e+Offset) mod Offset;
           // Впереди мебель
           if ((exp='впереди стул') and (e=eSTUL)) or
            ((exp='впереди стол') and (e=eSTOL)) or
@@ -325,10 +325,10 @@ begin
          case field[i,j].ElemT of
            EMPTY: FieldBox.Canvas.Brush.Color := clGreen;
            RUBSH: FieldBox.Canvas.Brush.Color := clGray;
-           eSTUL,eSTUL+Offset: FieldBox.Canvas.Brush.Color := clLime;
-           eSTOL,eSTOL+Offset: FieldBox.Canvas.Brush.Color := clBlue;
-           eDIVAN,eDIVAN+Offset: FieldBox.Canvas.Brush.Color := clAqua;
-           eSHKAF,eSHKAF+Offset: FieldBox.Canvas.Brush.Color := clOlive;
+           eSTUL,eSTUL+Offset: FieldBox.Canvas.Brush.Color := InsertStul.ButtonColor;
+           eSTOL,eSTOL+Offset: FieldBox.Canvas.Brush.Color := InsertStol.ButtonColor;
+           eDIVAN,eDIVAN+Offset: FieldBox.Canvas.Brush.Color := InsertDivan.ButtonColor;
+           eSHKAF,eSHKAF+Offset: FieldBox.Canvas.Brush.Color := InsertShkaf.ButtonColor;
          end;
          if (field[i,j].ElemT<>ePYLS) and (field[i,j].ElemT<>ePYLS+Offset)
           then FieldBox.Canvas.Rectangle((i-1)*asize,(j-1)*asize,i*asize,j*asize)
@@ -639,7 +639,7 @@ begin
    InsMode := true;
    InsType := eSTUL;
    ifstart := false;   
-   FirstDotColor:=clLime;
+   FirstDotColor:=InsertStul.ButtonColor;
 end;
 
 procedure TForm1.InsertStolClick(Sender: TObject);
@@ -648,7 +648,7 @@ begin
    InsMode := true;
    InsType := eSTOL;
    ifstart := true;
-   FirstDotColor:=clBlue;
+   FirstDotColor:=InsertStol.ButtonColor;
 end;
 
 procedure TForm1.InsertShkafClick(Sender: TObject);
@@ -657,7 +657,7 @@ begin
    InsMode := true;
    InsType := eSHKAF;
    ifstart := true;   
-   FirstDotColor:=clOlive;
+   FirstDotColor:=InsertShkaf.ButtonColor;
 end;
 
 procedure TForm1.InsertDivanClick(Sender: TObject);
@@ -666,7 +666,7 @@ begin
    InsMode := true;
    InsType := eDIVAN;
    ifstart := true;   
-   FirstDotColor:=clAqua;
+   FirstDotColor:=InsertDivan.ButtonColor;
 end;
 
 // Создание нового поля
