@@ -1,9 +1,8 @@
-
 {*******************************************************}
 {                                                       }
-{       Borland Delphi Visual Component Library         }
+{       CodeGear Delphi Visual Component Library        }
 {                                                       }
-{  Copyright (c) 1995-2001 Borland Software Corporation }
+{           Copyright (c) 1995-2007 CodeGear            }
 {                                                       }
 {*******************************************************}
 
@@ -133,6 +132,24 @@ resourcestring
   SMsgDlgNoToAll = 'Н&ет для всех';
   SMsgDlgYesToAll = 'Да для &всех';
 
+ { SMsgDlgWarning = 'Warning';
+  SMsgDlgError = 'Error';
+  SMsgDlgInformation = 'Information';
+  SMsgDlgConfirm = 'Confirm';
+  SMsgDlgYes = '&Yes';
+  SMsgDlgNo = '&No';
+  SMsgDlgOK = 'OK';
+  SMsgDlgCancel = 'Cancel';
+  SMsgDlgHelp = '&Help';
+  SMsgDlgHelpNone = 'No help available';
+  SMsgDlgHelpHelp = 'Help';
+  SMsgDlgAbort = '&Abort';
+  SMsgDlgRetry = '&Retry';
+  SMsgDlgIgnore = '&Ignore';
+  SMsgDlgAll = '&All';
+  SMsgDlgNoToAll = 'N&o to All';
+  SMsgDlgYesToAll = 'Yes to &All';}
+
   SmkcBkSp = 'BkSp';
   SmkcTab = 'Tab';
   SmkcEsc = 'Esc';
@@ -248,6 +265,8 @@ resourcestring
   SDockTreeRemoveError = 'Error removing control from dock tree';
   SDockZoneNotFound = ' - Dock zone not found';
   SDockZoneHasNoCtl = ' - Dock zone has no control';
+  SDockZoneVersionConflict = 'Error loading dock zone from the stream. ' +
+    'Expecting version %d, but found %d.';
 
   SAllCommands = 'All Commands';
 
@@ -287,7 +306,7 @@ resourcestring
   SErrorActionManagerNotAssigned = 'ActionManager must first be assigned';
   SAddRemoveButtons = '&Add or Remove Buttons';
   SResetActionToolBar = 'Reset Toolbar';
-  SCustomize = '&Customize';
+  SCustomize = '&Customize...';
   SSeparator = 'Separator';
   SCirularReferencesNotAllowed = 'Circular references not allowed';
   SCannotHideActionBand = '%s does not allow hiding';
@@ -302,7 +321,48 @@ resourcestring
   SXPStyleActionBars = 'XP Style';
   SActionBarStyleMissing = 'No ActionBand style unit present in the uses clause.'#13 +
     'Your application must include either XPStyleActnCtrls, StdStyleActnCtrls or ' +
-    'a third party ActionBand style unit in its uses clause.';
+    'a third party ActionBand style unit in its uses clause';
+  sParameterCannotBeNil = '%s parameter in call to %s cannot be nil';
+  SInvalidColorString = 'Invalid Color string';
+
+  SInvalidPath = '"%s" is an invalid path';
+  SInvalidPathCaption = 'Invalid path';
+
+  SANSIEncoding = 'ANSI';
+  SASCIIEncoding = 'ASCII';
+  SUnicodeEncoding = 'Unicode';
+  SBigEndianEncoding = 'Big Endian Unicode';
+  SUTF8Encoding = 'UTF-8';
+  SUTF7Encoding = 'UTF-7';
+  SEncodingLabel = 'Encoding:';
+
+  sCannotAddFixedSize = 'Cannot add columns or rows while expand style is fixed size';
+  sInvalidSpan = '''%d'' is not a valid span';
+  sInvalidRowIndex = 'Row index, %d, out of bounds';
+  sInvalidColumnIndex = 'Column index, %d, out of bounds';
+  sInvalidControlItem = 'ControlItem.Control cannot be set to owning GridPanel';
+  sCannotDeleteColumn = 'Cannot delete a column that contains controls';
+  sCannotDeleteRow = 'Cannot delete a row that contains controls';
+  sCellMember = 'Member';
+  sCellSizeType = 'Size Type';
+  sCellValue = 'Value';
+  sCellAutoSize = 'Auto';
+  sCellPercentSize = 'Percent';
+  sCellAbsoluteSize = 'Absolute';
+  sCellColumn = 'Column%d';
+  sCellRow = 'Row%d';
+
+  STrayIconRemoveError = 'Cannot remove shell notification icon';
+  STrayIconCreateError = 'Cannot create shell notification icon';
+
+  SPageControlNotSet = 'PageControl must first be assigned';
+
+  SWindowsVistaRequired = '%s requires Windows Vista or later';
+  SXPThemesRequired = '%s requires themes to be enabled';
+
+  STaskDlgButtonCaption = 'Button%d';
+  STaskDlgRadioButtonCaption = 'RadioButton%d';
+  SInvalidTaskDlgButtonCaption = 'Caption cannot be empty';
 
 implementation
 
