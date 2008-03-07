@@ -294,7 +294,7 @@ object Form1: TForm1
       ParentFont = False
       TabOrder = 3
       OnClick = InsertShkafClick
-      ButtonColor = clOlive
+      ButtonColor = clFuchsia
     end
   end
   object GroupBox3: TGroupBox
