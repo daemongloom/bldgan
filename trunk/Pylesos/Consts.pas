@@ -120,7 +120,7 @@ resourcestring
   SMsgDlgConfirm = 'Подтверждение';
   SMsgDlgYes = '&Да';
   SMsgDlgNo = '&Нет';
-  SMsgDlgOK = 'Хорошо';
+  SMsgDlgOK = 'Ok';
   SMsgDlgCancel = 'Отмена';
   SMsgDlgHelp = '&Помощь';
   SMsgDlgHelpNone = 'Справка недоступна';
