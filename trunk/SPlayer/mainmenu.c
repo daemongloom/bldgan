@@ -105,14 +105,14 @@ void AboutDlg()
   void *eq;
   PrepareEditControl(&ec);
   eq=AllocEQueue(ma,mfree_adr());
-  wsprintf(ews,"%t","SPlayer v 0.7.6.0\n\nАвторы (c):\nMr.Anderstand\nBlind007\nDemonGloom\n\nОформление (r):\nVedan\ngrafx75.net.ru");
+  wsprintf(ews,"%t","SPlayer v 0.7.6.0\n\nАвторы (c):\nMr.Anderstand\nBlind007\nDemonGloom\n\nОформление (r):\nVedan");
   ConstructEditControl(&ec,1,0x40,ews,512);
   AddEditControlToEditQend(eq,&ec,ma);
   CreateInputTextDialog(&info_desc,&info_about,eq,1,0);
   FreeWS(ews);
   */
   ShowMSG(0,(int)"(r)\nIlya_ZX\n-Shadow-\nCaptain SISka\nVedan\nGanster and The_Zen");
-  ShowMSG(0,(int)"SPlayer v0.7.7.0\n(c): \nAnderstand\nBlind007\nDemonGloom");
+  ShowMSG(0,(int)"SPlayer v0.7.8.6\n(c): \nAnderstand\nBlind007\nDemonGloom");
   GeneralFuncF1(1);
 };
 /////////////////////////////////////////////Об эльфе///////////////////////////////////////////////////

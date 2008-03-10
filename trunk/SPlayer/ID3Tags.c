@@ -31,7 +31,8 @@ int ReadID3v1(char*fname, ID3TAGDATA *tag) // Чтение ID3 v1
     memcpy(tag->artist,&tagtext[30],30);
     memcpy(tag->album,&tagtext[60],30);
     memcpy(tag->year,&tagtext[90],4);
-    if(tagtext[122])   // Прилепим еще это :)   AAA
+    // Прилепим еще это :)   AAA 
+    if(tagtext[122]!=0x00)   //  !!При 0х20(пробел) почему то думает что ячейка пуста...!!
     {
       memcpy(tag->comment,&tagtext[94],30);
     }else{

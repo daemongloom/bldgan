@@ -87,8 +87,8 @@ void Disp_Info(ID3TAGDATA *tag)
   wsprintf(ws_info,"");
   ConstructEditControl(&ec,ECT_READ_ONLY,0,ws_info,1);
   AddEditControlToEditQend(eq,&ec,ma);
-  
- /* // File
+  /*
+  // File
   wsprintf(ws_info,"%t",LG_Full_name);
   ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
   AddEditControlToEditQend(eq,&ec,ma);
@@ -109,48 +109,63 @@ void Disp_Info(ID3TAGDATA *tag)
   ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,128);
   AddEditControlToEditQend(eq,&ec,ma);*/
   // Title
-  wsprintf(ws_info,"%t",LG_Title);
-  ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
-  AddEditControlToEditQend(eq,&ec,ma);
+  if(strlen(tag->title))
+  {
+    wsprintf(ws_info,"%t",LG_Title);
+    ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
+    AddEditControlToEditQend(eq,&ec,ma);
   
-  wsprintf(ws_info,"%t",tag->title);
-  ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,30);
-  AddEditControlToEditQend(eq,&ec,ma);
+    wsprintf(ws_info,"%t",tag->title);
+    ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,30);
+    AddEditControlToEditQend(eq,&ec,ma);
+  }
   // Artist
-  wsprintf(ws_info,"%t",LG_Artist);
-  ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
-  AddEditControlToEditQend(eq,&ec,ma);
+  if(strlen(tag->artist))
+  {
+    wsprintf(ws_info,"%t",LG_Artist);
+    ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
+    AddEditControlToEditQend(eq,&ec,ma);
   
-  wsprintf(ws_info,"%t",tag->artist);
-  ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,30);
-  AddEditControlToEditQend(eq,&ec,ma);
+    wsprintf(ws_info,"%t",tag->artist);
+    ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,30);
+    AddEditControlToEditQend(eq,&ec,ma);
+  }
   // Album
-  wsprintf(ws_info,"%t",LG_Album);
-  ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
-  AddEditControlToEditQend(eq,&ec,ma);
+  if(strlen(tag->album))
+  {
+    wsprintf(ws_info,"%t",LG_Album);
+    ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
+    AddEditControlToEditQend(eq,&ec,ma);
     
-  wsprintf(ws_info,"%t",tag->album);
-  ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,30);
-  AddEditControlToEditQend(eq,&ec,ma);
+    wsprintf(ws_info,"%t",tag->album);
+    ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,30);
+    AddEditControlToEditQend(eq,&ec,ma);
+  }
   // Year
-  wsprintf(ws_info,"%t",LG_Year);
-  ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
-  AddEditControlToEditQend(eq,&ec,ma);
+  if(strlen(tag->year))
+  {
+    wsprintf(ws_info,"%t",LG_Year);
+    ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
+    AddEditControlToEditQend(eq,&ec,ma);
   
-  wsprintf(ws_info,"%t",tag->year);
-  ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,4);
-  AddEditControlToEditQend(eq,&ec,ma);
+    wsprintf(ws_info,"%t",tag->year);
+    ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,4);
+    AddEditControlToEditQend(eq,&ec,ma);
+  }
   // Comment
-  wsprintf(ws_info,"%t",LG_Comment);
-  ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
-  AddEditControlToEditQend(eq,&ec,ma);
+  if(strlen(tag->comment))
+  {
+    wsprintf(ws_info,"%t",LG_Comment);
+    ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
+    AddEditControlToEditQend(eq,&ec,ma);
   
-  wsprintf(ws_info,"%t",tag->comment);
-  ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,30);
-  AddEditControlToEditQend(eq,&ec,ma);
+    wsprintf(ws_info,"%t",tag->comment);
+    ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,30);
+    AddEditControlToEditQend(eq,&ec,ma);
+  }
+  // Number
   if(tag->version1_1&&tag->number)
   {
-    // Number
     wsprintf(ws_info,"%t",LG_Number);
     ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
     AddEditControlToEditQend(eq,&ec,ma);
@@ -160,14 +175,16 @@ void Disp_Info(ID3TAGDATA *tag)
     AddEditControlToEditQend(eq,&ec,ma);
   }
   // Genre
-  wsprintf(ws_info,"%t",LG_Genre);
-  ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
-  AddEditControlToEditQend(eq,&ec,ma);
+  if(tag->genre<149)
+  {
+    wsprintf(ws_info,"%t",LG_Genre);
+    ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
+    AddEditControlToEditQend(eq,&ec,ma);
   
-  if(tag->genre<149) {wsprintf(ws_info,"%t",ID3v1_genre[tag->genre]);}
-  else {wsprintf(ws_info,"%t","None");}
-  ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,128);
-  AddEditControlToEditQend(eq,&ec,ma);
+    wsprintf(ws_info,"%t",ID3v1_genre[tag->genre]);
+    ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,128);
+    AddEditControlToEditQend(eq,&ec,ma);
+  }
   
   patch_header(&info_hdr);
   patch_input(&info_desc);

@@ -55,6 +55,7 @@ unsigned int MAINGUI_ID = 0;
 const char ipc_my_name[32]=IPC_SPLAYER_NAME;
 const char ipc_xtask_name[]=IPC_XTASK_NAME;
 const char ipc_grantee_name[]=IPC_GRANTEE_NAME;
+const char ipc_control_name[]=IPC_CONTROL_NAME;
 IPC_REQ gipc;
 
 extern unsigned short stop; // 1, если останавливаем листание   AAA
@@ -305,10 +306,6 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       
       const char *p=strrchr(fname,'\\')+1; 
       str_2ws(sndFName,p,128);
-      // Вылавливаем имя трека   AAA
-      char *trackname=malloc(128);
-      strncpy(trackname,p,128);
-      // Выловили имя трека   AAA
       strncpy(s,fname,p-fname);
       s[p-fname]='\0';
       str_2ws(sndPath,s,128);
@@ -341,16 +338,25 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       // Покажем что играем тем кому нужно :)))   AAA
       if(FnameIPC)
       {
+        // Вылавливаем имя трека   AAA
+        char *trackname=malloc(256);
+        strncpy(trackname, p, strlen(p)-4);   // Мочим расширение   AAA
+        // Выловили имя трека   AAA
         ID3TAGDATA *StatTag;
+        if(FnameIPC==2) {
+        StatTag=malloc(sizeof(ID3TAGDATA));
+        ReadID3v1(GetPlayedTrack(PlayedTrack[PlayedPL]), StatTag);
+        if(strlen(StatTag->artist)&&strlen(StatTag->title)) {sprintf(trackname,"%s - %s",StatTag->artist,StatTag->title);}
+        mfree(StatTag); }
+        
         gipc.name_to=ipc_grantee_name;
         gipc.name_from=ipc_my_name;
-        StatTag=malloc(sizeof(ID3TAGDATA));   // С этим жопа какая то... Наверно лучше не пытаться   AAA
-        ReadID3v1(GetPlayedTrack(PlayedTrack[PlayedPL]), StatTag);
-        if(StatTag->artist&&StatTag->title) {sprintf(trackname,"%s%s%s%s",StatTag->artist," - ",StatTag->title,".mp3");}
-        gipc.data=(void*)trackname;
+        gipc.data=(void*)p;
         GBS_SendMessage(MMI_CEPID,MSG_IPC,0,&gipc);
+        
+       // ShowMSG(1,(int)trackname);
+        
         mfree(trackname);
-        mfree(StatTag);
       }
 //      BeginTime = SetBeginTime(); // Время начала играния файла Blind007
       FreeWS(sndPath);
@@ -364,8 +370,8 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
   REDRAW();*/
     } else {
       // Если нет такого файла!
-      ToDevelop();
       ShowMSG(1,(int)LG_Can_not_find_file);
+      ToDevelop();
     }
   }
 }
@@ -485,12 +491,26 @@ void load_skin(char const* cfgname)              // Извращенец... Такое создать.
   }
 }
 
+void SendNULL()   // Послать по окончании воспр.   AAA
+{
+    if(FnameIPC)
+      {
+        gipc.name_to=ipc_grantee_name;
+        gipc.name_from=ipc_my_name;
+        gipc.data=NULL;
+        GBS_SendMessage(MMI_CEPID,MSG_IPC,0,&gipc);
+      }
+}
+
 void ToDevelop()   // Развернуть   AAA
 {
-  gipc.name_to=ipc_xtask_name;
-  gipc.name_from=ipc_my_name;
-  gipc.data=(void *)MAINCSM_ID;
-  GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_XTASK_SHOW_CSM,&gipc);
+  if(!IsGuiOnTop(MAINGUI_ID))
+  {
+    gipc.name_to=ipc_xtask_name;
+    gipc.name_from=ipc_my_name;
+    gipc.data=(void *)MAINCSM_ID;
+    GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_XTASK_SHOW_CSM,&gipc);
+  }
 }
 
 void CheckDoubleRun(void)   // При открытии копии   AAA
@@ -718,8 +738,8 @@ void NextTrackDown() {
 }
 
 void SwitchPlayModeDown() {
-  playmode+=1;
-  if (playmode==4) playmode=0;
+  if (playmode<3) {playmode+=1;}
+  else {playmode=0;}
   Mode_keypressed = 1;
 }
 /* Блок функций. Неоходимо для конфига клавиш. */
@@ -788,6 +808,9 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
           ShowMSG(1,(int)LG_Keypad_Lock);
           KeyLock=1;
        }
+       if (playmode>0) {playmode-=1;}
+       else {playmode=3;}
+  
       break;
       case '*':
         if (mode==0) {EditPL=!(EditPL); mode=1;}
@@ -1044,6 +1067,22 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
             gipc.name_from=ipc_my_name;
             gipc.data=(void *)MAINCSM_ID;
             GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_XTASK_SHOW_CSM,&gipc);*/
+            break;
+          case IPC_PLAY_PAUSE:
+            ipc->data=(void *)((int)(ipc->data)+1);
+	    if (ipc->name_from==ipc_control_name) {TogglePlayback();}
+            break;
+          case IPC_STOP:
+            ipc->data=(void *)((int)(ipc->data)+1);
+	    if (ipc->name_from==ipc_control_name) {StopAllPlayback();}
+            break;
+          case IPC_NEXT_TRACK:
+            ipc->data=(void *)((int)(ipc->data)+1);
+	    if (ipc->name_from==ipc_control_name) {NextTrack();}
+            break;
+          case IPC_PREV_TRACK:
+            ipc->data=(void *)((int)(ipc->data)+1);
+	    if (ipc->name_from==ipc_control_name) {PreviousTrack();}
             break;
           }
         }

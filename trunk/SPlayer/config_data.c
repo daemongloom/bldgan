@@ -26,12 +26,23 @@ __root const unsigned int IDLE_Y = 120;
 __root const CFG_HDR cfghdr05 = {CFG_INT,LG_Auto_Exit_Min,0,2000};
 __root const unsigned int AUTO_EXIT_MIN=30;
 
+__root const CFG_HDR cfghdr06 = {CFG_INT,LG_Speed_Moving,0,30};
+#ifdef NEWSGOLD
+__root const unsigned int SCROLL_MULT=2;
+#else
+__root const unsigned int SCROLL_MULT=10;
+#endif
+
+__root const CFG_HDR cfghdr07={CFG_CBOX,LG_Show_Anim,0,2};
+__root const unsigned int GrafOn1 = 1;
+__root const CFG_CBOX_ITEM cfgcbox7[2]={LG_No,LG_Yes};
+
 //Level 1
 __root const CFG_HDR cfghdr_m11={CFG_LEVEL,LG_Sets,1,0};
 
-__root const CFG_HDR cfghdr12={CFG_CBOX,LG_Show_full_names,0,2};
-__root const int SHOW_FULLNAMES = 0;
-__root const CFG_CBOX_ITEM cfgcbox1[2]={LG_No,LG_Yes};
+__root const CFG_HDR cfghdr12={CFG_CBOX,LG_Show_full_names,0,3};
+__root const int SHOW_NAMES = 1;
+__root const CFG_CBOX_ITEM cfgcbox1[3]={"Tags(bugs)","Full","Name"};
 
 __root const CFG_HDR cfghdr13={CFG_CBOX,LG_Show_effects,0,2};
 __root const unsigned int GrafOn = 1;
@@ -56,12 +67,12 @@ __root const int soundvolume=6;
 __root const CFG_HDR cfghdr17 = {CFG_INT,LG_Amount_of_lines,0,10000};
 __root const unsigned int LinesInPL_C = 256;
 
-__root const CFG_HDR cfghdr18 = {CFG_INT,"Size Of Font",0,20};
+__root const CFG_HDR cfghdr18 = {CFG_INT,LG_Size_Of_Font,0,20};
 __root const unsigned int SizeOfFont = 11;
 
-__root const CFG_HDR cfghdr19={CFG_CBOX,LG_Send_fname,0,2};
+__root const CFG_HDR cfghdr19={CFG_CBOX,LG_Send_fname,0,3};
 __root const unsigned int FnameIPC = 0;
-__root const CFG_CBOX_ITEM cfgcbox5[2]={LG_No,LG_Yes};
+__root const CFG_CBOX_ITEM cfgcbox5[3]={LG_No,"Name","ID3 Tag"};
 
 __root const CFG_HDR cfghdr_m10={CFG_LEVEL,"",0,0};
 

@@ -77,6 +77,8 @@ void load_skin(char const* cfgname);
 
 void PlayMP3File(const char * fname);
 
+void SendNULL();    // Послать по окончании воспр.   AAA
+
 void ToDevelop();   // Развернуть   AAA
 
 void PausingTime(unsigned short action);
