@@ -11,11 +11,12 @@ extern char COLOR_TEXT_CURSOR[]; //Еще добавил  AAA
 extern char COLOR_TEXT_PLAY[];   //И еще AAA
 extern char COLOR_BANDROLL[];    //Цвет полосы прокрутки
 extern char COLOR_BANDROLL_C[];
-extern const int SHOW_FULLNAMES;
+extern const int SHOW_NAMES;
 extern const char PIC_DIR[];           // Для курсора AAA
 extern const int EXT;                  // Расширение по умолчанию
 extern const int soundvolume;          // Громкость
 extern const unsigned int SizeOfFont;  // Шрифт AAA
+extern const unsigned int SCROLL_MULT; // Скорость листания   перенес в конфиг  AAA
 
 // Мои переменные
 unsigned short SoundVolume;           // Громкость
@@ -52,6 +53,7 @@ extern unsigned short w;
 extern int playmode;
 extern unsigned short copy;
 extern const unsigned int GrafOn; // 1,если включены эффекты типа скролла   AAA
+extern const unsigned int GrafOn1; // 1,если включена анимация   AAA
 unsigned short stop=1; // 1, если останавливаем листание   AAA
 extern short Stat_keypressed;
 // Всякие "мелкие" переменные
@@ -63,6 +65,7 @@ extern unsigned int MAINGUI_ID;
 #define TMR_SEC 216*2
 GBSTMR tmr_scroll;
 GBSTMR tmr_displacement;
+GBSTMR tmr_cursor_move;
 volatile int scroll_disp;
 volatile int max_scroll_disp;
 
@@ -250,6 +253,7 @@ void TogglePlayback()
 // Останавливаем проигрывание
 void StopAllPlayback()
 {
+  SendNULL();
   Stat_keypressed = 1;
   if(PlayingStatus==0)return;
   if (phandle!=-1){
@@ -322,10 +326,49 @@ void PTtoFirst()
   if(PlayedPL=CurrentPL&&PlayedTrack[PlayedPL]!=0)PlayedTrack[PlayedPL] = 0;
 }
 
+
+// Фторопях, неидеально, с небольшими недочетами   AAA
+short p, p1, p3;
+short n, d, v, v1, v2;
+unsigned short i;
+void PL(void)
+{
+ // unsigned short i=0;
+ // unsigned short n=0;
+  if(i<4&&GrafOn1)
+  {
+    i++;
+    n-=s/4;
+    p=n;
+    p3=n;
+    
+    d-=s/2;
+    p1=d;
+    
+    REDRAW();
+    GBS_StartTimerProc(&tmr_cursor_move,10,PL);
+    
+  }else{
+    
+    p1=0;
+    p3=0;
+    p=0;
+    REDRAW();
+    GBS_DelTimer(&tmr_cursor_move);
+    d=0;
+    n=0;
+    i=0;
+  }
+}
+
 //Пробуем листание вниз AAA
 void CTDown()
 {
   DisableScroll();
+  v=-1;
+  v1=0;
+  v2=1;
+  PL();
   if (CurrentTrack[CurrentPL]<TC[CurrentPL])
   {
     CurrentTrack[CurrentPL]++;
@@ -340,6 +383,10 @@ void CTDown()
 void CTUp()
 {
   DisableScroll();
+  v=1;
+  v1=1;
+  v2=0;
+  PL();
   if (CurrentTrack[CurrentPL]>1)
   {
     CurrentTrack[CurrentPL]--;
@@ -349,11 +396,6 @@ void CTUp()
     CurrentTrack[CurrentPL] = TC[CurrentPL];
   }
 }
-#ifdef NEWSGOLD
-#define SCROLL_MULT 2
-#else 
-#define SCROLL_MULT 10
-#endif
 
 // Быстрое листание вниз AAA
 void CTDownSpeed(void)
@@ -837,8 +879,12 @@ void PL_Redraw()
   unsigned short my_x;
   unsigned short my_y;
   unsigned short k;
+  short p2=0;
+  short v3=1;
   unsigned short c = 0;  // Координаты  AAA
   int i;
+  char* str;
+  ID3TAGDATA *ShowTag;
   
   // Имя файла...
   if (TC[CurrentPL]>0)
@@ -872,17 +918,17 @@ void PL_Redraw()
 */
     if (TC[CurrentPL]>5)
     {
-    if(CurrentTrack[CurrentPL]==1) {k=0;}
-    else{ if(CurrentTrack[CurrentPL]==2) {k=1;}
-    else{ if(CurrentTrack[CurrentPL]==TC[CurrentPL]-2) {k=3;}
-    else{ if(CurrentTrack[CurrentPL]==TC[CurrentPL]-1) {k=4;}
-    else{ if(CurrentTrack[CurrentPL]==TC[CurrentPL]) {k=5;} else {k=2;}}}}}
+    if(CurrentTrack[CurrentPL]==1) {k=0; v3=0;}
+    else{ if(CurrentTrack[CurrentPL]==2) {k=1; v3=0;}
+    else{ if(CurrentTrack[CurrentPL]==TC[CurrentPL]-2) {k=3; v3=0;}
+    else{ if(CurrentTrack[CurrentPL]==TC[CurrentPL]-1) {k=4; v3=0;}
+    else{ if(CurrentTrack[CurrentPL]==TC[CurrentPL]) {k=5; v3=0;} else {k=2;}}}}}
     }else{
-    if(CurrentTrack[CurrentPL]==1) {k=0;}
-    else{ if(CurrentTrack[CurrentPL]==2) {k=1;}
-    else{ if(CurrentTrack[CurrentPL]==3) {k=2;}
-    else{ if(CurrentTrack[CurrentPL]==4) {k=3;}
-    else{ if(CurrentTrack[CurrentPL]==5) {k=4;}}}}}
+    if(CurrentTrack[CurrentPL]==1) {k=0; v3=0;}
+    else{ if(CurrentTrack[CurrentPL]==2) {k=1; v3=0;}
+    else{ if(CurrentTrack[CurrentPL]==3) {k=2; v3=0;}
+    else{ if(CurrentTrack[CurrentPL]==4) {k=3; v3=0;}
+    else{ if(CurrentTrack[CurrentPL]==5) {k=4; v3=0;}}}}}
     }
     
     for(int l=0;l<6;l++)
@@ -890,31 +936,60 @@ void PL_Redraw()
     i = CurrentTrack[CurrentPL]+l-k;
     if(TC[CurrentPL]>l)
     {
-    if (SHOW_FULLNAMES)
-    {
-      utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
-    }
-    else
-    {
-      FullpathToFilename(GetTrackByNumber(i),out_ws);
-    };
+      switch(SHOW_NAMES)
+      {
+      case 0:
+        ShowTag=malloc(sizeof(ID3TAGDATA));
+        str=malloc(256);
+        ReadID3v1(GetTrackByNumber(i), ShowTag);
+        
+        if(strlen(ShowTag->artist)&&strlen(ShowTag->title))
+        {
+          sprintf(str,"%s - %s",ShowTag->artist,ShowTag->title);
+          utf8_2ws(out_ws,str,strlen(str));
+          
+        }else{
+          utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
+        }
+        mfree(ShowTag);
+        mfree(str);
+        break;
+      case 1:
+        utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
+        break;
+      case 2:
+        FullpathToFilename(GetTrackByNumber(i),out_ws);
+        break;
+      }
+        /*
+        if (SHOW_FULLNAMES)
+        {
+          utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
+        
+        }else{
+        
+        FullpathToFilename(GetTrackByNumber(i),out_ws);
+        }*/
     if(k!=l)
     {
     // Делаем другой цвет для не текущего трека...
     if (PlayedTrack[CurrentPL]==i)
     {
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(SizeOfFont)+c,
+      DrawScrollString(out_ws,my_x,my_y+c+(p2-p3*v)*v3,w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
                    1,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
     }else{
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(SizeOfFont)+c,
+      DrawScrollString(out_ws,my_x,my_y+c+(p2-p3*v)*v3,w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
                    1,SizeOfFont,0,color(COLOR_TEXT_CURSOR),0);
     }
-    
+    p2=0;
     }else{
-      
+      short v4=1;
+      if(v3!=0) {v4=0;}
       char sfname[256];
       sprintf(sfname,"%s%s",PIC_DIR,"cursor.png");
-      DrawImg(my_x-1,my_y+c-3,(int)sfname);
+      DrawImg(my_x-1,my_y+c-3+p*v*v4,(int)sfname);
+      
+      p2=-p1*v1;
       
     if (PlayedTrack[CurrentPL]==CurrentTrack[CurrentPL])
     {
@@ -935,7 +1010,7 @@ void PL_Redraw()
 	    max_scroll_disp=i;
 	  }
       }
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(SizeOfFont)+c,
+      DrawScrollString(out_ws,my_x,my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
                    scroll_disp+1,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
     }else{
 //      DrawString(out_ws,my_x,my_y,w,my_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
@@ -956,7 +1031,7 @@ void PL_Redraw()
 	    max_scroll_disp=i;
 	  }
         }
-      DrawScrollString(out_ws,my_x,my_y+c,w-7,my_y+GetFontYSIZE(SizeOfFont)+c,
+      DrawScrollString(out_ws,my_x,my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
                    scroll_disp+1,SizeOfFont,0,color(COLOR_TEXT),0);
     }
     c+=s;
@@ -964,6 +1039,8 @@ void PL_Redraw()
     c+=s;
     }
     }
+    if(n==0) {n=s;}
+    if(d==0) {d=2*s;}
     FreeWS(out_ws);
   }
   // Плейлист
@@ -1084,5 +1161,6 @@ void MemoryFree()
 {
   GBS_DelTimer(&tmr_scroll);
   GBS_DelTimer(&tmr_displacement);
+  GBS_DelTimer(&tmr_cursor_move);
  // FreePlaylist();
 }
