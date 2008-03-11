@@ -4,7 +4,7 @@
 {=  Главный модуль программы                   =}
 {= Авторы: Николай Трубинов                    =}
 {=         Николай Козаченко                   =}
-{= Дата: 2008.03.04                            =}
+{= Дата: 2008.03.11                            =}
 {===============================================}
 
 unit Unit1;
@@ -280,7 +280,7 @@ begin
            ((exp='впереди не диван') and (e<>eDIVAN)) or
            ((exp='впереди не шкаф') and (e<>eSHKAF)) then
              Result := true else
-          // Впереди пусто-не пусто   
+          // Впереди пусто-не пусто
           if ((exp='впереди пусто') and (e=EMPTY)) or
            ((exp='впереди не пусто') and (e<>EMPTY)) then
              Result := true else   
@@ -434,6 +434,11 @@ begin
    OpenDialog2.InitialDir := ExtractFilePath(Application.ExeName);
    SaveDialog3.InitialDir := ExtractFilePath(Application.ExeName);
    OpenDialog3.InitialDir := ExtractFilePath(Application.ExeName);
+
+   // Закроем кнопки
+   SpeedButton8.Enabled := false;
+   SpeedButton10.Enabled := false;
+   SpeedButton11.Enabled := false;
    // Создадим новую программу  
    BackupListBox.Clear;
    ListBox1.Clear;
@@ -509,6 +514,7 @@ begin
          if InsertElement(x,y,InsType,InsRotation) then begin
             // Перерисуем поле
             DrawField;
+            SetButtonsState(true);
             // Отслеживаем количество пылесосов
             if pylsc>=MaxPylsCount then InsertPyls.Enabled := false;
             // Сбросим режим вставки
@@ -969,6 +975,7 @@ begin
   backup_field := field;
   execute := true;
   SetButtonsState(false);
+  SpeedButton10.Enabled:=true;
   while (k<ListBox1.Items.Count) and execute do begin
      DoComand(ListBox1.Items.Strings[k],k);
      Inc(k);
