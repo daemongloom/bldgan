@@ -518,10 +518,12 @@ object Form1: TForm1
       end
       object N12: TMenuItem
         Caption = '-'
+        Visible = False
       end
       object N13: TMenuItem
         Caption = #1042#1099#1087#1086#1083#1085#1080#1090#1100
         Enabled = False
+        Visible = False
       end
     end
     object N28: TMenuItem
