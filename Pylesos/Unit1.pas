@@ -318,17 +318,17 @@ begin
    FieldBox.Canvas.Brush.Color := clBlack;
    FieldBox.Canvas.Rectangle(0,0,FieldBox.Width,FieldBox.Height);
    // Рисуем сетку и ставим предметы
-   FieldBox.Canvas.Pen.Color := clBlack;
    FieldBox.Canvas.Brush.Color := clGreen;
    for i:=1 to fsize_w do begin
       for j:=1 to fsize_h do begin
+         FieldBox.Canvas.Pen.Color := clWhite;
          case field[i,j].ElemT of
-           EMPTY: FieldBox.Canvas.Brush.Color := clGreen;
+           EMPTY: FieldBox.Canvas.Brush.Color := $a0ffa0;
            RUBSH: FieldBox.Canvas.Brush.Color := clGray;
-           eSTUL,eSTUL+Offset: FieldBox.Canvas.Brush.Color := InsertStul.ButtonColor;
-           eSTOL,eSTOL+Offset: FieldBox.Canvas.Brush.Color := InsertStol.ButtonColor;
-           eDIVAN,eDIVAN+Offset: FieldBox.Canvas.Brush.Color := InsertDivan.ButtonColor;
-           eSHKAF,eSHKAF+Offset: FieldBox.Canvas.Brush.Color := InsertShkaf.ButtonColor;
+           eSTUL,eSTUL+Offset: begin FieldBox.Canvas.Brush.Color := InsertStul.ButtonColor; FieldBox.Canvas.Pen.Color := clBlack; end;
+           eSTOL,eSTOL+Offset: begin FieldBox.Canvas.Brush.Color := InsertStol.ButtonColor; FieldBox.Canvas.Pen.Color := clBlack; end;
+           eDIVAN,eDIVAN+Offset: begin FieldBox.Canvas.Brush.Color := InsertDivan.ButtonColor; FieldBox.Canvas.Pen.Color := clBlack; end;
+           eSHKAF,eSHKAF+Offset: begin FieldBox.Canvas.Brush.Color := InsertShkaf.ButtonColor; FieldBox.Canvas.Pen.Color := clBlack; end;
          end;
          if (field[i,j].ElemT<>ePYLS) and (field[i,j].ElemT<>ePYLS+Offset)
           then FieldBox.Canvas.Rectangle((i-1)*asize,(j-1)*asize,i*asize,j*asize)

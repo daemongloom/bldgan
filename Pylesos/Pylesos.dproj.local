@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
-  <Transactions>
+	<Transactions>
     <Transaction>2008.03.03 21:12:24.687.pas,D:\Developing\Pylesos\Unit4.pas=D:\Developing\Pylesos\MessageDialogsEx.pas</Transaction>
     <Transaction>2008.03.03 21:12:24.687.dfm,D:\Developing\Pylesos\Unit4.dfm=D:\Developing\Pylesos\MessageDialogsEx.dfm</Transaction>
   </Transactions>
