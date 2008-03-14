@@ -100,6 +100,7 @@ type
     Label1: TLabel;
     XPManifest1: TXPManifest;
     Image1: TImage;
+    N37: TMenuItem;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -1077,7 +1078,11 @@ end;
 
 procedure TForm1.CodePopupMenu1Popup(Sender: TObject);
 begin
-  N34.Enabled:=not( (ListBox1.ItemIndex=0) or (ListBox1.ItemIndex=ListBox1.Items.Count-1));
+   N34.Enabled:=(not( (ListBox1.ItemIndex=0) or (ListBox1.ItemIndex=ListBox1.Items.Count-1)) );
+   // Скроем меню, если программа запущена
+   n7.Visible:=not execute;
+   n34.Visible:=not execute;
+   n37.Visible:=not execute;
 end;
 
 // Цикл Повтори
