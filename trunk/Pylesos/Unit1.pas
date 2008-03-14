@@ -803,32 +803,44 @@ procedure TForm1.ListBox1KeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var i:integer;
     str: string;
+    spaces: string;
+    k: integer;
 begin
    // создаем резервную копию
    BackupListBox.Items:=ListBox1.Items;
-   BackupListBox.ItemIndex:=ListBox1.ItemIndex; 
+   BackupListBox.ItemIndex:=ListBox1.ItemIndex;
    N7.Enabled:=true;
 
    i:=ListBox1.ItemIndex; // сохраним позицию курсора
    str := ListBox1.Items.Strings[i];
+   // Пробелы
+   k:=1;
+   spaces := '';
+   while str[k]=' ' do begin
+      spaces := spaces+' ';
+      Inc(k);
+   end;
    if Key=46 then begin
       if (ListBox1.ItemIndex in [1..ListBox1.Items.count-2]) then begin
          if (pos('ИНАЧЕ',str)>0) or (pos('КОНЕЦ ЕСЛИ',str)>0) or
           (pos('КОНЕЦ ПОВТОРИ',str)>0) or (pos('КОНЕЦ ПОКА',str)>0)
          then {nothing} else begin
             ListBox1.Items.Delete(ListBox1.ItemIndex);
-            if (pos('ЕСЛИ',str)>0) and (pos('КОНЕЦ',str)<=0) then begin
-               while pos('КОНЕЦ ЕСЛИ',ListBox1.Items.Strings[i])<=0 do
+            // Удаляем ветвление
+            if (pos('ЕСЛИ',str)=k) then begin
+               while pos(spaces+'КОНЕЦ ЕСЛИ',ListBox1.Items.Strings[i])<>1 do
                   ListBox1.Items.Delete(i);
                ListBox1.Items.Delete(i);
             end;
-            if (pos('ПОВТОРИ',str)>0) and (pos('КОНЕЦ',str)<=0) then begin
-               while pos('КОНЕЦ ПОВТОРИ',ListBox1.Items.Strings[i])<=0 do
+            // Удаляем цикл повтори
+            if (pos('ПОВТОРИ',str)=k) then begin
+               while pos(spaces+'КОНЕЦ ПОВТОРИ',ListBox1.Items.Strings[i])<>1 do
                   ListBox1.Items.Delete(i);
                ListBox1.Items.Delete(i);   
             end;
-            if (pos('ПОКА',str)>0) and (pos('КОНЕЦ',str)<=0) then begin
-               while pos('КОНЕЦ ПОКА',ListBox1.Items.Strings[i])<=0 do
+            // Удаляем цикл пока
+            if (pos('ПОКА',str)=k) then begin
+               while pos('КОНЕЦ ПОКА',ListBox1.Items.Strings[i])<>1 do
                   ListBox1.Items.Delete(i);
                ListBox1.Items.Delete(i);   
             end;
