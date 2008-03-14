@@ -130,7 +130,8 @@ type
     procedure CPClick1(Sender: TObject);
     procedure SpeedButton5Click(Sender: TObject);
     procedure CPClick2(Sender: TObject);
-    procedure SpeedButton6Click(Sender: TObject);
+    procedure SpeedButton6Click(Sender: TObject);  
+    procedure CPClick3(Sender: TObject);
     procedure SpeedButton7Click(Sender: TObject);
     procedure Edit1KeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -1078,9 +1079,11 @@ begin
 end;
 
 procedure TForm1.CodePopupMenu1Popup(Sender: TObject);
+var tempstr:string;
 begin
-   N34.Enabled:=(not( (ListBox1.ItemIndex=0) or (ListBox1.ItemIndex=ListBox1.Items.Count-1)) );
-   N37.Enabled:=(not( (ListBox1.ItemIndex=0) or (ListBox1.ItemIndex=ListBox1.Items.Count-1)) );
+   N34.Enabled:=(not((ListBox1.ItemIndex=0) or (ListBox1.ItemIndex=ListBox1.Items.Count-1)));
+   tempstr:=ListBox1.Items[ListBox1.ItemIndex];
+   N37.Enabled:=(not boolean(pos('КОНЕЦ',tempstr))) and ( boolean(pos('ПОКА',tempstr))or boolean(pos('ПОВТОРИ',tempstr)) or boolean(pos('ЕСЛИ',tempstr)));
    // Скроем меню, если программа запущена
    n7.Visible:=not execute;
    n34.Visible:=not execute;
@@ -1284,10 +1287,45 @@ begin
   ListBox1KeyDown(Sender,key,[]);
 end;
 
-procedure TForm1.N37Click(Sender: TObject);     // Редактирование
+procedure TForm1.CPClick3(Sender: TObject);
+var tempstr:string;
 begin
-  if True then
-          else;
+   if pos('ЕСЛИ',ListBox1.Items[ListBox1.ItemIndex])<>0 then
+    ListBox1.Items[ListBox1.ItemIndex]:=(GetSpaces(ListBox1.ItemIndex)+'ЕСЛИ '+(Sender as TMenuItem).Caption+' ТО');
+   if pos('ПОКА',ListBox1.Items[ListBox1.ItemIndex])<>0 then
+    ListBox1.Items[ListBox1.ItemIndex]:=(GetSpaces(ListBox1.ItemIndex)+'ПОКА '+(Sender as TMenuItem).Caption+' ДЕЛАЙ');
+   // мелкий фикс
+   tempstr:=ListBox1.Items[ListBox1.ItemIndex];
+   delete(tempstr,1,2);         
+   ListBox1.Items[ListBox1.ItemIndex]:=tempstr;
+end;
+
+procedure TForm1.N37CLick(Sender: TObject);
+var tempstr:string;
+    i:integer;
+    MyComp: TComponent;
+begin
+   tempstr:=ListBox1.Items[ListBox1.ItemIndex];
+
+   for i:=14 to 27 do begin
+      MyComp := FindComponent('N'+IntToStr(i)) as TMenuItem;
+      TMenuItem(MyComp).OnClick := CPClick3;
+      end;
+   MyComp := FindComponent('N35') as TMenuItem;
+   TMenuItem(MyComp).OnClick := CPClick3;
+   MyComp := FindComponent('N36') as TMenuItem;
+   TMenuItem(MyComp).OnClick := CPClick3;
+
+   if (pos('ПОКА',tempstr)) <> 0 then begin
+                                        ConditionsPopup.Popup(Mouse.CursorPos.X,Mouse.CursorPos.Y);
+                                      end;
+
+   if (pos('ПОВТОРИ',tempstr)) <> 0 then begin
+                                         end;
+
+   if (pos('ЕСЛИ',tempstr)) <> 0 then begin   
+                                        ConditionsPopup.Popup(Mouse.CursorPos.X,Mouse.CursorPos.Y);
+                                      end;
 end;
 
 // Загрузка проекта
