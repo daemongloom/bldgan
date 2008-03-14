@@ -89,8 +89,8 @@ object Form1: TForm1
       OnClick = SpeedButton4Click
     end
     object SpeedButton5: TSpeedButton
-      Left = 8
-      Top = 48
+      Left = 9
+      Top = 49
       Width = 65
       Height = 25
       Caption = #1045#1089#1083#1080
