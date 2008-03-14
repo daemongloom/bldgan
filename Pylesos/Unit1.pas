@@ -151,6 +151,7 @@ type
     procedure N7Click(Sender: TObject);
     procedure N34Click(Sender: TObject);
     procedure CodePopupMenu1Popup(Sender: TObject);
+    procedure N37Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -1079,6 +1080,7 @@ end;
 procedure TForm1.CodePopupMenu1Popup(Sender: TObject);
 begin
    N34.Enabled:=(not( (ListBox1.ItemIndex=0) or (ListBox1.ItemIndex=ListBox1.Items.Count-1)) );
+   N37.Enabled:=(not( (ListBox1.ItemIndex=0) or (ListBox1.ItemIndex=ListBox1.Items.Count-1)) );
    // Скроем меню, если программа запущена
    n7.Visible:=not execute;
    n34.Visible:=not execute;
@@ -1280,6 +1282,12 @@ var key:word;
 begin
   key:=46;
   ListBox1KeyDown(Sender,key,[]);
+end;
+
+procedure TForm1.N37Click(Sender: TObject);     // Редактирование
+begin
+  if True then
+          else;
 end;
 
 // Загрузка проекта
