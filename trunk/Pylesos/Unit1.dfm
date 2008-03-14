@@ -647,6 +647,7 @@ object Form1: TForm1
     end
     object N37: TMenuItem
       Caption = #1056#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1090#1100
+      OnClick = N37Click
     end
   end
   object XPManifest1: TXPManifest
