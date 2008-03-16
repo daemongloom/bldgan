@@ -340,18 +340,22 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       {
         // Вылавливаем имя трека   AAA
         char *trackname=malloc(256);
-        strncpy(trackname, p, strlen(p)-4);   // Мочим расширение   AAA
+      //  strncpy(trackname, p, strlen(p)-4);   // Мочим расширение   AAA
         // Выловили имя трека   AAA
         ID3TAGDATA *StatTag;
         if(FnameIPC==2) {
         StatTag=malloc(sizeof(ID3TAGDATA));
         ReadID3v1(GetPlayedTrack(PlayedTrack[PlayedPL]), StatTag);
         if(strlen(StatTag->artist)&&strlen(StatTag->title)) {sprintf(trackname,"%s - %s",StatTag->artist,StatTag->title);}
-        mfree(StatTag); }
+        mfree(StatTag);
+        gipc.data=(void*)trackname;
+        }else{
+        gipc.data=(void*)p;
+        }
         
         gipc.name_to=ipc_grantee_name;
         gipc.name_from=ipc_my_name;
-        gipc.data=(void*)p;
+        
         GBS_SendMessage(MMI_CEPID,MSG_IPC,0,&gipc);
         
        // ShowMSG(1,(int)trackname);
@@ -370,8 +374,10 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
   REDRAW();*/
     } else {
       // Если нет такого файла!
+      if(IsUnlocked()){
       ShowMSG(1,(int)LG_Can_not_find_file);
-      ToDevelop();
+      ToDevelop();}
+      NextTrackX();
     }
   }
 }
