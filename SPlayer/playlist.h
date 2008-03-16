@@ -133,7 +133,7 @@ void PL_Redraw();
 void BandRoll();
 
 //»щем файлы в папке   AAA
-void FindMusic(const char *dir, int i);
+//void FindMusic(const char *dir, int i);
 
 void LoadingDaemonList(const char* path);
 

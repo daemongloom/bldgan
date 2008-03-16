@@ -152,7 +152,7 @@ const PROC_MAP keyprocs[] = {
   {"stopall", StopAllPlayback},
   {"nexttrack", NextTrackDown},
   {"prevtrack", PrevTrackDown},
-  {"findmusic", FindMusic},
+  {"findmusic", FindingMusic},//FindMusic},        // Коля, горе луковое! Нельзя же так слюдьми...   AAA
   {"switchmode", SwitchPlayModeDown},
 };
 

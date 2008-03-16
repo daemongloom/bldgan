@@ -323,7 +323,7 @@ void CTtoFirst()
 // Сделал в две для удобства AAA
 void PTtoFirst()
 {
-  if(PlayedPL=CurrentPL&&PlayedTrack[PlayedPL]!=0)PlayedTrack[PlayedPL] = 0;
+  if(PlayedPL==CurrentPL&&PlayedTrack[PlayedPL]!=0)PlayedTrack[PlayedPL] = 0;
 }
 
 
@@ -639,7 +639,7 @@ void LoadingPlaylist(const char * fn)
     {
       for(unsigned int i=0;i<TC[CurrentPL]+1;i++)
       {
-        playlist_lines[CurrentPL][i++]=0;
+        playlist_lines[CurrentPL][i]=0;
       }
     }
     TC[CurrentPL] = LoadPlaylist(fn)-1;
@@ -883,8 +883,8 @@ void PL_Redraw()
   short v3=1;
   unsigned short c = 0;  // Координаты  AAA
   int i;
-  char* str;
-  ID3TAGDATA *ShowTag;
+ // char* str;
+ // ID3TAGDATA *ShowTag;
   
   // Имя файла...
   if (TC[CurrentPL]>0)
@@ -938,8 +938,8 @@ void PL_Redraw()
     {
       switch(SHOW_NAMES)
       {
-      case 0:
-        ShowTag=malloc(sizeof(ID3TAGDATA));
+      case 0:// На будущее  AAA
+       /* ShowTag=malloc(sizeof(ID3TAGDATA));
         str=malloc(256);
         ReadID3v1(GetTrackByNumber(i), ShowTag);
         
@@ -952,7 +952,7 @@ void PL_Redraw()
           utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
         }
         mfree(ShowTag);
-        mfree(str);
+        mfree(str);*/
         break;
       case 1:
         utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
@@ -993,8 +993,6 @@ void PL_Redraw()
       
     if (PlayedTrack[CurrentPL]==CurrentTrack[CurrentPL])
     {
-//      DrawString(out_ws,my_x,my_y,w,my_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//                 color(COLOR_TEXT_PLAY),0);
       if(GrafOn)
       {
           int i=Get_WS_width(out_ws,SizeOfFont);  //Определяет кол-во пикселей при этом шрифте (или что то вроде того...)
@@ -1013,9 +1011,6 @@ void PL_Redraw()
       DrawScrollString(out_ws,my_x,my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
                    scroll_disp+1,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
     }else{
-//      DrawString(out_ws,my_x,my_y,w,my_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,
-//               color(COLOR_TEXT),0);
-
 	if(GrafOn)
         {
           int i=Get_WS_width(out_ws,SizeOfFont);
@@ -1061,7 +1056,7 @@ void BandRoll()
     DrawRoundedFrame(BRC_x,BR1_y+yy-(BR2_y-BR1_y)/TC[CurrentPL],BRC_x+BRC_w-1,BR1_y+yy,0,0,0,0,color(COLOR_BANDROLL_C));
   }
 }
-
+/*
 //Ищем файлы в папке   AAA
 void FindMusic(const char *dir, int i)
 {
@@ -1097,10 +1092,10 @@ void FindMusic(const char *dir, int i)
   FindClose(&de,&err);
   if(i>1) {TC[CurrentPL]=i-1;}
   else {TC[CurrentPL]=0;}
-}
+}*/
 
 //LoadDaemonList(" 4:\\Doc\\");
-int LoadDaemonList(const char* path)
+int LoadDaemonList(const char* path) // Теперь я хотя бы понимаю почему нихуя не пашет   AAA
 {
  // ShowMSG(0,(int)path);
   DIR_ENTRY de;
@@ -1120,9 +1115,14 @@ int LoadDaemonList(const char* path)
         // тута делаем что хотим с найдеными файлами
         //////////////////
        // strcpy(playlist_lines[CurrentPL][i++],path);
-       // strcat(playlist_lines[CurrentPL][i++],de.file_name);
-        sprintf(playlist_lines[CurrentPL][i++],"%s%s",path,de.file_name);
+       // strcat(playlist_lines[CurrentPL][i],de.file_name);
+       // sprintf(playlist_lines[CurrentPL][i++],"%s%s",path,de.file_name);
        // ShowMSG(1,(int)playlist_lines[CurrentPL][i++]);
+       // char* p=malloc(256);
+      //  strcpy(p,path);
+      //  strcat(p,de.file_name);
+      //  playlist_lines[CurrentPL][i++]=p;
+       // mfree(p);
         count1++;
       }
       else //если ето директория вызываем рекурсивно ето ф.
@@ -1149,7 +1149,7 @@ void LoadingDaemonList(const char* path)
     {
       for(unsigned int i=0;i<TC[CurrentPL]+1;i++)
       {
-        playlist_lines[CurrentPL][i++]=0;
+        playlist_lines[CurrentPL][i]=0;
       }
     }
     TC[CurrentPL] = LoadDaemonList(path);

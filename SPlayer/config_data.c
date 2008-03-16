@@ -42,7 +42,7 @@ __root const CFG_HDR cfghdr_m11={CFG_LEVEL,LG_Sets,1,0};
 
 __root const CFG_HDR cfghdr12={CFG_CBOX,LG_Show_full_names,0,3};
 __root const int SHOW_NAMES = 1;
-__root const CFG_CBOX_ITEM cfgcbox1[3]={"Tags(bugs)","Full","Name"};
+__root const CFG_CBOX_ITEM cfgcbox1[3]={"Tags(don't work)","Full","Name"};
 
 __root const CFG_HDR cfghdr13={CFG_CBOX,LG_Show_effects,0,2};
 __root const unsigned int GrafOn = 1;
