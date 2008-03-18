@@ -143,7 +143,7 @@ int random(int max)
   TDate date;
   TTime time;
   GetDateTime(&date,&time);
-  return((time.hour+time.min+time.sec+time.millisec+date.day+date.month+date.year)%max+1);
+  return((time.hour+time.min*time.sec+time.millisec+date.day+date.month+date.year+time.millisec*time.sec)%max+1);
 }
 
 // Случайный трек DemonGloom
