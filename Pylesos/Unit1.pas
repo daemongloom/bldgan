@@ -101,6 +101,8 @@ type
     XPManifest1: TXPManifest;
     Image1: TImage;
     N37: TMenuItem;
+    ClearButton: TColorButton;
+    DirtyButton: TColorButton;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -326,8 +328,8 @@ begin
       for j:=1 to fsize_h do begin
          FieldBox.Canvas.Pen.Color := clWhite;
          case field[i,j].ElemT of
-           EMPTY: FieldBox.Canvas.Brush.Color := $a0ffa0;
-           RUBSH: FieldBox.Canvas.Brush.Color := clGray;
+           EMPTY: FieldBox.Canvas.Brush.Color := ClearButton.ButtonColor;
+           RUBSH: FieldBox.Canvas.Brush.Color := DirtyButton.ButtonColor;
            eSTUL,eSTUL+Offset: begin FieldBox.Canvas.Brush.Color := InsertStul.ButtonColor; FieldBox.Canvas.Pen.Color := clBlack; end;
            eSTOL,eSTOL+Offset: begin FieldBox.Canvas.Brush.Color := InsertStol.ButtonColor; FieldBox.Canvas.Pen.Color := clBlack; end;
            eDIVAN,eDIVAN+Offset: begin FieldBox.Canvas.Brush.Color := InsertDivan.ButtonColor; FieldBox.Canvas.Pen.Color := clBlack; end;
@@ -336,8 +338,8 @@ begin
          if (field[i,j].ElemT<>ePYLS) and (field[i,j].ElemT<>ePYLS+Offset)
           then FieldBox.Canvas.Rectangle((i-1)*asize,(j-1)*asize,i*asize,j*asize)
          else begin
-            if field[i,j].ElemT=ePYLS then FieldBox.Canvas.Brush.Color := clGreen
-               else FieldBox.Canvas.Brush.Color := clGray;
+            if field[i,j].ElemT=ePYLS then FieldBox.Canvas.Brush.Color := ClearButton.ButtonColor
+               else FieldBox.Canvas.Brush.Color := DirtyButton.ButtonColor;
             FieldBox.Canvas.Rectangle((i-1)*asize,(j-1)*asize,i*asize,j*asize);
             case field[i,j].Rot of
               // тут надо нарисовать треугольники
