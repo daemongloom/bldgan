@@ -296,6 +296,26 @@ object Form1: TForm1
       OnClick = InsertShkafClick
       ButtonColor = clFuchsia
     end
+    object ClearButton: TColorButton
+      Left = 8
+      Top = 56
+      Width = 65
+      Height = 17
+      Caption = #1063#1080#1089#1090#1086
+      TabOrder = 4
+      Visible = False
+      ButtonColor = clSkyBlue
+    end
+    object DirtyButton: TColorButton
+      Left = 88
+      Top = 56
+      Width = 65
+      Height = 17
+      Caption = #1043#1088#1103#1079#1085#1086
+      TabOrder = 5
+      Visible = False
+      ButtonColor = clGray
+    end
   end
   object GroupBox3: TGroupBox
     Left = 8
