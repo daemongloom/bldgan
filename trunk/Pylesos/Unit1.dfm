@@ -4,7 +4,7 @@ object Form1: TForm1
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
-  ClientHeight = 566
+  ClientHeight = 586
   ClientWidth = 827
   Color = clBtnFace
   TransparentColorValue = clBtnFace
@@ -50,11 +50,12 @@ object Form1: TForm1
     Left = 424
     Top = 0
     Width = 403
-    Height = 547
+    Height = 567
     Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     Enabled = False
     TabOrder = 1
+    ExplicitHeight = 547
     object SpeedButton1: TSpeedButton
       Left = 8
       Top = 16
@@ -200,7 +201,7 @@ object Form1: TForm1
     end
     object ListBox1: TListBox
       Left = 2
-      Top = 164
+      Top = 184
       Width = 399
       Height = 381
       Align = alBottom
@@ -212,6 +213,7 @@ object Form1: TForm1
       TabOrder = 0
       OnClick = ListBox1Click
       OnKeyDown = ListBox1KeyDown
+      ExplicitTop = 164
     end
   end
   object GroupBox2: TGroupBox
@@ -413,7 +415,7 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 547
+    Top = 567
     Width = 827
     Height = 19
     Panels = <
@@ -428,6 +430,7 @@ object Form1: TForm1
       item
         Width = 0
       end>
+    ExplicitTop = 547
   end
   object ProgressBar1: TProgressBar
     Left = 8
@@ -451,26 +454,6 @@ object Form1: TForm1
     ShowHint = True
     TabOrder = 6
   end
-  object Edit1: TSpinEdit
-    Left = 585
-    Top = 64
-    Width = 80
-    Height = 30
-    Color = clYellow
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -16
-    Font.Name = 'MS Sans Serif'
-    Font.Style = []
-    MaxValue = 999
-    MinValue = 1
-    ParentFont = False
-    TabOrder = 7
-    Value = 1
-    Visible = False
-    OnExit = Edit1Exit
-    OnKeyUp = Edit1KeyUp
-  end
   object BackupListBox: TListBox
     Left = 32
     Top = 240
@@ -481,8 +464,28 @@ object Form1: TForm1
     Items.Strings = (
       'Bac'
       'kup')
-    TabOrder = 8
+    TabOrder = 7
     Visible = False
+  end
+  object Edit1: TSpinEdit
+    Left = 585
+    Top = 79
+    Width = 81
+    Height = 26
+    Color = clYellow
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -15
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    MaxValue = 999
+    MinValue = 1
+    ParentFont = False
+    TabOrder = 8
+    Value = 1
+    Visible = False
+    OnExit = Edit1Exit
+    OnKeyUp = Edit1KeyUp
   end
   object MainMenu1: TMainMenu
     BiDiMode = bdLeftToRight
