@@ -304,7 +304,7 @@ object Form1: TForm1
       Caption = #1063#1080#1089#1090#1086
       TabOrder = 4
       Visible = False
-      ButtonColor = clSkyBlue
+      ButtonColor = 10551200
     end
     object DirtyButton: TColorButton
       Left = 88
