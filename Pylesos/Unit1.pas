@@ -672,7 +672,7 @@ begin
 end;
 
 procedure TForm1.InsertDivanClick(Sender: TObject);
-begin               
+begin
    DrawField;      // фикс многоточий...
    InsMode := true;
    InsType := eDIVAN;
@@ -771,7 +771,7 @@ end;
 procedure TForm1.N7Click(Sender: TObject);
 begin
   ListBox1.Items:=BackupListBox.Items;
-  ListBox1.ItemIndex:=BackupListBox.ItemIndex;  
+  ListBox1.ItemIndex:=BackupListBox.ItemIndex;
   N7.Enabled:=false;
 end;
 
@@ -1335,6 +1335,10 @@ begin
                                       end;
 
    if (pos('ПОВТОРИ',tempstr)) <> 0 then begin
+                                           Delete(tempstr,1,pos('ПОВТОРИ',tempstr)+7);
+                                           Edit1.Value:=strtoint(tempstr);
+                                           Edit1.Show;
+                                           Edit1.SetFocus;
                                          end;
 
    if (pos('ЕСЛИ',tempstr)) <> 0 then begin   
