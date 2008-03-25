@@ -4,7 +4,7 @@ object Form1: TForm1
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
-  ClientHeight = 586
+  ClientHeight = 605
   ClientWidth = 827
   Color = clBtnFace
   TransparentColorValue = clBtnFace
@@ -50,12 +50,12 @@ object Form1: TForm1
     Left = 424
     Top = 0
     Width = 403
-    Height = 567
+    Height = 586
     Align = alRight
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     Enabled = False
     TabOrder = 1
-    ExplicitHeight = 547
+    ExplicitHeight = 567
     object SpeedButton1: TSpeedButton
       Left = 8
       Top = 16
@@ -201,7 +201,7 @@ object Form1: TForm1
     end
     object ListBox1: TListBox
       Left = 2
-      Top = 184
+      Top = 203
       Width = 399
       Height = 381
       Align = alBottom
@@ -213,7 +213,7 @@ object Form1: TForm1
       TabOrder = 0
       OnClick = ListBox1Click
       OnKeyDown = ListBox1KeyDown
-      ExplicitTop = 164
+      ExplicitTop = 184
     end
   end
   object GroupBox2: TGroupBox
@@ -415,7 +415,7 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 567
+    Top = 586
     Width = 827
     Height = 19
     Panels = <
@@ -430,7 +430,7 @@ object Form1: TForm1
       item
         Width = 0
       end>
-    ExplicitTop = 547
+    ExplicitTop = 567
   end
   object ProgressBar1: TProgressBar
     Left = 8

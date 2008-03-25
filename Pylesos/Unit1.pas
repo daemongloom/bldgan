@@ -985,7 +985,7 @@ end;
 procedure TForm1.SpeedButton8Click(Sender: TObject);
 var k: integer;
 begin
-  if InsertPyls.Enabled then ShowMessage('А вы ничего не забыли? Пылесос например...')     // если пылесос не был добавлен, то делать ничего не надо
+  if pylsc=0 then ShowMessage('А вы ничего не забыли? Пылесос например...')     // если пылесос не был добавлен, то делать ничего не надо
   else begin
   k := 1;
   backup_pylpos := pylpos;
@@ -1318,7 +1318,12 @@ procedure TForm1.N37CLick(Sender: TObject);
 var tempstr:string;
     i:integer;
     MyComp: TComponent;
-begin
+begin                  
+   // создаем резервную копию
+   BackupListBox.Items:=ListBox1.Items;
+   BackupListBox.ItemIndex:=ListBox1.ItemIndex;
+   N7.Enabled:=true;
+
    tempstr:=ListBox1.Items[ListBox1.ItemIndex];
 
    for i:=14 to 27 do begin
