@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 195
-  Top = 115
+  Left = 110
+  Top = 77
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = #1055#1099#1083#1077#1089#1086#1089#1080#1082
@@ -15,7 +15,7 @@ object Form1: TForm1
   Font.Style = []
   Menu = MainMenu1
   OldCreateOrder = False
-  Position = poDesktopCenter
+  Position = poDesigned
   Visible = True
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -55,7 +55,6 @@ object Form1: TForm1
     Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     Enabled = False
     TabOrder = 1
-    ExplicitHeight = 567
     object SpeedButton1: TSpeedButton
       Left = 8
       Top = 16
@@ -201,9 +200,9 @@ object Form1: TForm1
     end
     object ListBox1: TListBox
       Left = 2
-      Top = 203
+      Top = 120
       Width = 399
-      Height = 381
+      Height = 464
       Align = alBottom
       BevelInner = bvNone
       BevelOuter = bvNone
@@ -213,7 +212,6 @@ object Form1: TForm1
       TabOrder = 0
       OnClick = ListBox1Click
       OnKeyDown = ListBox1KeyDown
-      ExplicitTop = 184
     end
   end
   object GroupBox2: TGroupBox
@@ -430,7 +428,6 @@ object Form1: TForm1
       item
         Width = 0
       end>
-    ExplicitTop = 567
   end
   object ProgressBar1: TProgressBar
     Left = 8
