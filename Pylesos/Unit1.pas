@@ -533,11 +533,17 @@ begin
       if InsMode=false then exit;
       // Вставляем не стул и не пылесос
       if (ifstart) then begin
-         startpoint.X := x;
-         startpoint.Y := y;
-         // Отметим первую точку
-         FieldBox.Canvas.Brush.Color := FirstDotColor;
-         FieldBox.Canvas.Ellipse((x-1)*asize+5,(y-1)*asize+5,x*asize-5,y*asize-5);
+          if InsertEnable(field,x,y) then begin
+              startpoint.X := x;
+               startpoint.Y := y;
+               // Отметим первую точку
+               FieldBox.Canvas.Brush.Color := FirstDotColor;
+               FieldBox.Canvas.Ellipse((x-1)*asize+5,(y-1)*asize+5,x*asize-5,y*asize-5);
+             end
+           else begin
+              MessageDlg('Не могу!',mtError,[mbOK],0);
+              InsMode:=false;
+           end;
          ifstart := false;
       end else begin
          finpoint.X := x;
