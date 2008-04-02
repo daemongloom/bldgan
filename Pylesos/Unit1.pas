@@ -1123,7 +1123,7 @@ begin
    str := ListBox1.Items.Strings[k];
    Delete(str,1,pos('ПОВТОРИ',str)+7);
    n := StrToInt(str);
-   i := 0;
+   i := 1;
    // Сформируем список команд в цикле
    cmds := TStringList.Create;
    Inc(k);
@@ -1389,6 +1389,8 @@ begin
                ListBox1.Items.LoadFromStream(fstream);
                // Заголовок
                Form1.Caption:='Пылесосик'+' - Проект '+ FileName;
+               // Кнопки покажем
+               SetButtonsState(true);
                // Перерисуем поле
                DrawField;
                // Освободим память
