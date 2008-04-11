@@ -3155,6 +3155,12 @@
     </configuration>
   </file>
   <file>
+    <name>$PROJ_DIR$\FM.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\FM.h</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\func.asm</name>
   </file>
   <file>
@@ -3210,6 +3216,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\SPlayer_ipc.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\Release\Exe\SPLayer_newsgold.elf</name>
   </file>
 </project>
 

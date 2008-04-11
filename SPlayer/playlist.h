@@ -93,17 +93,14 @@ int GetTC();
 // Выделим память   AAA
 void Memory();
 
-// Для загрузки пл из главного модуля
-void LoadingPlaylist(const char * fn);
-
 // Сохраняем пл!   AAA
 void SavePlaylist(char *fn);
 
 // Добавляем строку в пл   AAA
-void PastLine(char *p);
+void PastLine(WSHDR *p, unsigned short i);
 
 // Копируем строку в пл   AAA
-void CopyLine(char *p);
+void CopyLine(WSHDR *p);
 
 // Удаляем строку из пл   AAA
 void DeleteLine();
@@ -120,21 +117,28 @@ void MoveLineRight();
 // Перемещаем строку в предыдущий пл   AAA
 void MoveLineLeft();
 
+// Убираем странный символ (всвязи с переходом на WSHDR)   AAA
+void fix(char* p);
+
 // Возвращется трек по номеру в пл
-char * GetCurrentTrack();
+WSHDR * GetCurrentTrack();
 
 // Возвращется играющий трек по номеру в пл
-char * GetPlayedTrack();
+WSHDR * GetPlayedTrack();
 
 // Перерисовка
-void PL_Redraw();
+void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, unsigned int* AllLines, int CurList, int MarkList);
 
 // Полоса прокрутки   AAA
-void BandRoll();
+void BandRoll(int CurLine, int AllLines);
 
 //Ищем файлы в папке   AAA
 //void FindMusic(const char *dir, int i);
 
+// Для загрузки пл из главного модуля
+void LoadingPlaylist(const char * fn);
+
+// Грузим файлы из папки. Респект
 void LoadingDaemonList(const char* path);
 
 // Утечка памяти в самом деле достала...   AAA

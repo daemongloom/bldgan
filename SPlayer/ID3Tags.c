@@ -11,9 +11,11 @@
 Вход: путь к мр3 - файлу; структура, в которую теги читаем
 Выход: флаг присутствия тегов в файле
 *******************************************************************************/
-int ReadID3v1(char*fname, ID3TAGDATA *tag) // Чтение ID3 v1
+int ReadID3v1(WSHDR* fnamews, ID3TAGDATA *tag) // Чтение ID3 v1
 {
-  tag->full_name=fname;
+  char* fname=malloc(256);
+  ws_2str(fnamews,fname,256);
+ // wstrcpy(tag->full_name,fnamews);
   unsigned int err;
   int f;
   FSTATS stat;
@@ -45,6 +47,7 @@ int ReadID3v1(char*fname, ID3TAGDATA *tag) // Чтение ID3 v1
   }
   else {tag->present=0; ShowMSG(1,(int)LG_No_Tags);} // Если проверку не прошли, значит тегов нет
   fclose(f,&err); // Закрываем файл
+  mfree(fname);
   REDRAW(); // Перерисовываем экран
   return (tag->present); // Возвращаем флаг присутствия тегов
 }

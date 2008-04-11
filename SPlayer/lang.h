@@ -17,6 +17,7 @@
 #define LG_Menu                  "Меню"
 #define LG_SetNextPlayed         "B очередь"
 #define LG_ShowID3               "Атрибуты"
+#define LG_FM                    "Файловый менеджер"
 #define LG_Settings              "Настройки"
 #define LG_AboutDlg              "Об эльфе..."
 #define LG_Exit_SPlayer          "Выход"
@@ -105,6 +106,7 @@
 ///////////MainMenu///////////
 #define LG_Menu                  "Меню"
 #define LG_SetNextPlayed         "У чергу"
+#define LG_FM                   ////////////////////////// "Файловый менеджер"
 #define LG_ShowID3               "Атрибути"
 #define LG_Settings              "Установки"
 #define LG_AboutDlg              "Про ельф..."
@@ -196,6 +198,7 @@
 #define LG_Menu                  "Menu"
 #define LG_SetNextPlayed         "Set next played"
 #define LG_ShowID3               "Attributes"
+#define LG_FM                    "File manager"
 #define LG_Settings              "Settings"
 #define LG_AboutDlg              "About..."
 #define LG_Exit_SPlayer          "Exit"

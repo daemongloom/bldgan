@@ -3,7 +3,7 @@
 #include "playlist.h"
 #include "lang.h"
 
-char ***playlist_lines;  // Массив указателей на имена файлов в пл   Mr. Anderstand: Воплотим мечту в жизнь!
+WSHDR *playlist_lines[TCPL][256];  // Массив указателей на имена файлов в пл   Mr. Anderstand: Воплотим мечту в жизнь!
 
 // Из конфига
 extern char COLOR_TEXT[];
@@ -553,98 +553,34 @@ int GetMP3Tag_v1(const char * fname, MP3Tagv1 * tag)
 // Выделим память   AAA
 void Memory()
 {
-  LinesInPL=LinesInPL_C;
-  playlist_lines=malloc(TCPL*sizeof(char *)); // 5 пл на 256 строк
-  for(unsigned int i=0;i<TCPL;i++)
+ // LinesInPL=LinesInPL_C;
+  for(unsigned int i=0;i<5;i++)
   {
-    playlist_lines[i]=malloc(LinesInPL*sizeof(char *));
+    for(unsigned int j=0;j<256;j++)
+    {
+      playlist_lines[i][j]=AllocWS(256);
+    }
   }
 }
 
 // Свобода пл!
 void FreePlaylist(void)
 {
-  if (playlist_lines)
-  {
-    for(unsigned int i=0;i<TCPL;i++)
+   /* for(unsigned int i=0;i<5;i++)
     {
-      for(int j=LinesInPL-1;j>-1;j--)
+      for(unsigned int j=0;j<256;j++)
       {
-        mfree(playlist_lines[i][j]);
-        playlist_lines[i][j]=0;
+        FreeWS(playlist_lines[i][j]);
+        playlist_lines[i][j]=NULL;
       }
-      mfree(playlist_lines[i]);
-      playlist_lines[i]=0;
-    }
-    mfree(playlist_lines);
-    playlist_lines=0;
-  }
+    }*/
+  for(unsigned int i=0; i<5; i++) {
+  while(TC[i]>0)
+        {
+          DeleteLine();
+        }}
 }
 
-// Загружаем пл!
-int LoadPlaylist(const char * fn)
-{
-  FSTATS stat;
-  int f;
-  unsigned int ul;
-  int i;
-  int fsize;
-  char *p;
-  char *pp;
-  int c;
-
-  if (GetFileStats(fn,&stat,&ul)==-1) return 0;
-  if ((fsize=stat.size)<=0) return 0;
-  if ((f=fopen(fn,A_ReadOnly+A_BIN,P_READ,&ul))==-1) return 0;
-
-  p=malloc(fsize+1);
-  p[fread(f,p,fsize,&ul)]=0;
-  fclose(f,&ul);
-  i=0;
-  pp=p;
-  for(;;)
-  {
-    c=*p;
-    if (c<16)
-    {
-      if (pp&&(pp!=p))
-      {
-	//playlist_lines=realloc(playlist_lines,(i+1)*sizeof(char *));
-     //   playlist_lines[CurrentPL][i+1]=malloc(256);
-      //  playlist_lines=realloc(playlist_lines,(1)*sizeof(char *));
-       // playlist_lines[CurrentPL]=realloc(playlist_lines[CurrentPL],(i+1)*sizeof(char *));
-	playlist_lines[CurrentPL][i++]=pp;
-      }
-      pp=NULL;
-      if (!c) break;
-      *p=0;
-    }
-    else
-    {
-      if (pp==NULL) pp=p;
-    }
-    p++;
-  }
-  return i;
-}
-
-// Для загрузки пл из главного модуля
-void LoadingPlaylist(const char * fn)
-{
-  if(LoadPlaylist(fn)-1>0)   // Экономим память + избавляемся от лишнего пикоффа + от одного недочета   AAA
-  {
-    CTtoFirst();
-    PTtoFirst();
-    if(TC[CurrentPL]>0)
-    {
-      for(unsigned int i=0;i<TC[CurrentPL]+1;i++)
-      {
-        playlist_lines[CurrentPL][i]=0;
-      }
-    }
-    TC[CurrentPL] = LoadPlaylist(fn)-1;
-  } else {TC[CurrentPL]=0;}
-}
 
 unsigned int char8to16(int c)
 {
@@ -691,7 +627,7 @@ void SavePlaylist(char *fn)
   f=fopen(m,A_WriteOnly+A_MMCStream+A_Create,P_WRITE,&err);
   for (i=0;i<TC[CurrentPL]+1;i++)
   {
-  fwrite(f,playlist_lines[CurrentPL][i],strlen(playlist_lines[CurrentPL][i]),&err);
+  fwrite(f,playlist_lines[CurrentPL][i],wstrlen(playlist_lines[CurrentPL][i]),&err);
   fwrite(f,s,1,&err);
   fwrite(f,s2,1,&err);
   }
@@ -701,49 +637,51 @@ void SavePlaylist(char *fn)
 
 /////////////////////////////////////////////////////<<<РЕДАКТИРОВАНИЕ ПЛ>>>/////////////////////////////////////////////////////////
 // Добавляем строку в пл   AAA
-void PastLine(char *p)
+void PastLine(WSHDR *p, unsigned short i) // Добавляем главно не с [0][0], а [0][1] почему-то... Работать должно тем не менее   AAA
 {
-  playlist_lines[CurrentPL][TC[CurrentPL]+1]=p;
+  playlist_lines[CurrentPL][TC[CurrentPL]+1]=AllocWS(256);
+  wstrcpy(playlist_lines[CurrentPL][TC[CurrentPL]+1],p);
   TC[CurrentPL]++;
-  CurrentTrack[CurrentPL]=TC[CurrentPL];
+  if(i) {CurrentTrack[CurrentPL]=TC[CurrentPL];}
 }
 
 // Копируем строку в пл   AAA
-void CopyLine(char *p)
+void CopyLine(WSHDR *p)
 {
   TC[CurrentPL]++;
   for(int i=TC[CurrentPL];i>CurrentTrack[CurrentPL]-1;i--)
     {
-      playlist_lines[CurrentPL][i]=playlist_lines[CurrentPL][i-1];
+      wstrcpy(playlist_lines[CurrentPL][i],playlist_lines[CurrentPL][i-1]);
     }
-  playlist_lines[CurrentPL][CurrentTrack[CurrentPL]]=p;
+  wstrcpy(playlist_lines[CurrentPL][CurrentTrack[CurrentPL]],p);
   if(PlayedTrack[PlayedPL]>CurrentTrack[CurrentPL]-1) {PlayedTrack[PlayedPL]++;}
   copy=0;
 }
 
 // Удаляем строку из пл   AAA
-void DeleteLine()
+void DeleteLine()  // Стираем однако тоже до [0][1] и поэтому я считаю беспокоиться не стоит.   AAA
 {
   DisableScroll();
-  if(CurrentTrack[CurrentPL]>0)
+  if(CurrentTrack[CurrentPL]>0&&TC[CurrentPL]>0)
   {
+  if(CurrentTrack[CurrentPL]==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]=0;}
+  else{if(CurrentTrack[CurrentPL]<PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]--;}}
+  
   int i=CurrentTrack[CurrentPL];
   if(i!=TC[CurrentPL])
   {
     while(i<TC[CurrentPL])
     {
-      playlist_lines[CurrentPL][i]=playlist_lines[CurrentPL][i+1];
+      wstrcpy(playlist_lines[CurrentPL][i],playlist_lines[CurrentPL][i+1]);
       i++;
     }
   }
   else
   {
-    CurrentTrack[CurrentPL]--;
+    if(CurrentTrack[CurrentPL]>1) {CurrentTrack[CurrentPL]--;}   // Не хочу рыть весь код, подстрахуюсь так   AAA
   }
-//  mfree(playlist_lines[CurrentPL][TC[CurrentPL]]);
+  FreeWS(playlist_lines[CurrentPL][TC[CurrentPL]]);
   playlist_lines[CurrentPL][TC[CurrentPL]]=NULL;
-  if(CurrentTrack[CurrentPL]==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]=0;}
-  else{if(CurrentTrack[CurrentPL]<PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]--;}}
   TC[CurrentPL]--;
   }
 }
@@ -754,7 +692,8 @@ void MoveLineUp()
   DisableScroll();
   if(CurrentTrack[CurrentPL]>0)
   {
-  char *p=playlist_lines[CurrentPL][CurrentTrack[CurrentPL]];
+  WSHDR *p=AllocWS(256);
+  wstrcpy(p,playlist_lines[CurrentPL][CurrentTrack[CurrentPL]]);
   if(copy)
   {
     CopyLine(p);
@@ -765,8 +704,8 @@ void MoveLineUp()
   {
     if(CurrentTrack[CurrentPL]==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]--;}
     else{if(CurrentTrack[CurrentPL]-1==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]++;}}
-    playlist_lines[CurrentPL][CurrentTrack[CurrentPL]]=playlist_lines[CurrentPL][CurrentTrack[CurrentPL]-1];
-    playlist_lines[CurrentPL][CurrentTrack[CurrentPL]-1]=p;
+    wstrcpy(playlist_lines[CurrentPL][CurrentTrack[CurrentPL]],playlist_lines[CurrentPL][CurrentTrack[CurrentPL]-1]);
+    wstrcpy(playlist_lines[CurrentPL][CurrentTrack[CurrentPL]-1],p);
     CurrentTrack[CurrentPL]--;
   }
   else
@@ -775,12 +714,13 @@ void MoveLineUp()
     else{if(PlayedTrack[PlayedPL]!=0) {PlayedTrack[PlayedPL]--;}}
     for(int i=1;i<TC[CurrentPL];i++)
     {
-      playlist_lines[CurrentPL][i]=playlist_lines[CurrentPL][i+1];
+      wstrcpy(playlist_lines[CurrentPL][i],playlist_lines[CurrentPL][i+1]);
     }
-    playlist_lines[CurrentPL][TC[CurrentPL]]=p;
+    wstrcpy(playlist_lines[CurrentPL][TC[CurrentPL]],p);
     CurrentTrack[CurrentPL]=TC[CurrentPL];
   }
   }
+  FreeWS(p);
   }
 }
 
@@ -790,7 +730,8 @@ void MoveLineDown()
   DisableScroll();
   if(CurrentTrack[CurrentPL]>0)
   {
-  char *p=playlist_lines[CurrentPL][CurrentTrack[CurrentPL]];
+  WSHDR *p=AllocWS(256);
+  wstrcpy(p,playlist_lines[CurrentPL][CurrentTrack[CurrentPL]]);
   if(copy)
   {
     CopyLine(p);
@@ -801,8 +742,8 @@ void MoveLineDown()
   {
     if(CurrentTrack[CurrentPL]==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]++;}
     else{if(CurrentTrack[CurrentPL]+1==PlayedTrack[PlayedPL]&&CurrentPL==PlayedPL) {PlayedTrack[PlayedPL]--;}}
-    playlist_lines[CurrentPL][CurrentTrack[CurrentPL]]=playlist_lines[CurrentPL][CurrentTrack[CurrentPL]+1];
-    playlist_lines[CurrentPL][CurrentTrack[CurrentPL]+1]=p;
+    wstrcpy(playlist_lines[CurrentPL][CurrentTrack[CurrentPL]],playlist_lines[CurrentPL][CurrentTrack[CurrentPL]+1]);
+    wstrcpy(playlist_lines[CurrentPL][CurrentTrack[CurrentPL]+1],p);
     CurrentTrack[CurrentPL]++;
   }
   else
@@ -811,39 +752,47 @@ void MoveLineDown()
     else {if(PlayedTrack[PlayedPL]!=0) {PlayedTrack[PlayedPL]++;}}
     for(int i=TC[CurrentPL];i>1;i--)
     {
-      playlist_lines[CurrentPL][i]=playlist_lines[CurrentPL][i-1];
+      wstrcpy(playlist_lines[CurrentPL][i],playlist_lines[CurrentPL][i-1]);
     }
-    playlist_lines[CurrentPL][1]=p;
+    wstrcpy(playlist_lines[CurrentPL][1],p);
     CurrentTrack[CurrentPL]=1;
   }
   }
+  FreeWS(p);
   }
 }
 
 // Перемещаем строку в следующий пл   AAA
 void MoveLineRight()
 {
-  char *p=playlist_lines[CurrentPL][CurrentTrack[CurrentPL]];
+  WSHDR *p=AllocWS(256);
+  wstrcpy(p,playlist_lines[CurrentPL][CurrentTrack[CurrentPL]]);
   if(copy==0) {DeleteLine();}
   else {copy=0; DisableScroll();}
   NextPL();
-  PastLine(p);
+  PastLine(p, 1);
+  FreeWS(p);
 }
 
 // Перемещаем строку в предыдущий пл   AAA
 void MoveLineLeft()
 {
-  char *p=playlist_lines[CurrentPL][CurrentTrack[CurrentPL]];
+  WSHDR *p=AllocWS(256);
+  wstrcpy(p,playlist_lines[CurrentPL][CurrentTrack[CurrentPL]]);
   if(copy==0) {DeleteLine();}
   else {copy=0; DisableScroll();}
   PrevPL();
-  PastLine(p);
+  PastLine(p, 1);
+  FreeWS(p);
 }
 /////////////////////////////////////////////////////<<<РЕДАКТИРОВАНИЕ ПЛ>>>/////////////////////////////////////////////////////////
 
 // Возвращает имя файла по полному пути...
-void FullpathToFilename(char * fname, WSHDR * wsFName)
+void FullpathToFilename(WSHDR * fnamews, WSHDR * wsFName)
 {
+  char* fname=malloc(256);
+  ws_2str(fnamews,fname,256);
+
   const char *p=strrchr(fname,0x1f)+1;
   const char *p2=strrchr(fname,'\\')+1;                         // Фикс для убирания этого странного символа... Теперь русский стал нормально
   if (p2>p){
@@ -853,27 +802,40 @@ void FullpathToFilename(char * fname, WSHDR * wsFName)
   int length=strrchr(fname,'.')-strrchr(fname,'\\')-2;
   utf8_2ws(wsFName,p,length);
   }
+  mfree(fname);
+}
+
+void fix(char* p)  // Убираем странный символ (всвязи с переходом на WSHDR)   AAA
+{
+  unsigned short j=0;
+  char* p1=malloc(256);
+  for(unsigned short i=0;i<256;i++)
+  {
+    if(p[i]!=0x1f) {p1[j++]=p[i];}
+  }
+  strcpy(p,p1);
+  mfree(p1);
 }
 
 // Возвращется трек по номеру в пл
-char * GetCurrentTrack()
+WSHDR * GetCurrentTrack()
 {
   return playlist_lines[CurrentPL][CurrentTrack[CurrentPL]];
 }
 
-char * GetPlayedTrack()
+WSHDR * GetPlayedTrack()
 {
   return playlist_lines[PlayedPL][PlayedTrack[PlayedPL]];
 }
 
 // Возвращает имя воспроизводимого по номеру в пл
-char * GetTrackByNumber(int number)
+WSHDR * GetTrackByNumber(WSHDR**mass, int number)
 {
-  return playlist_lines[CurrentPL][number];
+  return mass[number];
 }
 
 // Нет функциям океренной величины!!   AAA
-void PL_Redraw()
+void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, unsigned int* AllLines, int CurList, int MarkList)
 {
   
   unsigned short my_x;
@@ -887,7 +849,7 @@ void PL_Redraw()
  // ID3TAGDATA *ShowTag;
   
   // Имя файла...
-  if (TC[CurrentPL]>0)
+  if (AllLines[CurList]>0)
   {
     my_x = CTmy_x;
     my_y = CTmy_y;
@@ -916,25 +878,25 @@ void PL_Redraw()
       break;
     }
 */
-    if (TC[CurrentPL]>5)
+    if (AllLines[CurList]>5)
     {
-    if(CurrentTrack[CurrentPL]==1) {k=0; v3=0;}
-    else{ if(CurrentTrack[CurrentPL]==2) {k=1; v3=0;}
-    else{ if(CurrentTrack[CurrentPL]==TC[CurrentPL]-2) {k=3; v3=0;}
-    else{ if(CurrentTrack[CurrentPL]==TC[CurrentPL]-1) {k=4; v3=0;}
-    else{ if(CurrentTrack[CurrentPL]==TC[CurrentPL]) {k=5; v3=0;} else {k=2;}}}}}
+    if(CurLine[CurList]==1) {k=0; v3=0;}
+    else{ if(CurLine[CurList]==2) {k=1; v3=0;}
+    else{ if(CurLine[CurList]==AllLines[CurList]-2) {k=3; v3=0;}
+    else{ if(CurLine[CurList]==AllLines[CurList]-1) {k=4; v3=0;}
+    else{ if(CurLine[CurList]==AllLines[CurList]) {k=5; v3=0;} else {k=2;}}}}}
     }else{
-    if(CurrentTrack[CurrentPL]==1) {k=0; v3=0;}
-    else{ if(CurrentTrack[CurrentPL]==2) {k=1; v3=0;}
-    else{ if(CurrentTrack[CurrentPL]==3) {k=2; v3=0;}
-    else{ if(CurrentTrack[CurrentPL]==4) {k=3; v3=0;}
-    else{ if(CurrentTrack[CurrentPL]==5) {k=4; v3=0;}}}}}
+    if(CurLine[CurList]==1) {k=0; v3=0;}
+    else{ if(CurLine[CurList]==2) {k=1; v3=0;}
+    else{ if(CurLine[CurList]==3) {k=2; v3=0;}
+    else{ if(CurLine[CurList]==4) {k=3; v3=0;}
+    else{ if(CurLine[CurList]==5) {k=4; v3=0;}}}}}
     }
     
     for(int l=0;l<6;l++)
     {
-    i = CurrentTrack[CurrentPL]+l-k;
-    if(TC[CurrentPL]>l)
+    i = CurLine[CurList]+l-k;
+    if(AllLines[CurList]>l)
     {
       switch(SHOW_NAMES)
       {
@@ -955,10 +917,11 @@ void PL_Redraw()
         mfree(str);*/
         break;
       case 1:
-        utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
+        wstrcpy(out_ws,GetTrackByNumber(mass, i));
+       // utf8_2ws(out_ws,GetTrackByNumber(i),strlen(GetTrackByNumber(i)));
         break;
       case 2:
-        FullpathToFilename(GetTrackByNumber(i),out_ws);
+        FullpathToFilename(GetTrackByNumber(mass, i),out_ws);
         break;
       }
         /*
@@ -973,7 +936,7 @@ void PL_Redraw()
     if(k!=l)
     {
     // Делаем другой цвет для не текущего трека...
-    if (PlayedTrack[CurrentPL]==i)
+    if (MarkLine[CurList]==i)
     {
       DrawScrollString(out_ws,my_x,my_y+c+(p2-p3*v)*v3,w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
                    1,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
@@ -991,7 +954,7 @@ void PL_Redraw()
       
       p2=-p1*v1;
       
-    if (PlayedTrack[CurrentPL]==CurrentTrack[CurrentPL])
+    if (MarkLine[CurList]==CurLine[CurList])
     {
       if(GrafOn)
       {
@@ -1040,120 +1003,99 @@ void PL_Redraw()
   }
   // Плейлист
   WSHDR * pl_c = AllocWS(64);
-  wsprintf(pl_c,"%i/%i/%i;%i/%i",CurrentTrack[CurrentPL],TC[CurrentPL],CurrentPL+1,PlayedTrack[PlayedPL],PlayedPL+1);
-  DrawString(pl_c,NUMmy_x,NUMmy_y,NUMmy_x+w,NUMmy_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
+  wsprintf(pl_c,"%i/%i/%i;%i/%i",CurLine[CurList],AllLines[CurList],CurList+1,MarkLine[MarkList],MarkList+1);
+  DrawString(pl_c,NUMmy_x,NUMmy_y,w,NUMmy_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
   FreeWS(pl_c);
-  BandRoll();
+  BandRoll(CurLine[CurList], AllLines[CurList]);
 }
 
 // Полоса прокрутки   AAA
-void BandRoll()
+void BandRoll(int CurLine, int AllLines)
 {
-  if(TC[CurrentPL]>6)
+  if(AllLines>6)
   {
-    int yy=CurrentTrack[CurrentPL]*(BR2_y-BR1_y)/TC[CurrentPL];
+    int yy=CurLine*(BR2_y-BR1_y)/AllLines;
     DrawRoundedFrame(BR_x,BR1_y,BR_x+BR_w-1,BR2_y,0,0,0,0,color(COLOR_BANDROLL));
-    DrawRoundedFrame(BRC_x,BR1_y+yy-(BR2_y-BR1_y)/TC[CurrentPL],BRC_x+BRC_w-1,BR1_y+yy,0,0,0,0,color(COLOR_BANDROLL_C));
+    DrawRoundedFrame(BRC_x,BR1_y+yy-(BR2_y-BR1_y)/AllLines,BRC_x+BRC_w-1,BR1_y+yy,0,0,0,0,color(COLOR_BANDROLL_C));
   }
 }
-/*
-//Ищем файлы в папке   AAA
-void FindMusic(const char *dir, int i)
-{
- // int i;
-  DIR_ENTRY de;
-  unsigned int err;
-  char path[256];
-  memcpy(path,dir,strlen(dir)-1);
-  char *ptr=path+strlen(path)+1;
-  strcat(path,"\\*.mp3");
-  if (FindFirstFile(&de,path,&err))
-  {
-   // i=1;
-    do
-    {
-      strcpy(ptr,de.file_name);
-      if(isdir(path,&err))
-      {
-       // FindMusic(path,i);
-      }
-      else
-      {
-        
-        strncpy(playlist_lines[CurrentPL][i++],path,256);
-        //playlist_lines=realloc(playlist_lines,(i+1)*sizeof(p));
-       // playlist_lines[CurrentPL][i+1]=malloc(256);
-       // playlist_lines[CurrentPL][i++]=p;
-        
-      }
-    }
-    while(FindNextFile(&de,&err));
-  }
-  FindClose(&de,&err);
-  if(i>1) {TC[CurrentPL]=i-1;}
-  else {TC[CurrentPL]=0;}
-}*/
 
-//LoadDaemonList(" 4:\\Doc\\");
-int LoadDaemonList(const char* path) // Теперь я хотя бы понимаю почему нихуя не пашет   AAA
-{
- // ShowMSG(0,(int)path);
-  DIR_ENTRY de;
-  unsigned int err;
-  char name[256];
-  unsigned int i=1;
-  strcpy(name,path);
-  strcat(name,"*.mp3");
-  int count1=0;
-  if(FindFirstFile(&de,name,&err))
-  {
-    do
-    {
-      if (!(de.file_attr&FA_DIRECTORY))
-      {
-        //////////////////
-        // тута делаем что хотим с найдеными файлами
-        //////////////////
-       // strcpy(playlist_lines[CurrentPL][i++],path);
-       // strcat(playlist_lines[CurrentPL][i],de.file_name);
-       // sprintf(playlist_lines[CurrentPL][i++],"%s%s",path,de.file_name);
-       // ShowMSG(1,(int)playlist_lines[CurrentPL][i++]);
-       // char* p=malloc(256);
-      //  strcpy(p,path);
-      //  strcat(p,de.file_name);
-      //  playlist_lines[CurrentPL][i++]=p;
-       // mfree(p);
-        count1++;
-      }
-      else //если ето директория вызываем рекурсивно ето ф.
-      {
-        strcpy(name,path);
-        strcat(name,de.file_name);
-        strcat(name,"\\");
-        count1=count1+LoadDaemonList(name);
-      }
-    }
-    while(FindNextFile(&de,&err));
-  }
-  FindClose(&de,&err);
-  return count1;
-};
+void NULLchar(char* p) {for(unsigned int i=0; i<256; i++) {p[i]=0;}}
 
-void LoadingDaemonList(const char* path)
+// Загружаем пл!
+int LoadPlaylist(const char * fn)  // Переделал. Нет утечкам и глюкам!    AAA
 {
-  if(LoadDaemonList(path)>0)
+  FSTATS stat;
+  int f;
+  unsigned int ul;
+  unsigned int i=0;
+  unsigned int j=0;
+  unsigned int k=0;
+  int fsize;
+  char *pp=malloc(256);
+  NULLchar(pp);
+  char *p;
+ // int c;
+
+  if (GetFileStats(fn,&stat,&ul)==-1) return 0;
+  if ((fsize=stat.size)<=0) return 0;
+  if ((f=fopen(fn,A_ReadOnly+A_BIN,P_READ,&ul))==-1) return 0;
+
+  p=malloc(fsize+1);
+  fread(f,p,fsize,&ul);
+  fclose(f,&ul);
+  while(i<fsize)
   {
-    CTtoFirst();
-    PTtoFirst();
-    if(TC[CurrentPL]>0)
+    if(p[i]!=0x0D&&p[i+1]!=0x0A) {pp[j++]=p[i];}
+    else
     {
-      for(unsigned int i=0;i<TC[CurrentPL]+1;i++)
+      fix(pp);
+      if(pp[0]!='#')
       {
-        playlist_lines[CurrentPL][i]=0;
+        WSHDR* ppp=AllocWS(256);
+        utf8_2ws(ppp,pp,strlen(pp));
+        PastLine(ppp, 0);
+        FreeWS(ppp);
+        ppp=NULL;
+        k++;
       }
+      i++;
+      j=0;
+      NULLchar(pp);
     }
-    TC[CurrentPL] = LoadDaemonList(path);
-  } else {TC[CurrentPL]=0;}
+    i++;
+  }
+  mfree(p);
+  mfree(pp);
+  return k;
+}
+
+// Для загрузки пл из главного модуля
+void LoadingPlaylist(const char * fn)
+{
+  /*  if(TC[CurrentPL]>0)
+    {
+      MsgBoxYesNo(1,(int)"Заменить?",Change);
+      if(change)
+      {
+        CTtoFirst();
+        PTtoFirst();
+        while(TC[CurrentPL]>0)
+        {
+          DeleteLine();
+        }
+      }
+    }else{
+      CTtoFirst();
+    }*/
+  CTtoFirst();
+  PTtoFirst();
+  while(TC[CurrentPL]>0)
+        {
+          DeleteLine();
+        }
+  CTtoFirst();
+  LoadPlaylist(fn);
 }
 
 // Утечка памяти в самом деле достала...   AAA
@@ -1162,5 +1104,5 @@ void MemoryFree()
   GBS_DelTimer(&tmr_scroll);
   GBS_DelTimer(&tmr_displacement);
   GBS_DelTimer(&tmr_cursor_move);
- // FreePlaylist();
+  FreePlaylist();
 }
