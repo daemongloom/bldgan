@@ -100,7 +100,6 @@ KEY_PROC procmap[] = {
   NextTrackDown,
   NULL,
   CTDownSix,
-  FindingMusic,
   ToggleVolume,
   SwitchPlayModeDown,
 };
@@ -152,7 +151,6 @@ const PROC_MAP keyprocs[] = {
   {"stopall", StopAllPlayback},
   {"nexttrack", NextTrackDown},
   {"prevtrack", PrevTrackDown},
-  {"findmusic", FindingMusic},//FindMusic},        // Коля, горе луковое! Нельзя же так слюдьми...   AAA
   {"switchmode", SwitchPlayModeDown},
 };
 

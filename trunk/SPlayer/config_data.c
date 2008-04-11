@@ -16,26 +16,26 @@ __root const char DEFAULT_PLAYLIST1[128] = "0:\\Sounds\\Playlist2.m3u";
 __root const CFG_HDR cfghdr02={CFG_STR_UTF8,LG_Default_playlist_3,3,127};
 __root const char DEFAULT_PLAYLIST2[128] = "0:\\Sounds\\Playlist3.m3u";
 
-__root const CFG_HDR cfghdr03={CFG_STR_UTF8,LG_Music_folder,3,127};
-__root const char MUSIC[128] = DEFAULT_DISK ":\\Music\\";
-
-__root const CFG_HDR cfghdr04={CFG_COORDINATES,LG_Idle_coordinates,0,0};
+__root const CFG_HDR cfghdr03={CFG_COORDINATES,LG_Idle_coordinates,0,0};
 __root const unsigned int IDLE_X = 5;
 __root const unsigned int IDLE_Y = 120;
 
-__root const CFG_HDR cfghdr05 = {CFG_INT,LG_Auto_Exit_Min,0,2000};
+__root const CFG_HDR cfghdr04 = {CFG_INT,LG_Auto_Exit_Min,0,2000};
 __root const unsigned int AUTO_EXIT_MIN=30;
 
-__root const CFG_HDR cfghdr06 = {CFG_INT,LG_Speed_Moving,0,30};
+__root const CFG_HDR cfghdr05 = {CFG_INT,LG_Speed_Moving,0,30};
 #ifdef NEWSGOLD
 __root const unsigned int SCROLL_MULT=2;
 #else
 __root const unsigned int SCROLL_MULT=10;
 #endif
 
-__root const CFG_HDR cfghdr07={CFG_CBOX,LG_Show_Anim,0,2};
+__root const CFG_HDR cfghdr06={CFG_CBOX,LG_Show_Anim,0,2};
 __root const unsigned int GrafOn1 = 1;
 __root const CFG_CBOX_ITEM cfgcbox7[2]={LG_No,LG_Yes};
+
+__root const CFG_HDR cfghdr07={CFG_STR_UTF8,LG_Music_folder,3,127};
+__root const char MUSIC[128] = "0:\\Sounds\\";
 
 //Level 1
 __root const CFG_HDR cfghdr_m11={CFG_LEVEL,LG_Sets,1,0};

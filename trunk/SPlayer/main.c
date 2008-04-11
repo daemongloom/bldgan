@@ -130,7 +130,6 @@ char COLOR_PROG_MAIN_FRAME[4];             // Ободок
 //extern const char COLOR_TEXT[];
 //extern const char I_BACKGROUND[];
 extern const char PIC_DIR[];
-extern const char MUSIC[];
 extern const char PLAYLISTS[];
 extern const char DEFAULT_PLAYLIST[];
 extern const char DEFAULT_PLAYLIST1[];
@@ -145,11 +144,13 @@ extern const unsigned int AUTO_EXIT_MIN;  // Время до автозакрытия   AAA
 //--- настройки из конфига ---
 
 //--- Переменные ---
+extern WSHDR *playlist_lines[TCPL][256];
 extern short phandle;  // Для определения конца воспр.  AAA
 extern unsigned short PlayingStatus;
 extern int CurrentPL;
 extern int PlayedPL;
 extern unsigned int TC[TCPL];
+extern int CurrentTrack[TCPL];
 extern int PlayedTrack[TCPL];
 char Quit_Required = 0;     // Флаг необходимости завершить работу
 char list[256];
@@ -275,7 +276,7 @@ int findmp3length(char *playy) {
 
 }
 
-void PlayMP3File(const char * fname)
+void PlayMP3File(WSHDR * fname)
 {
 if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
 {
@@ -297,24 +298,26 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
     sh=time.hour;
     sm=time.min;
 
-    if (GetFileStats(fname,&fstats,&err)!=-1) // Проверка файла на существование
+    char * fnamech=malloc(256);
+    ws_2str(fname,fnamech,256);
+    if (GetFileStats(fnamech,&fstats,&err)!=-1) // Проверка файла на существование
     {
       PLAYFILE_OPT pfopt;
       WSHDR* sndPath=AllocWS(128);
       WSHDR* sndFName=AllocWS(128);
       char s[128];
       
-      const char *p=strrchr(fname,'\\')+1; 
+      const char *p=strrchr(fnamech,'\\')+1; 
       str_2ws(sndFName,p,128);
-      strncpy(s,fname,p-fname);
-      s[p-fname]='\0';
+      strncpy(s,fnamech,p-fnamech);
+      s[p-fnamech]='\0';
       str_2ws(sndPath,s,128);
       zeromem(&pfopt,sizeof(PLAYFILE_OPT));
       pfopt.repeat_num=1;
       pfopt.time_between_play=0;
       pfopt.play_first=0;
       pfopt.volume=GetVolLevel();
-      char *pp=strrchr(fname,':')-1;
+      char *pp=strrchr(fnamech,':')-1;
 #ifdef X75
       fs=findmp3length(pp);
       fm=(fs-(fs%60))/60;
@@ -379,6 +382,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       ToDevelop();}
       NextTrackX();
     }
+    mfree(fnamech);
   }
 }
 else
@@ -677,9 +681,12 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
 			COLOR_PROG_MAIN);
 #endif
   
-    PL_Redraw();
+    PL_Redraw(playlist_lines[CurrentPL],CurrentTrack,PlayedTrack,TC,CurrentPL,PlayedPL);
     TimeRedraw();
     
+    if(GetPlayingStatus()==2){
+    WSHDR * channel = AllocWS(64);
+    }
   }
 }
 
@@ -726,11 +733,6 @@ void LoadDefPlaylist() {
   CTtoFirst();
   PTtoFirst();
   LoadingPlaylist(DEFAULT_PLAYLIST);
-}
-
-void FindingMusic() {
- // FindMusic(MUSIC, 1);
-  LoadingDaemonList(MUSIC);
 }
 
 void PrevTrackDown() {
@@ -1262,7 +1264,7 @@ int main(char *exename, char *fname)
   SoundVolume = soundvolume;
   
   wl.wfilename=AllocWS(128);
-  Memory();
+ // Memory();
   // Если что-то передали в параметре - загружаем...
   if (fname)
   {

@@ -49,7 +49,7 @@ typedef struct
 
 typedef struct
 {
-  char*full_name; // Путь к файлу   AAA
+  WSHDR* full_name; // Путь к файлу   AAA
   char istagg[3]; // Слово "TAG"
   char title[30]; // Название
   char artist[30]; // Исполнитель
@@ -62,7 +62,7 @@ typedef struct
   int present; // Присутствует
 }ID3TAGDATA;
 
-int ReadID3v1(char*fname, ID3TAGDATA *tag); // Чтение ID3 v1
+int ReadID3v1(WSHDR* fnamews, ID3TAGDATA *tag); // Чтение ID3 v1
 
 
 #ifdef NEWSGOLD
@@ -75,7 +75,7 @@ int ReadID3v1(char*fname, ID3TAGDATA *tag); // Чтение ID3 v1
 
 void load_skin(char const* cfgname);
 
-void PlayMP3File(const char * fname);
+void PlayMP3File(WSHDR * fname);
 
 void SendNULL();    // Послать по окончании воспр.   AAA
 

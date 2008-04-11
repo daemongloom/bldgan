@@ -52,7 +52,7 @@ extern unsigned int TC[TCPL];
 void inp_locret(void){}
 ID3TAGDATA *MainTag;
 
-#define N_ITEMS 6
+#define N_ITEMS 7
 
 int MainMenu_ID;
 
@@ -132,6 +132,7 @@ static const char * const menutexts[N_ITEMS]=
 {
   LG_SetNextPlayed,
   LG_ShowID3,
+  LG_FM,
   LG_Sets_Menu,
   LG_Settings,
   LG_AboutDlg,
@@ -147,9 +148,12 @@ MENUITEM_DESC menuitems[N_ITEMS]=
   {0,(int)"Выход",LGP_NULL,0,NULL,MENU_FLAG3,MENU_FLAG2}
 };*/
 
+extern void ShowFM();
+
 void *menuprocs[N_ITEMS]={
                           (void *)SetNextPlayedOn,
                           (void *)ShowID3,
+                          (void *)ShowFM,
                           (void *)Sets_Menu,
                           (void *)Settings,
                           (void *)AboutDlg,
@@ -204,6 +208,9 @@ void menuitemhandler(void *data, int curitem, void *unk)
   case 5:
     SetMenuItemIconArray(data,item,S_ICONS+5);
     break;
+  case 6:
+    SetMenuItemIconArray(data,item,S_ICONS+6);
+    break;
   }
   SetMenuItemText(data, item, ws, curitem);
 }
@@ -239,7 +246,8 @@ static const MENU_DESC tmenu=
 
 //int S_ICONS[N_ITEMS];
 char setnexttrackpic[128];
-char showid3[128];
+char showid3pic[128];
+char fmpic[128];
 char setsmenupic[128];
 char settingspic[128];
 char aboutpic[128];
@@ -254,29 +262,34 @@ void MM_Show()
   S_ICONS[0] = (int)setnexttrackpic;
 
   // Картинка Атрибуты
-  strcpy(showid3,PIC_DIR);
-  strcat(showid3,"showid3.png");
-  S_ICONS[1] = (int)showid3;
+  strcpy(showid3pic,PIC_DIR);
+  strcat(showid3pic,"showid3.png");
+  S_ICONS[1] = (int)showid3pic;
 
+  // Картинка Файловый менеджер
+  strcpy(fmpic,PIC_DIR);
+  strcat(fmpic,"fm.png");
+  S_ICONS[2] = (int)fmpic;
+  
   // Картинка Коордиаты
   strcpy(setsmenupic,PIC_DIR);
   strcat(setsmenupic,"setsmenu.png");
-  S_ICONS[2] = (int)setsmenupic;
+  S_ICONS[3] = (int)setsmenupic;
 
   // Картинка Настройки
   strcpy(settingspic,PIC_DIR);
   strcat(settingspic,"settings.png");
-  S_ICONS[3] = (int)settingspic;
+  S_ICONS[4] = (int)settingspic;
 
   // Картинка Об эльфе...
   strcpy(aboutpic,PIC_DIR);
   strcat(aboutpic,"about.png");
-  S_ICONS[4] = (int)aboutpic;
+  S_ICONS[5] = (int)aboutpic;
 
   // Картинка Выход
   strcpy(exitpic,PIC_DIR);
   strcat(exitpic,"exit.png");
-  S_ICONS[5] = (int)exitpic;
+  S_ICONS[6] = (int)exitpic;
 
 #else
   S_ICONS[0] = 0;
