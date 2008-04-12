@@ -6,3 +6,5 @@
 #define IPC_STOP            3
 #define IPC_NEXT_TRACK      4
 #define IPC_PREV_TRACK      5
+#define IPC_SPLAYER_STARTED 0xF
+#define IPC_SPLAYER_CLOSED  0x0
