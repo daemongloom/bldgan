@@ -574,8 +574,10 @@ void FreePlaylist(void)
         playlist_lines[i][j]=NULL;
       }
     }*/
-  for(unsigned int i=0; i<5; i++) {
-  while(TC[i]>0)
+  for(unsigned int i=0; i<TCPL; i++) {
+    if(CurrentPL<TCPL) {CurrentPL++;}
+    else {CurrentPL=0;}
+  while(TC[CurrentPL]>0)
         {
           DeleteLine();
         }}
@@ -1094,7 +1096,6 @@ void LoadingPlaylist(const char * fn)
         {
           DeleteLine();
         }
-  CTtoFirst();
   LoadPlaylist(fn);
 }
 
