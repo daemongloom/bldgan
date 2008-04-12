@@ -575,12 +575,13 @@ void FreePlaylist(void)
       }
     }*/
   for(unsigned int i=0; i<TCPL; i++) {
-    if(CurrentPL<TCPL) {CurrentPL++;}
-    else {CurrentPL=0;}
   while(TC[CurrentPL]>0)
         {
           DeleteLine();
-        }}
+        }
+    if(CurrentPL<TCPL-1) {CurrentPL++;}
+    else {CurrentPL=0;}
+  }
 }
 
 
