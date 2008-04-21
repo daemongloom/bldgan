@@ -69,7 +69,6 @@ type
     N23: TMenuItem;
     N24: TMenuItem;
     N25: TMenuItem;
-    SpeedButton8: TSpeedButton;
     SpeedButton9: TSpeedButton;
     TrackBar1: TTrackBar;
     SaveDialog2: TSaveDialog;
@@ -78,12 +77,10 @@ type
     N27: TMenuItem;
     N28: TMenuItem;
     N29: TMenuItem;
-    SpeedButton10: TSpeedButton;
     InsertStol: TColorButton;
     InsertDivan: TColorButton;
     InsertStul: TColorButton;
     InsertShkaf: TColorButton;
-    SpeedButton11: TSpeedButton;
     N30: TMenuItem;
     N32: TMenuItem;
     N33: TMenuItem;
@@ -103,6 +100,11 @@ type
     N37: TMenuItem;
     ClearButton: TColorButton;
     DirtyButton: TColorButton;
+    RadioGroup1: TRadioGroup;
+    AutoMode: TRadioButton;
+    RadioButton2: TRadioButton;
+    SpeedButton8: TSpeedButton;
+    SpeedButton10: TSpeedButton;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -440,10 +442,6 @@ begin
    SaveDialog3.InitialDir := ExtractFilePath(Application.ExeName);
    OpenDialog3.InitialDir := ExtractFilePath(Application.ExeName);
 
-   // Закроем кнопки
-   SpeedButton8.Enabled := false;
-   SpeedButton10.Enabled := false;
-   SpeedButton11.Enabled := false;
    // Создадим новую программу  
    BackupListBox.Clear;
    ListBox1.Clear;
@@ -983,9 +981,7 @@ begin
   speedbutton5.Enabled:=state;
   speedbutton6.Enabled:=state;
   speedbutton7.Enabled:=state;
-  speedbutton8.Enabled:=state;
   speedbutton9.Enabled:=state;
-  speedbutton11.Enabled:=state;
 end;
 
 procedure TForm1.SpeedButton8Click(Sender: TObject);
@@ -993,20 +989,29 @@ var k: integer;
 begin
   if pylsc=0 then ShowMessage('А вы ничего не забыли? Пылесос например...')     // если пылесос не был добавлен, то делать ничего не надо
   else begin
-  k := 1;
-  backup_pylpos := pylpos;
-  backup_field := field;
-  execute := true;
-  SetButtonsState(false);
-  SpeedButton10.Enabled:=true;
-  while (k<ListBox1.Items.Count) and execute do begin
-     DoComand(ListBox1.Items.Strings[k],k);
-     Inc(k);
-     Application.ProcessMessages;
+  if AutoMode.Checked then begin
+     if execute then begin
+        execute := false;
+        SpeedButton8.Caption := 'Продолжить';
+        SpeedButton10.Enabled := true;
+     end else begin
+        SpeedButton8.Caption := 'Стоп';
+        SpeedButton10.Enabled := false;
+        k := 1;
+        backup_pylpos := pylpos;
+        backup_field := field;
+        execute := true;
+        SetButtonsState(false);
+        while (k<ListBox1.Items.Count) and execute do begin
+           DoComand(ListBox1.Items.Strings[k],k);
+           Inc(k);
+           Application.ProcessMessages;
+        end;
+        k:=1;
+        SetButtonsState(true);
+        execute:=false;
+     end;
   end;
-  k:=1;
-  SetButtonsState(true);
-  execute:=false;
   end;
 end;
 
@@ -1249,11 +1254,13 @@ end;
 procedure TForm1.SpeedButton10Click(Sender: TObject);
 begin
    SetButtonsState(true);
-   if execute then execute:=false else begin
+   if AutoMode.Checked then begin
       pylpos := backup_pylpos;
       field := backup_field;
+      SpeedButton8.Caption := 'Пуск';
+      ListBox1.ItemIndex := 1;
       DrawField;
-   end;
+   end;   
 end;
 
 // Пошаговое выполнение
