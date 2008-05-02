@@ -52,7 +52,6 @@ object Form1: TForm1
     Width = 403
     Height = 586
     Align = alRight
-    Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072
     Enabled = False
     TabOrder = 1
     object SpeedButton1: TSpeedButton
@@ -144,6 +143,7 @@ object Form1: TForm1
       Width = 73
       Height = 22
       Caption = #1057#1073#1088#1086#1089
+      Enabled = False
       OnClick = SpeedButton10Click
     end
     object ListBox1: TListBox
@@ -177,6 +177,7 @@ object Form1: TForm1
       Checked = True
       TabOrder = 2
       TabStop = True
+      OnClick = AutoModeClick
     end
     object RadioButton2: TRadioButton
       Left = 16
@@ -185,6 +186,7 @@ object Form1: TForm1
       Height = 17
       Caption = #1055#1086#1096#1072#1075#1086#1074#1099#1081' '#1088#1077#1078#1080#1084
       TabOrder = 3
+      OnClick = RadioButton2Click
     end
   end
   object GroupBox2: TGroupBox
@@ -193,7 +195,6 @@ object Form1: TForm1
     Width = 409
     Height = 73
     Align = alCustom
-    Caption = #1069#1083#1077#1084#1077#1085#1090#1099
     TabOrder = 2
     object InsertPyls: TSpeedButton
       Left = 8
