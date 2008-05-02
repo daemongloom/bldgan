@@ -14,7 +14,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
   StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit,
-  NewPrgUnit, ShellAPI, ColorButton, Spin, Dialogs;
+  NewPrgUnit, ShellAPI, ColorButton, Dialogs, uColorButton, Spin;
 
 type
   TForm1 = class(TForm)
@@ -157,6 +157,8 @@ type
     procedure N34Click(Sender: TObject);
     procedure CodePopupMenu1Popup(Sender: TObject);
     procedure N37Click(Sender: TObject);
+    procedure RadioButton2Click(Sender: TObject);
+    procedure AutoModeClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -990,6 +992,7 @@ begin
   if pylsc=0 then ShowMessage('А вы ничего не забыли? Пылесос например...')     // если пылесос не был добавлен, то делать ничего не надо
   else begin
   if AutoMode.Checked then begin
+  // Автоматический режим
      if execute then begin
         execute := false;
         SpeedButton8.Caption := 'Продолжить';
@@ -1008,9 +1011,20 @@ begin
            Application.ProcessMessages;
         end;
         k:=1;
+        SpeedButton8.Caption := 'Пуск';
+        SpeedButton10.Enabled := true;
         SetButtonsState(true);
         execute:=false;
      end;
+  end else begin
+  // Пошаговый режим
+     SpeedButton10.Enabled := true;
+     k:=ListBox1.ItemIndex;
+     execute:=true;
+     DoComand(ListBox1.Items.Strings[k],k);
+     execute:=false;
+     Inc(k);
+     ListBox1.ItemIndex := k;
   end;
   end;
 end;
@@ -1254,25 +1268,28 @@ end;
 procedure TForm1.SpeedButton10Click(Sender: TObject);
 begin
    SetButtonsState(true);
-   if AutoMode.Checked then begin
-      pylpos := backup_pylpos;
-      field := backup_field;
+   pylpos := backup_pylpos;
+   field := backup_field;
+   ListBox1.ItemIndex := 1;
+   DrawField;
+   if AutoMode.Checked then
       SpeedButton8.Caption := 'Пуск';
-      ListBox1.ItemIndex := 1;
-      DrawField;
-   end;   
 end;
 
-// Пошаговое выполнение
+// Сброс на выполнение сначала
 procedure TForm1.SpeedButton11Click(Sender: TObject);
 var k: integer;
 begin
-   k:=ListBox1.ItemIndex;
+{   k:=ListBox1.ItemIndex;
    execute:=true;
    DoComand(ListBox1.Items.Strings[k],k);
    execute:=false;
    Inc(k);
-   ListBox1.ItemIndex := k;
+   ListBox1.ItemIndex := k;}
+   pylpos := backup_pylpos;
+   field := backup_field;
+   ListBox1.ItemIndex := 1;
+   DrawField;
 end;
 
 // Сохранение проекта
@@ -1432,6 +1449,21 @@ begin
             Inc(i);
          end;   
       end;
+end;
+
+procedure TForm1.RadioButton2Click(Sender: TObject);
+begin
+   SpeedButton8.Caption := 'Шаг';
+   SpeedButton10.Enabled := false;
+   ListBox1.ItemIndex := 1;
+   backup_pylpos := pylpos;
+   backup_field := field;
+end;
+
+procedure TForm1.AutoModeClick(Sender: TObject);
+begin
+   SpeedButton8.Caption := 'Пуск';
+   SpeedButton10.Enabled := false;
 end;
 
 end.
