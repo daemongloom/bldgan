@@ -174,6 +174,7 @@ type
     procedure WhileHandler(var k: integer);
     procedure SetButtonsState(state:boolean);
     function GetSpaces(k: integer): string;
+    function GetSpacesCount(s: string): integer;
   end;
 
 var
@@ -235,7 +236,10 @@ var asize: integer = 24;              // Размер клетки в пикселах
     pylpos, backup_pylpos: TPylsPos;  // Положение пылесоса на поле
     startpoint, finpoint: TPoint;
     execute: boolean;                 // Выполняется ли программа
-    ifstart: boolean;                 // Для расстановки мебели 
+    ifstart: boolean;                 // Для расстановки мебели
+    repeatneed: integer;              // Сколько надо повторений
+    inrepeat: boolean;                // Внутри цикла повтори Н
+    repeatend: integer;               // КОНЕЦ ПОВТОРИ для текущего цикла 
 
 // Выдает значение логического выражения для конструкций ЕСЛИ и ПОКА 
 function ExpressionResult(exp: string): boolean;
@@ -951,6 +955,8 @@ begin
 end;
 
 procedure TForm1.DoComand(str: string; var k: integer);
+var s: string;
+    sc: integer;
 begin
    if not execute then exit;
    ListBox1.ItemIndex := k;
@@ -962,7 +968,39 @@ begin
       if (pos('ПЫЛЕСОСИТЬ',str)>0) then Clean(false);
    if (pos('ИНАЧЕ',str)>0) then ElseHandler(k);
    if (pos('ЕСЛИ',str)>0) and (pos('КОНЕЦ',str)<=0) then ifHandler(k);
-   if (pos('ПОВТОРИ',str)>0) and (pos('КОНЕЦ',str)<=0) then RepeatN(k);
+   if (pos('ПОВТОРИ',str)>0) and (pos('КОНЕЦ',str)<=0) then begin
+      if inrepeat then begin
+         Dec(repeatneed);
+      end else begin
+         str := ListBox1.Items.Strings[k];
+         Delete(str,1,pos('ПОВТОРИ',str)+7);
+         repeatneed := StrToInt(str); // Столько повторять
+         inrepeat:=true;
+      end;
+      if repeatneed>0 then begin
+         k:=k+1;
+         str := ListBox1.Items.Strings[k];
+         DoComand(str,k);
+      end else begin
+         k := repeatend+1;
+         str := ListBox1.Items.Strings[k];
+         DoComand(str,k);
+      end;
+   end;
+   if (pos('КОНЕЦ ПОВТОРИ',str)>0) then begin
+      repeatend := k;
+      sc:=GetSpacesCount(str);
+      s:='';
+      while sc>0 do begin
+         s:=s+' ';
+         Dec(sc);
+      end;
+      s:=s+'ПОВТОРИ';
+      Dec(k);
+      while pos(s,ListBox1.Items.Strings[k])<>1 do Dec(k);
+      str := ListBox1.Items.Strings[k];
+      DoComand(str,k);
+   end;
    if (pos('ПОКА',str)>0) and (pos('КОНЕЦ',str)<=0) then WhileHandler(k);
 end;          
 
@@ -1141,9 +1179,11 @@ var i: integer;
 begin
    str := ListBox1.Items.Strings[k];
    Delete(str,1,pos('ПОВТОРИ',str)+7);
+   repeatneed := StrToInt(str); // Столько повторять
    n := StrToInt(str);
-   i := 1;
-   // Сформируем список команд в цикле
+   Inc(k);
+   ListBox1.ItemIndex := k;
+{   // Сформируем список команд в цикле
    cmds := TStringList.Create;
    Inc(k);
    tk:=k;
@@ -1160,7 +1200,7 @@ begin
       end;
       Inc(i);
    end;
-   cmds.Destroy;
+   cmds.Destroy;}
 end;
 
 {Обработчики ИНАЧЕ и ЕСЛИ}
@@ -1271,6 +1311,9 @@ begin
    pylpos := backup_pylpos;
    field := backup_field;
    ListBox1.ItemIndex := 1;
+   // Готовим цикл repeat
+   repeatneed := 0;
+   inrepeat := false;
    DrawField;
    if AutoMode.Checked then
       SpeedButton8.Caption := 'Пуск';
@@ -1464,6 +1507,16 @@ procedure TForm1.AutoModeClick(Sender: TObject);
 begin
    SpeedButton8.Caption := 'Пуск';
    SpeedButton10.Enabled := false;
+end;
+
+{Возвращает кол-во лидирующих пробелов}
+function TForm1.GetSpacesCount(s: string): integer;
+begin
+   Result := 0;
+   while s[1]=' ' do begin
+      Inc(Result);
+      Delete(s,1,1);
+   end
 end;
 
 end.
