@@ -4,7 +4,7 @@
 {=  Главный модуль программы                   =}
 {= Авторы: Николай Трубинов                    =}
 {=         Николай Козаченко                   =}
-{= Дата: 2008.03.11                            =}
+{= Дата: 2008.05.16                            =}
 {===============================================}
 
 unit Unit1;
@@ -14,7 +14,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
   StdCtrls, ExtCtrls, ComCtrls, Menus, Buttons, XPMan, AboutUnit,
-  NewPrgUnit, ShellAPI, ColorButton, Dialogs, uColorButton, Spin;
+  NewPrgUnit, ShellAPI, Dialogs, Spin, ColorButton;
 
 type
   TForm1 = class(TForm)
@@ -237,9 +237,13 @@ var asize: integer = 24;              // Размер клетки в пикселах
     startpoint, finpoint: TPoint;
     execute: boolean;                 // Выполняется ли программа
     ifstart: boolean;                 // Для расстановки мебели
+    // Цикл Повтори
     repeatneed: integer;              // Сколько надо повторений
     inrepeat: boolean;                // Внутри цикла повтори Н
-    repeatend: integer;               // КОНЕЦ ПОВТОРИ для текущего цикла 
+    repeatend: integer;               // КОНЕЦ ПОВТОРИ для текущего цикла
+    // Цикл Пока
+    inwhile: boolean;                 // Находимся ли внутри цикла Пока
+    whileend: integer;                // КОНЕЦ ПОКА для текущего цикла
 
 // Выдает значение логического выражения для конструкций ЕСЛИ и ПОКА 
 function ExpressionResult(exp: string): boolean;
@@ -956,6 +960,7 @@ end;
 
 procedure TForm1.DoComand(str: string; var k: integer);
 var s: string;
+    usl: string;
     sc: integer;
 begin
    if not execute then exit;
@@ -968,6 +973,7 @@ begin
       if (pos('ПЫЛЕСОСИТЬ',str)>0) then Clean(false);
    if (pos('ИНАЧЕ',str)>0) then ElseHandler(k);
    if (pos('ЕСЛИ',str)>0) and (pos('КОНЕЦ',str)<=0) then ifHandler(k);
+   // Цикл ПОВТОРИ
    if (pos('ПОВТОРИ',str)>0) and (pos('КОНЕЦ',str)<=0) then begin
       if inrepeat then begin
          Dec(repeatneed);
@@ -1001,8 +1007,45 @@ begin
       str := ListBox1.Items.Strings[k];
       DoComand(str,k);
    end;
-   if (pos('ПОКА',str)>0) and (pos('КОНЕЦ',str)<=0) then WhileHandler(k);
-end;          
+   // Цикл ПОКА
+   if (pos('ПОКА',str)>0) and (pos('КОНЕЦ',str)<=0) then begin
+      // выделим условие
+      usl := ListBox1.Items.Strings[k];
+      Delete(usl,1,pos('ПОКА',usl)+4);
+      Delete(usl,length(usl)-5,6);
+      if ExpressionResult(usl) then begin
+         Inc(k);
+         str := ListBox1.Items.Strings[k];
+         DoComand(str,k);
+      end else begin
+         // Найдем конец
+         sc:=GetSpacesCount(str);
+         s:='';
+         while sc>0 do begin
+            s:=s+' ';
+            Dec(sc);
+         end;
+         s:=s+'КОНЕЦ ПОКА';
+         while pos(s,ListBox1.Items.Strings[k])<>1 do Inc(k);
+         Inc(k);
+         str := ListBox1.Items.Strings[k];
+         DoComand(str,k);
+      end;   
+   end;
+   if (pos('КОНЕЦ ПОКА',str)>0) then begin
+      sc:=GetSpacesCount(str);
+      s:='';
+      while sc>0 do begin
+         s:=s+' ';
+         Dec(sc);
+      end;
+      s:=s+'ПОКА';
+      Dec(k);
+      while pos(s,ListBox1.Items.Strings[k])<>1 do Dec(k);
+      str := ListBox1.Items.Strings[k];
+      DoComand(str,k);
+   end;
+end;
 
 procedure TForm1.SetButtonsState(state:boolean);
 begin
