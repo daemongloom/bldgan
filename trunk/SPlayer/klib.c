@@ -78,6 +78,7 @@ int EnumIni(int local, char *ininame, INIPROC proc)
      fclose(f,&err);
      res=1;
   }
+  else {ShowMSG(1,(int)"spkeys error!");}
   if(name)mfree(name);
   if(value)mfree(value);
   return res;

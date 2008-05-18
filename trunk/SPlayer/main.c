@@ -62,12 +62,12 @@ extern unsigned short stop; // 1, если останавливаем листание   AAA
 unsigned short copy=0; // 1, если копируем   AAA
 unsigned short move=0; // 1, если перемещаем   AAA
 unsigned short EditPL=0; // 1, если редактируем   AAA
-int mode; // 1, если длинное нажатие боковой клавиши
-int KeyLock; // 1, если заблокирована;
-short Stat_keypressed = 0; // нажата ли клавиша изменения статуса?
-short Mode_keypressed = 0; // нажата ли клавиша изменения режима проигрывания?
-short N_keypressed = 0;
-short P_keypressed = 0;
+unsigned short mode=0; // 1, если длинное нажатие боковой клавиши
+unsigned short KeyLock=0; // 1, если заблокирована;
+unsigned short Stat_keypressed = 0; // нажата ли клавиша изменения статуса?
+unsigned short Mode_keypressed = 0; // нажата ли клавиша изменения режима проигрывания?
+unsigned short N_keypressed = 0;
+unsigned short P_keypressed = 0;
 
 unsigned short w;
 
@@ -156,7 +156,7 @@ char Quit_Required = 0;     // Флаг необходимости завершить работу
 char list[256];
 char sfname[256];
 extern unsigned short SoundVolume;
-int playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
+unsigned short playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
 GBSTMR offtm;     // Таймер автоотключения   AAA
 
 // Переписываем время... DemonGloom
@@ -495,8 +495,8 @@ void load_skin(char const* cfgname)              // Извращенец... Такое создать.
           COLOR_PROG_MAIN_FRAME[2]=data[49];
           COLOR_PROG_MAIN_FRAME[3]=data[50];
         }
-        mfree(data);
       }
+    mfree(data);
     fclose(handle,&err);
   }
 }
@@ -683,10 +683,6 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   
     PL_Redraw(playlist_lines[CurrentPL],CurrentTrack,PlayedTrack,TC,CurrentPL,PlayedPL);
     TimeRedraw();
-    
-    if(GetPlayingStatus()==2){
-    WSHDR * channel = AllocWS(64);
-    }
   }
 }
 
@@ -770,8 +766,8 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
      return 0;
      }
   else{
-    if(EditPL==0)         //  Mr. Anderstand: самому не оч нравится такой вариант...
-  {
+if(EditPL==0)         //  Mr. Anderstand: самому не оч нравится такой вариант...
+{
   if (msg->gbsmsg->msg==KEY_UP) {
      stop=1;              //  Mr. Anderstand: а это??
      Stat_keypressed = 0;
@@ -821,12 +817,13 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
   
       break;
       case '*':
-        if (mode==0) {EditPL=!(EditPL); mode=1;}
+        EditPL=1;
+        ToggleVolume();
       break;
     }
     REDRAW();
   }
-  }else{
+}else{
     
   if (msg->gbsmsg->msg==KEY_UP)
   {
@@ -837,9 +834,6 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       break;
     case DOWN_BUTTON:
       if(move==0) {stop=1;}
-      break;
-    case '*':
-      EditPL=!(EditPL);
       break;
     }
     REDRAW();
@@ -893,6 +887,9 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
       break;
     case '8':
       if(move==0) {CTDownSix();}
+      break;
+    case '*':
+      EditPL=0;
       break;
     }
     REDRAW();

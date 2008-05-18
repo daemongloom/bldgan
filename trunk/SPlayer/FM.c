@@ -324,8 +324,4 @@ static const RECT Canvas={0,0,0,0};
   main_gui->gui.item_ll.data_mfree=(void (*)(void *))mfree_adr();
   
   CreateGUI(main_gui);
-    for(unsigned int j=0;j<256;j++)
-    {
-      Files[j]=AllocWS(256);
-    }
 }
