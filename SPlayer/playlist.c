@@ -50,12 +50,12 @@ unsigned short BRC_w;  //=2;
 
 // Всякие "мелкие" переменные
 extern unsigned short w;
-extern int playmode;
+extern unsigned int playmode;
 extern unsigned short copy;
 extern const unsigned int GrafOn; // 1,если включены эффекты типа скролла   AAA
 extern const unsigned int GrafOn1; // 1,если включена анимация   AAA
 unsigned short stop=1; // 1, если останавливаем листание   AAA
-extern short Stat_keypressed;
+extern unsigned short Stat_keypressed;
 // Всякие "мелкие" переменные
 
 extern unsigned int MAINGUI_ID;
