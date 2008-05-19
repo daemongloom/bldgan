@@ -126,20 +126,17 @@ WSHDR * GetCurrentTrack();
 // Возвращется играющий трек по номеру в пл
 WSHDR * GetPlayedTrack();
 
+// Чистим массив   AAA
+void NULLchar(char* p, unsigned int imax);
+
 // Перерисовка
-void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, unsigned int* AllLines, int CurList, int MarkList);
+void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsigned int* AllLines, int CurList, int MarkList);
 
 // Полоса прокрутки   AAA
 void BandRoll(int CurLine, int AllLines);
 
-//Ищем файлы в папке   AAA
-//void FindMusic(const char *dir, int i);
-
 // Для загрузки пл из главного модуля
 void LoadingPlaylist(const char * fn);
-
-// Грузим файлы из папки. Респект
-void LoadingDaemonList(const char* path);
 
 // Утечка памяти в самом деле достала...   AAA
 void MemoryFree();

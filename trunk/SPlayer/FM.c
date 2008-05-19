@@ -2,7 +2,7 @@
 #include "main.h"
 #include "FM.h"
 #include "lang.h"
-//#include "playlist.h"
+#include "playlist.h"
 
 
 typedef struct
@@ -30,14 +30,13 @@ WSHDR* Files[256];   // Массив путей к файлам/папкам   AAA
 extern const char PIC_DIR[];
 extern const char MUSIC[];
 extern char COLOR_BG[4];
+extern const int SHOW_NAMES;
 int MarkLines[256];  // Массив-маркер для выделения файлов   AAA
 int CurFile=1;       // Текущий элемент   AAA
 unsigned int TCFM=0; // Количество элементов   AAA
+char nowpath[128];
+extern unsigned short ShowNamesNoConst;
 //////////////////////////Переменные//////////////////////////////
-void DisableScroll(void);
-extern void fix(char* p);
-extern void PastLine(WSHDR *p, unsigned short i);
-extern void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, unsigned int* AllLines, int CurList, int MarkList);
 
 void PastFile(WSHDR *p, unsigned short i)
 {
@@ -59,76 +58,53 @@ void DeleteFiles()
   }
 }
 
-/*
-//Ищем файлы в папке   AAA
-void FindMusic(const char *dir)
-{
-  DIR_ENTRY de;
-  unsigned int err;
-  char path[256];
-  strcpy(path,dir);
-  char *ptr=path+strlen(path)+1;
-  strcat(path,"\\*.mp3");
-  if (FindFirstFile(&de,path,&err))
-  {
-    do
-    {
-      strcpy(ptr,de.file_name);
-      if(isdir(path,&err))
-      {
-       // FindMusic(path,i);
-      }
-      else
-      {
-        
-      }
-    }
-    while(FindNextFile(&de,&err));
-  }
-  FindClose(&de,&err);
-}*/
 //LoadDaemonList(" 4:\\Doc\\");
-int LoadDaemonList(const char* path) // Теперь пашет частично   AAA
+void LoadDaemonList(const char* path, unsigned int re, unsigned int toPL) // Теперь пашет частично   AAA
 {
  // ShowMSG(0,(int)path);
+  NULLmass(MarkLines, TCFM);
+  if(toPL==0) {strcpy(nowpath, path);}
   DIR_ENTRY de;
   unsigned int err;
   char name[256];
   strcpy(name,path);
-  strcat(name,"*.mp3");
-  int count1=0;
+  strcat(name,"*");
   if(FindFirstFile(&de,name,&err))
   {
     do
     {
       char* p1=malloc(256);
       WSHDR* p=AllocWS(256);
+      strcpy(name,path);
+      strcat(name,de.file_name);
       
-      
-      
-      if (de.file_attr&FA_DIRECTORY) //если ето директория вызываем рекурсивно ето ф.
+      if (!isdir(name, &err))//(de.file_attr&FA_DIRECTORY)
       {
-      /*  strcpy(name,path);           // Рекурсия. чего то не пашет, но пока и не нужно   AAA
-        strcat(name,de.file_name);
-        strcat(name,"\\");
-        count1=count1+LoadDaemonList(name);*/
-        
-        strcpy(p1,path);
-        strcat(p1,de.file_name);
-        strcat(p1,"\\");
-        fix(p1);
-        ShowMSG(0,(int)path);
-        utf8_2ws(p,p1,256);
-        PastFile(p, 0);
+        int a=de.file_name[strlen(de.file_name)-3];
+        int b=de.file_name[strlen(de.file_name)-2];
+        int c=de.file_name[strlen(de.file_name)-1];
+        if(((a=='m'||a=='M')&&(b=='p'||b=='P')&&c=='3')||
+           ((a=='w'||a=='W')&&(b=='a'||b=='A')&&(c=='v'||c=='V'))||
+            ((a=='a'||a=='A')&&(b=='a'||b=='A')&&(c=='c'||c=='C'))||
+             ((a=='m'||a=='M')&&(b=='i'||b=='I')&&(c=='d'||c=='D')))   // Перерываем форматы   AAA
+        {
+          strcpy(p1,name);
+          fix(p1);
+          utf8_2ws(p,p1,256);
+          if(toPL==0) {PastFile(p, 0);}
+          else {PastLine(p, 0);}
+        }
       }
       else
       {
-        strcpy(p1,path);
-        strcat(p1,de.file_name);
-        fix(p1);
-        utf8_2ws(p,p1,256);
-        PastFile(p, 0);
-        count1++;
+        if(re==1) {strcat(name,"\\"); LoadDaemonList(name, re, toPL);}
+        else{
+          strcpy(p1,name);
+          strcat(p1,"\\");
+          fix(p1);
+          utf8_2ws(p,p1,256);
+          PastFile(p, 0);
+        }
       }
       FreeWS(p);
       mfree(p1);
@@ -136,10 +112,9 @@ int LoadDaemonList(const char* path) // Теперь пашет частично   AAA
     while(FindNextFile(&de,&err));
   }
   FindClose(&de,&err);
-  return count1;
-};
+}
 
-void LoadingDaemonList(const char* path)
+void LoadingDaemonList(const char* path, unsigned int re, unsigned int toPL)
 {
   /*  if(TC[CurrentPL]>0)
     {
@@ -157,25 +132,54 @@ void LoadingDaemonList(const char* path)
       CTtoFirst();
     }*/
   DeleteFiles();  // Перед загрузкой все стираем   AAA
-  LoadDaemonList(path);
+  LoadDaemonList(path, re, toPL);
 }
 
-void NULLmass(int* mass, unsigned int end) {for(unsigned int i=0; i<end; i++) {mass[i]=0;}}   // Обнуляем массив-маркер   AAA
+void NULLmass(int* mass, unsigned int end) {for(unsigned int i=0; i<end+1; i++) {mass[i]=0;}}   // Обнуляем массив-маркер   AAA
 
 void CopyFName(WSHDR** mlines, int* mark, unsigned int imax)   // Копируем пути к файлам в пл   AAA
 {
-  for(unsigned int i=0; i<imax; i++)
+  unsigned int err;
+  char path[256];
+  for(unsigned int i=0; i<imax+1; i++)
   {
-    if(mark[i]) {PastLine(mlines[i], 0);}
+    if(mark[i])
+    {
+      ws_2str(mlines[i],path,256);
+      if(isdir(path,&err))
+      {
+        LoadDaemonList(path, 1, 1);
+      }else{
+        PastLine(mlines[i], 0);
+      }
+    }
   }
   NULLmass(mark, imax);
 }
 
-
-
-
-
-
+void GO()
+{
+char pn[128];
+WSHDR* ws=AllocWS(256);
+if(strlen(nowpath)>3)
+{
+  nowpath[strlen(nowpath)-1]=0;
+  const char *p=strrchr(nowpath,'\\')+1;
+  strncpy(pn,nowpath,p-nowpath);
+  pn[p-nowpath]='\0';
+  LoadingDaemonList(pn, 0, 0);
+}else{
+  NULLchar(nowpath, 128);
+  NULLmass(MarkLines, TCFM);
+  DeleteFiles();
+  for(unsigned short i=0; i<5; i++)
+  {
+    if(i!=3){
+      wsprintf(ws, "%d:\\", i);
+      PastFile(ws, 0);
+    }}}
+FreeWS(ws);
+}
 
 static void OnRedraw(SHOW_FM_GUI *data)
 {
@@ -188,8 +192,9 @@ static void OnRedraw(SHOW_FM_GUI *data)
     DrawImg(0,0,(int)sfname1);  // Рисуем фон
     #else
     #endif
-    
-    PL_Redraw(Files ,&CurFile, MarkLines, &TCFM, 0, 0);  // MarkLines тут не совсем подходит... Надо будет подкорректировать...   AAA
+    if(strlen(nowpath)) {ShowNamesNoConst=SHOW_NAMES;}
+    else {ShowNamesNoConst=1;}
+    PL_Redraw(Files ,&CurFile, 0, MarkLines, &TCFM, 0, 0);  // MarkLines тут не совсем подходит... Надо будет подкорректировать...   AAA
     
   }
 }
@@ -198,7 +203,6 @@ void FreeMemFM();
 
 static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//горячо любимый онкей
 {
-  FSTATS fstats;
   unsigned int err;
   char* p=malloc(256);
  int sh=msg->gbsmsg->msg;
@@ -207,32 +211,41 @@ static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//горячо любимый онкей
    case KEY_DOWN:
     switch(msg->gbsmsg->submess)
     {
-    case RIGHT_SOFT:
+    case LEFT_SOFT:
       FreeMemFM();
       return (1);
-    case LEFT_SOFT:
-      LoadingDaemonList(MUSIC);
-      break;
-    case RED_BUTTON:
-      
+    case RIGHT_SOFT:
+      if(strlen(nowpath))
+      {
+        GO();
+        }else{
+      FreeMemFM();
+      return (1);
+      }
       break;
     case GREEN_BUTTON:
+      CTtoFirst();
       CopyFName(Files, MarkLines, TCFM);
       break;
     case ENTER_BUTTON:
+      if(TCFM>0){
       ws_2str(Files[CurFile], p, 256);
-      if (GetFileStats(p,&fstats,&err)!=-1) // Проверка файла на существование
+      if(strlen(nowpath)){
+      if (isdir(p, &err)) // Проверка папка или нет AAA
       {
-        PlayMP3File(Files[CurFile]);
+        LoadingDaemonList(p, 0, 0);
       }else{
-        LoadingDaemonList(p);
-      }
+        StopAllPlayback();
+        PlayMP3File(Files[CurFile]);
+      }}else{LoadingDaemonList(p, 0, 0);}}
       break;
     case UP_BUTTON:
-      CurFile--;
+      if(CurFile>1) {CurFile--;}
+      else {CurFile=TCFM;}
       break;
     case DOWN_BUTTON:
-      CurFile++;
+      if(CurFile<TCFM) {CurFile++;}
+      else {CurFile=1;}
       break;
     case RIGHT_BUTTON:
       
@@ -240,14 +253,17 @@ static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//горячо любимый онкей
     case LEFT_BUTTON:
       
       break;
-    case '1':
-      
-      break;
     case '2':
-      
+      if(CurFile-6>0) {CurFile-=6;}
+      else {CurFile=1;}
+      break;
+    case '8':
+      if(CurFile+6<TCFM+1) {CurFile+=6;}
+      else {CurFile=TCFM;}
       break;
     case '0':
       MarkLines[CurFile]=!MarkLines[CurFile];
+      if(CurFile<TCFM) {CurFile++;}
       break;
     case '*':
       for(unsigned int i=0; i<TCFM; i++) {MarkLines[i]=!MarkLines[i];}
@@ -265,6 +281,7 @@ void FreeMemFM()
   DeleteFiles();
   CurFile=1;
   NULLmass(MarkLines, TCFM);
+  ShowNamesNoConst=SHOW_NAMES;
 }
 
 static void OnCreate(SHOW_FM_GUI *data,void *(*malloc_adr)(int))
@@ -295,8 +312,6 @@ static void OnUnfocus(SHOW_FM_GUI *data,void (*mfree_adr)(void *))
         data->gui.state=1;
 }
 
-
-
 static int met0(void){return(0);}
 static const void * const SHOW_FM_gui_methods[11]={
   (void *)OnRedraw,
@@ -324,4 +339,7 @@ static const RECT Canvas={0,0,0,0};
   main_gui->gui.item_ll.data_mfree=(void (*)(void *))mfree_adr();
   
   CreateGUI(main_gui);
+  
+  NULLchar(nowpath, 128);
+  GO();
 }

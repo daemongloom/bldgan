@@ -6,6 +6,7 @@
 #include "ID3Genres.h"
 #include "item_info.h"
 #include "sets_menu.h"
+#include "FM.h"
 
 #ifdef NEWSGOLD
 #define DEFAULT_DISK "4"
@@ -147,8 +148,6 @@ MENUITEM_DESC menuitems[N_ITEMS]=
   {0,(int)"Об эльфе...",LGP_NULL,0,NULL,MENU_FLAG3,MENU_FLAG2},
   {0,(int)"Выход",LGP_NULL,0,NULL,MENU_FLAG3,MENU_FLAG2}
 };*/
-
-extern void ShowFM();
 
 void *menuprocs[N_ITEMS]={
                           (void *)SetNextPlayedOn,
