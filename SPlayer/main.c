@@ -136,6 +136,7 @@ extern const char DEFAULT_PLAYLIST1[];
 extern const char DEFAULT_PLAYLIST2[];
 extern const unsigned int IDLE_X;
 extern const unsigned int IDLE_Y;
+extern const int SHOW_NAMES;
 extern const int PlayMode;
 extern const int soundvolume;
 extern const unsigned int SizeOfFont;  // Шрифт   AAA
@@ -157,6 +158,7 @@ char list[256];
 char sfname[256];
 extern unsigned short SoundVolume;
 unsigned short playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
+extern unsigned short ShowNamesNoConst;
 GBSTMR offtm;     // Таймер автоотключения   AAA
 
 // Переписываем время... DemonGloom
@@ -307,7 +309,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       WSHDR* sndFName=AllocWS(128);
       char s[128];
       
-      const char *p=strrchr(fnamech,'\\')+1; 
+      const char *p=strrchr(fnamech,'\\')+1;
       str_2ws(sndFName,p,128);
       strncpy(s,fnamech,p-fnamech);
       s[p-fnamech]='\0';
@@ -681,7 +683,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
 			COLOR_PROG_MAIN);
 #endif
   
-    PL_Redraw(playlist_lines[CurrentPL],CurrentTrack,PlayedTrack,TC,CurrentPL,PlayedPL);
+    PL_Redraw(playlist_lines[CurrentPL],CurrentTrack,PlayedTrack,0,TC,CurrentPL,PlayedPL);
     TimeRedraw();
   }
 }
@@ -1259,6 +1261,7 @@ int main(char *exename, char *fname)
   SUBPROC((void*)LoadKeys);
   playmode = PlayMode;
   SoundVolume = soundvolume;
+  ShowNamesNoConst=SHOW_NAMES;
   
   wl.wfilename=AllocWS(128);
  // Memory();

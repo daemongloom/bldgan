@@ -33,6 +33,7 @@ extern const unsigned int LinesInPL_C; // Количество треков (макс)
 unsigned int LinesInPL;
 int PlayTime;
 unsigned short NextPlayedTrack[2];   // № трека и пл в очереди
+unsigned short ShowNamesNoConst;       // В константе не получается изменять   AAA
 
 extern unsigned short CTmy_x;     // Координаты CurrentTrack
 extern unsigned short CTmy_y;
@@ -614,6 +615,7 @@ void SavePlaylist(char *fn)
   int j=0;
   int i;
   int f;
+  char* p=malloc(256);
   char m[256];
   char s[]={0x0D}; 
   char s2[]={0x0A};                                // Сделал совместимость с m3u 
@@ -627,13 +629,15 @@ void SavePlaylist(char *fn)
     if(EXT==0){sprintf(m,"%s%i%s",fn,j,".spl");}
     else{sprintf(m,"%s%i%s",fn,j,".m3u");}
   }
-  f=fopen(m,A_WriteOnly+A_MMCStream+A_Create,P_WRITE,&err);
-  for (i=0;i<TC[CurrentPL]+1;i++)
+  f=fopen(m,A_WriteOnly+A_MMCStream+A_Create+A_BIN,P_WRITE,&err);
+  for (i=1;i<TC[CurrentPL]+1;i++)
   {
-  fwrite(f,playlist_lines[CurrentPL][i],wstrlen(playlist_lines[CurrentPL][i]),&err);
-  fwrite(f,s,1,&err);
-  fwrite(f,s2,1,&err);
+    ws_2str(playlist_lines[CurrentPL][i],p,256);
+    fwrite(f,p,strlen(p),&err);
+    fwrite(f,s,1,&err);
+    fwrite(f,s2,1,&err);
   }
+  mfree(p);
   fclose(f,&err);
   ShowMSG(1,(int)LG_PL_Saved);
 }
@@ -793,17 +797,27 @@ void MoveLineLeft()
 // Возвращает имя файла по полному пути...
 void FullpathToFilename(WSHDR * fnamews, WSHDR * wsFName)
 {
+  unsigned int err;
   char* fname=malloc(256);
   ws_2str(fnamews,fname,256);
 
-  const char *p=strrchr(fname,0x1f)+1;
-  const char *p2=strrchr(fname,'\\')+1;                         // Фикс для убирания этого странного символа... Теперь русский стал нормально
-  if (p2>p){
-  int length=strrchr(fname,'.')-strrchr(fname,'\\')-1;
-  utf8_2ws(wsFName,p2,length);
-  } else{
-  int length=strrchr(fname,'.')-strrchr(fname,'\\')-2;
-  utf8_2ws(wsFName,p,length);
+  if (!isdir(fname, &err))
+  {
+      const char *p=strrchr(fname,0x1f)+1;
+      const char *p2=strrchr(fname,'\\')+1;                         // Фикс для убирания этого странного символа... Теперь русский стал нормально
+       if (p2>p){
+         int length=strrchr(fname,'.')-strrchr(fname,'\\')-1;
+         utf8_2ws(wsFName,p2,length);
+       }else{
+         int length=strrchr(fname,'.')-strrchr(fname,'\\')-2;
+         utf8_2ws(wsFName,p,length);
+       }
+  }else{
+    fix(fname);
+      fname[strlen(fname)-1]=0;
+      const char *p=strrchr(fname,'\\')+1;
+      utf8_2ws(wsFName,p,strlen(p));
+      wsprintf(wsFName,"%w\\",wsFName);
   }
   mfree(fname);
 }
@@ -838,7 +852,7 @@ WSHDR * GetTrackByNumber(WSHDR**mass, int number)
 }
 
 // Нет функциям океренной величины!!   AAA
-void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, unsigned int* AllLines, int CurList, int MarkList)
+void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsigned int* AllLines, int CurList, int MarkList)
 {
   
   unsigned short my_x;
@@ -901,7 +915,7 @@ void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, unsigned int* AllLines
     i = CurLine[CurList]+l-k;
     if(AllLines[CurList]>l)
     {
-      switch(SHOW_NAMES)
+      switch(ShowNamesNoConst)
       {
       case 0:// На будущее  AAA
        /* ShowTag=malloc(sizeof(ID3TAGDATA));
@@ -939,7 +953,7 @@ void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, unsigned int* AllLines
     if(k!=l)
     {
     // Делаем другой цвет для не текущего трека...
-    if (MarkLine[CurList]==i)
+    if (MarkLine[CurList]==i||MarkLines[i]==1)
     {
       DrawScrollString(out_ws,my_x,my_y+c+(p2-p3*v)*v3,w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
                    1,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
@@ -957,7 +971,7 @@ void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, unsigned int* AllLines
       
       p2=-p1*v1;
       
-    if (MarkLine[CurList]==CurLine[CurList])
+    if (MarkLine[CurList]==CurLine[CurList]||MarkLines[CurLine[CurList]]==1)
     {
       if(GrafOn)
       {
@@ -1006,7 +1020,13 @@ void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, unsigned int* AllLines
   }
   // Плейлист
   WSHDR * pl_c = AllocWS(64);
+  if(MarkLine){
   wsprintf(pl_c,"%i/%i/%i;%i/%i",CurLine[CurList],AllLines[CurList],CurList+1,MarkLine[MarkList],MarkList+1);
+  }else{
+  unsigned int nLines=0;
+  for(unsigned int i=0; i<AllLines[CurList]+1; i++) {if(MarkLines[i]==1) {nLines++;}}
+  wsprintf(pl_c,"%i/%i;%i",CurLine[CurList],AllLines[CurList],nLines);
+  }
   DrawString(pl_c,NUMmy_x,NUMmy_y,w,NUMmy_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
   FreeWS(pl_c);
   BandRoll(CurLine[CurList], AllLines[CurList]);
@@ -1023,7 +1043,8 @@ void BandRoll(int CurLine, int AllLines)
   }
 }
 
-void NULLchar(char* p) {for(unsigned int i=0; i<256; i++) {p[i]=0;}}
+// Чистим массив   AAA
+void NULLchar(char* p, unsigned int imax) {for(unsigned int i=0; i<imax+1; i++) {p[i]=0;}}  //{unsigned int i=0; while(p[i]!='\0') {p[i]=0; i++;} p[i]=0;}
 
 // Загружаем пл!
 int LoadPlaylist(const char * fn)  // Переделал. Нет утечкам и глюкам!    AAA
@@ -1036,7 +1057,7 @@ int LoadPlaylist(const char * fn)  // Переделал. Нет утечкам и глюкам!    AAA
   unsigned int k=0;
   int fsize;
   char *pp=malloc(256);
-  NULLchar(pp);
+  NULLchar(pp, 256);
   char *p;
  // int c;
 
@@ -1064,7 +1085,7 @@ int LoadPlaylist(const char * fn)  // Переделал. Нет утечкам и глюкам!    AAA
       }
       i++;
       j=0;
-      NULLchar(pp);
+      NULLchar(pp, 256);
     }
     i++;
   }

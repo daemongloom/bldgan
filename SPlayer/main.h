@@ -91,8 +91,6 @@ void DoExit();
 
 void LoadDefPlaylist();
 
-void FindingMusic();
-
 void PrevTrackDown();
 
 void NextTrackDown();
