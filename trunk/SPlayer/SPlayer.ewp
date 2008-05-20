@@ -3188,6 +3188,9 @@
     <name>$PROJ_DIR$\lang.h</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\langpack.h</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\main.c</name>
   </file>
   <file>
@@ -3216,9 +3219,6 @@
   </file>
   <file>
     <name>$PROJ_DIR$\SPlayer_ipc.h</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\Release\Exe\SPLayer_newsgold.elf</name>
   </file>
 </project>
 

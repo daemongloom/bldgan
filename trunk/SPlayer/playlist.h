@@ -135,6 +135,9 @@ void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsign
 // Полоса прокрутки   AAA
 void BandRoll(int CurLine, int AllLines);
 
+// Загружаем пл!
+int LoadPlaylist(const char * fn);
+
 // Для загрузки пл из главного модуля
 void LoadingPlaylist(const char * fn);
 

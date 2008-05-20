@@ -1,5 +1,5 @@
 #include "..\inc\swilib.h"
-#include "lang.h"
+#include "langpack.h"
 #include "item_info.h"
 #include "mainmenu.h"
 #include "main.h"
@@ -44,8 +44,8 @@ void info_ghook(GUI *gui, int cmd)
 
 SOFTKEY_DESC info_sk[]=
 {
-  {0x0018,0x0000,(int)LG_SELECT},
-  {0x0001,0x0000,(int)LG_BACK},
+  {0x0018,0x0000,NULL},
+  {0x0001,0x0000,NULL},
   {0x003D,0x0000,(int)LGP_DOIT_PIC}
 };
 
@@ -71,7 +71,7 @@ INPUTDIA_DESC info_desc=
   0x40000000// Поменять софт-кнопки
 };
 
-HEADER_DESC info_hdr={0,0,0,0,NULL,(int)LG_ID3_Tag_Info,LGP_NULL};
+HEADER_DESC info_hdr={0,0,0,0,NULL,NULL,LGP_NULL};
 
 void Disp_Info(ID3TAGDATA *tag)
 {
@@ -89,7 +89,7 @@ void Disp_Info(ID3TAGDATA *tag)
   AddEditControlToEditQend(eq,&ec,ma);
   
 /*  // File
-  wsprintf(ws_info,"%t",LG_Full_name);
+  wsprintf(ws_info,"%t",lgpData[LGP_Full_name]);
   ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
   AddEditControlToEditQend(eq,&ec,ma);
   
@@ -97,7 +97,7 @@ void Disp_Info(ID3TAGDATA *tag)
   ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,256);
   AddEditControlToEditQend(eq,&ec,ma);
   // Size
-  wsprintf(ws_info,"%t",LG_Size);
+  wsprintf(ws_info,"%t",lgpData[LGP_Size]);
   ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
   AddEditControlToEditQend(eq,&ec,ma);
   FSTATS stat;
@@ -111,7 +111,7 @@ void Disp_Info(ID3TAGDATA *tag)
   // Title
   if(strlen(tag->title))
   {
-    wsprintf(ws_info,"%t",LG_Title);
+    wsprintf(ws_info,"%t",lgpData[LGP_Title]);
     ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
     AddEditControlToEditQend(eq,&ec,ma);
   
@@ -122,7 +122,7 @@ void Disp_Info(ID3TAGDATA *tag)
   // Artist
   if(strlen(tag->artist))
   {
-    wsprintf(ws_info,"%t",LG_Artist);
+    wsprintf(ws_info,"%t",lgpData[LGP_Artist]);
     ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
     AddEditControlToEditQend(eq,&ec,ma);
   
@@ -133,7 +133,7 @@ void Disp_Info(ID3TAGDATA *tag)
   // Album
   if(strlen(tag->album))
   {
-    wsprintf(ws_info,"%t",LG_Album);
+    wsprintf(ws_info,"%t",lgpData[LGP_Album]);
     ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
     AddEditControlToEditQend(eq,&ec,ma);
     
@@ -144,7 +144,7 @@ void Disp_Info(ID3TAGDATA *tag)
   // Year
   if(strlen(tag->year))
   {
-    wsprintf(ws_info,"%t",LG_Year);
+    wsprintf(ws_info,"%t",lgpData[LGP_Year]);
     ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
     AddEditControlToEditQend(eq,&ec,ma);
   
@@ -155,7 +155,7 @@ void Disp_Info(ID3TAGDATA *tag)
   // Comment
   if(strlen(tag->comment))
   {
-    wsprintf(ws_info,"%t",LG_Comment);
+    wsprintf(ws_info,"%t",lgpData[LGP_Comment]);
     ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
     AddEditControlToEditQend(eq,&ec,ma);
   
@@ -166,7 +166,7 @@ void Disp_Info(ID3TAGDATA *tag)
   // Number
   if(tag->version1_1&&tag->number)
   {
-    wsprintf(ws_info,"%t",LG_Number);
+    wsprintf(ws_info,"%t",lgpData[LGP_Number]);
     ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
     AddEditControlToEditQend(eq,&ec,ma);
     
@@ -177,7 +177,7 @@ void Disp_Info(ID3TAGDATA *tag)
   // Genre
   if(tag->genre<149)
   {
-    wsprintf(ws_info,"%t",LG_Genre);
+    wsprintf(ws_info,"%t",lgpData[LGP_Genre]);
     ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
     AddEditControlToEditQend(eq,&ec,ma);
   
@@ -189,4 +189,11 @@ void Disp_Info(ID3TAGDATA *tag)
   patch_header(&info_hdr);
   patch_input(&info_desc);
   CreateInputTextDialog(&info_desc,&info_hdr,eq,1,0);
+}
+
+void initItemInfoLangPack() //Инициализировать язык  - Vedan
+{
+  info_sk[0].lgp_id=(int)lgpData[LGP_SELECT];
+  info_sk[1].lgp_id=(int)lgpData[LGP_BACK];
+  info_hdr.lgp_id=(int)lgpData[LGP_ID3_Tag_Info];
 }

@@ -1,7 +1,8 @@
 #include "../inc/swilib.h"
 #include "main.h"
 #include "playlist.h"
-#include "lang.h"
+#include "mylib.h" 
+#include "langpack.h"
 
 WSHDR *playlist_lines[TCPL][256];  // Массив указателей на имена файлов в пл   Mr. Anderstand: Воплотим мечту в жизнь!
 
@@ -55,8 +56,10 @@ extern unsigned int playmode;
 extern unsigned short copy;
 extern const unsigned int GrafOn; // 1,если включены эффекты типа скролла   AAA
 extern const unsigned int GrafOn1; // 1,если включена анимация   AAA
+extern const unsigned int InfoOn; // 1,если включен показ информации   Vedan
 unsigned short stop=1; // 1, если останавливаем листание   AAA
 extern unsigned short Stat_keypressed;
+extern const char p_3s[];
 // Всякие "мелкие" переменные
 
 extern unsigned int MAINGUI_ID;
@@ -629,7 +632,7 @@ void SavePlaylist(char *fn)
     if(EXT==0){sprintf(m,"%s%i%s",fn,j,".spl");}
     else{sprintf(m,"%s%i%s",fn,j,".m3u");}
   }
-  f=fopen(m,A_WriteOnly+A_MMCStream+A_Create+A_BIN,P_WRITE,&err);
+  f=fopen(m,A_ReadWrite+A_MMCStream+A_Create+A_BIN,P_READ+P_WRITE,&err);
   for (i=1;i<TC[CurrentPL]+1;i++)
   {
     ws_2str(playlist_lines[CurrentPL][i],p,256);
@@ -639,7 +642,7 @@ void SavePlaylist(char *fn)
   }
   mfree(p);
   fclose(f,&err);
-  ShowMSG(1,(int)LG_PL_Saved);
+  ShowMSG(1,(int)lgpData[LGP_PL_Saved]);
 }
 
 /////////////////////////////////////////////////////<<<РЕДАКТИРОВАНИЕ ПЛ>>>/////////////////////////////////////////////////////////
@@ -797,6 +800,24 @@ void MoveLineLeft()
 // Возвращает имя файла по полному пути...
 void FullpathToFilename(WSHDR * fnamews, WSHDR * wsFName)
 {
+  char* fname=malloc(256);
+  ws_2str(fnamews,fname,256);
+
+      const char *p=strrchr(fname,0x1f)+1;
+      const char *p2=strrchr(fname,'\\')+1;                         // Фикс для убирания этого странного символа... Теперь русский стал нормально
+       if (p2>p){
+         int length=strrchr(fname,'.')-strrchr(fname,'\\')-1;
+         utf8_2ws(wsFName,p2,length);
+       }else{
+         int length=strrchr(fname,'.')-strrchr(fname,'\\')-2;
+         utf8_2ws(wsFName,p,length);
+       }
+  mfree(fname);
+}
+
+// Возвращает имя файла по полному пути...
+void FullpathToFile(WSHDR * fnamews, WSHDR * wsFName)
+{
   unsigned int err;
   char* fname=malloc(256);
   ws_2str(fnamews,fname,256);
@@ -864,6 +885,41 @@ void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsign
   int i;
  // char* str;
  // ID3TAGDATA *ShowTag;
+  //---- Информация о воспроизводящемся файле (формат, канал, частота дискретизации), вывод закошен под AIMP, просьба не менять  - Vedan
+  WSHDR * info_pf = AllocWS(32); 
+  if(InfoOn)
+  {
+// Ддя информации
+char chanel[8],
+       freq[8],
+     format[8];
+//Определение Канала 
+    if(*RamChannel()==0)strcpy(chanel," mono"); else strcpy(chanel," stereo");   
+//Определени формата 
+    switch (*RamFormatTrack())
+    {
+    case 0xA: strcpy(format,"MP3 ::"); break;
+    case 0x8: strcpy(format,"WAV ::"); break;
+    case 0x4: strcpy(format,"MID ::"); break;
+    case 0x2: strcpy(format,"3GP ::"); break;
+    default:  strcpy(format," - "); 
+    }
+//Определение частоты
+    switch (*RamFreq())
+    {
+    case 0x4: strcpy(freq,", 22 kHz"); break;
+    case 0x5: strcpy(freq,", 32 kHz"); break;
+    case 0x7: strcpy(freq,", 44 kHz"); break;
+    case 0x8: strcpy(freq,", 48 kHz"); break;
+    default:  strcpy(freq," - "); 
+    }
+    //strcpy(format,null);
+    //strcpy(freq,null);
+    //strcpy(chanel,null);
+    
+    wsprintf(info_pf,"%t%t%t",format,chanel,freq); //Строка информации (фомат, канал, частота)
+  }
+  
   
   // Имя файла...
   if (AllLines[CurList]>0)
@@ -940,6 +996,9 @@ void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsign
       case 2:
         FullpathToFilename(GetTrackByNumber(mass, i),out_ws);
         break;
+      case 3:
+        FullpathToFile(GetTrackByNumber(mass, i),out_ws);
+        break;
       }
         /*
         if (SHOW_FULLNAMES)
@@ -966,7 +1025,7 @@ void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsign
       short v4=1;
       if(v3!=0) {v4=0;}
       char sfname[256];
-      sprintf(sfname,"%s%s",PIC_DIR,"cursor.png");
+      sprintf(sfname,p_3s,PIC_DIR,items1[12],PNGEXT);
       DrawImg(my_x-1,my_y+c-3+p*v*v4,(int)sfname);
       
       p2=-p1*v1;
@@ -990,6 +1049,13 @@ void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsign
       }
       DrawScrollString(out_ws,my_x,my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
                    scroll_disp+1,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
+      if(InfoOn)
+     {
+        
+        DrawString(info_pf,my_x,GetFontYSIZE(SizeOfFont)+2+my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+2*GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v+2,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
+     }
+      
+      
     }else{
 	if(GrafOn)
         {
@@ -1025,10 +1091,11 @@ void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsign
   }else{
   unsigned int nLines=0;
   for(unsigned int i=0; i<AllLines[CurList]+1; i++) {if(MarkLines[i]==1) {nLines++;}}
-  wsprintf(pl_c,"%i/%i;%i",CurLine[CurList],AllLines[CurList],nLines);
+  wsprintf(pl_c,"%i/%i;%i(%i)",CurLine[CurList],AllLines[CurList],nLines,TC[CurrentPL]);
   }
   DrawString(pl_c,NUMmy_x,NUMmy_y,w,NUMmy_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
   FreeWS(pl_c);
+  FreeWS(info_pf);
   BandRoll(CurLine[CurList], AllLines[CurList]);
 }
 
@@ -1059,7 +1126,6 @@ int LoadPlaylist(const char * fn)  // Переделал. Нет утечкам и глюкам!    AAA
   char *pp=malloc(256);
   NULLchar(pp, 256);
   char *p;
- // int c;
 
   if (GetFileStats(fn,&stat,&ul)==-1) return 0;
   if ((fsize=stat.size)<=0) return 0;

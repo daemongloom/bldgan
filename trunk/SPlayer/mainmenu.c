@@ -1,7 +1,7 @@
 #include "../inc/swilib.h"
 #include "main.h"
 #include "mainmenu.h"
-#include "lang.h"
+#include "langpack.h"
 #include "playlist.h"
 #include "ID3Genres.h"
 #include "item_info.h"
@@ -75,7 +75,7 @@ void ShowID3()
   }
   else
   {
-    MsgBoxError(0,(int)LG_Is_not_selected);
+    MsgBoxError(0,(int)lgpData[LGP_Is_not_selected]);
   }
   GeneralFuncF1(1);
 }
@@ -123,12 +123,13 @@ void Exit_SPlayer()
   QuitCallbackProc(0);
 }
 
-HEADER_DESC menuhdr={0,0,131,21,NULL,(int)LG_Menu,LGP_NULL};
+HEADER_DESC menuhdr={0,0,131,21,NULL,NULL,LGP_NULL};
 
 int mmenusoftkeys[]={0,1,2};
 
 int icon_array[2];
 
+/*
 static const char * const menutexts[N_ITEMS]=
 {
   LG_SetNextPlayed,
@@ -139,6 +140,21 @@ static const char * const menutexts[N_ITEMS]=
   LG_AboutDlg,
   LG_Exit_SPlayer
 };
+*/
+// Убрал постоянность, чтобы можно было изменить текст - Vedan
+// И присваиваем текстовым значениям нули, потому что и так уже загружены
+static char * menutexts[N_ITEMS]=
+{
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL
+};
+
+
 /*
 MENUITEM_DESC menuitems[N_ITEMS]=
 {
@@ -169,8 +185,8 @@ static const MENUPROCS_DESC menuprocs[N_ITEMS]={
 
 SOFTKEY_DESC mmenu_sk[]=
 {
-  {0x0018,0x0000,(int)LG_SELECT},
-  {0x0001,0x0000,(int)LG_BACK},
+  {0x0018,0x0000,NULL},
+  {0x0001,0x0000,NULL},
   {0x003D,0x0000,(int)LGP_DOIT_PIC}
 };
 
@@ -244,6 +260,7 @@ static const MENU_DESC tmenu=
 };
 
 //int S_ICONS[N_ITEMS];
+/*
 char setnexttrackpic[128];
 char showid3pic[128];
 char fmpic[128];
@@ -251,10 +268,14 @@ char setsmenupic[128];
 char settingspic[128];
 char aboutpic[128];
 char exitpic[128];
+*/
 
-void MM_Show()
+char pic[TOTAL_ITEMS][128];
+
+void MM_Show()  // Люблю порядок... Ниче так килобайт почти из воздуха! :)   AAA
 {
 #ifndef NO_PNG
+  /*
   // Картинка В очередь
   strcpy(setnexttrackpic,PIC_DIR);
   strcat(setnexttrackpic,"setnexttrack.png");
@@ -289,8 +310,19 @@ void MM_Show()
   strcpy(exitpic,PIC_DIR);
   strcat(exitpic,"exit.png");
   S_ICONS[6] = (int)exitpic;
-
+*/
+  for(unsigned int i=0; i<TOTAL_ITEMS; i++)
+  {
+    strcpy(pic[i],PIC_DIR);
+    strcat(pic[i],items[i]);
+    strcat(pic[i],PNGEXT);
+    S_ICONS[i] = (int)pic[i];
+  }
+  
+  
+  
 #else
+  /*
   S_ICONS[0] = 0;
   menuitems[0].icon = S_ICONS;
   S_ICONS[1] = 0;
@@ -303,6 +335,14 @@ void MM_Show()
   menuitems[4].icon = S_ICONS+4;
   S_ICONS[5] = 0;
   menuitems[5].icon = S_ICONS+5;
+  S_ICONS[6] = 0;
+  menuitems[6].icon = S_ICONS+6;
+  */
+  for(unsigned int i=0; i<TOTAL_ITEMS; i++)
+  {
+    S_ICONS[i] = 0;
+    menuitems[i].icon = S_ICONS+i;
+  }
 #endif  
   
   icon_array[0]=GetPicNByUnicodeSymbol(CBOX_CHECKED);
@@ -310,4 +350,19 @@ void MM_Show()
   
   patch_header(&menuhdr);
   MainMenu_ID = CreateMenu(0,0,&tmenu,&menuhdr,0,N_ITEMS,0,0);
+}
+
+void initMainMenuLangPack() //Инициализировать язык для Главного Меню - Vedan
+{
+  mmenu_sk[0].lgp_id=(int)lgpData[LGP_SELECT];
+  mmenu_sk[1].lgp_id=(int)lgpData[LGP_BACK];
+  menuhdr.lgp_id=(int)lgpData[LGP_Menu];
+  menutexts[0]=(char *)lgpData[LGP_SetNextPlayed];
+  menutexts[1]=(char *)lgpData[LGP_ShowID3];
+  menutexts[2]=(char *)lgpData[LGP_FM];
+  menutexts[3]=(char *)lgpData[LGP_Sets_Menu];
+  menutexts[4]=(char *)lgpData[LGP_Settings];
+  menutexts[5]=(char *)lgpData[LGP_AboutDlg];
+  menutexts[6]=(char *)lgpData[LGP_Exit_SPlayer];
+
 }

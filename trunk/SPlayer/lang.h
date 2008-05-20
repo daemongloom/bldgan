@@ -14,7 +14,7 @@
 #ifdef LANG_RU
 
 ///////////MainMenu///////////
-#define LG_Menu                  "Меню"
+/*#define LG_Menu                  "Меню"
 #define LG_SetNextPlayed         "B очередь"
 #define LG_ShowID3               "Атрибуты"
 #define LG_FM                    "Файловый менеджер"
@@ -43,7 +43,7 @@
 #define LG_Comment               "Комментарий"
 #define LG_Number                "Номер"
 #define LG_Genre                 "Жанр"
-
+*/
 ///////////Config///////////
 #define LG_Default_playlist      "Станд. плейлист"
 #define LG_Default_playlist_2    "Станд. плейлист 2"
@@ -63,6 +63,7 @@
 #define LG_Yes                   "Да"
 
 #define LG_Show_effects          "Показывать эффекты"
+#define LG_Show_info             "Показывать информацию"
 #define LG_Playmode              "Режим воспр."
 #define LG_Play_all              "Воспр. все"
 #define LG_Repeat_all            "Повторить все"
@@ -79,9 +80,10 @@
 #define LG_Picture_folder        "Папка для графики"
 #define LG_Playlist_folder       "Папка для плейлистов"
 #define LG_Path_To_SCE           "SPlayer cfg editor"
+#define LG_Path_To_Lang          "Файл ленгпака"
 
 ///////////ShowMSG/MsgBoxError///////////
-#define LG_Can_not_find_file     "Файл не найден!"
+/*#define LG_Can_not_find_file     "Файл не найден!"
 #define LG_Load_a_playlist       "Пожалуйста, загрузите плейлист!"
 #define LG_Keypad_Unlock         "Клавиатура разблокирована"
 #define LG_Keypad_Lock           "Клавиатура заблокирована"
@@ -93,7 +95,7 @@
 #define LG_Already_Started       "Уже запущен!"
 #define LG_Error_1               "Ошибка 1"
 #define LG_Error_2               "Ошибка 2: Неверно назначена клавиша!"
-
+*/
 #endif //RU
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +104,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 #ifdef LANG_UA
-
+/*
 ///////////MainMenu///////////
 #define LG_Menu                  "Меню"
 #define LG_SetNextPlayed         "У чергу"
@@ -133,7 +135,7 @@
 #define LG_Comment               "Коментарi"
 #define LG_Number             ////////////////////////   "Номер"
 #define LG_Genre                 "Жанр"
-
+*/
 ///////////Config///////////
 #define LG_Default_playlist      "Стнад. плейлист"
 #define LG_Default_playlist_2    "Стнад. плейлист 2"
@@ -153,6 +155,7 @@
 #define LG_Yes			"Так"
 
 #define LG_Show_effects          "Показ ефектiв"
+#define LG_Show_info           //////////////////////  "Show info"
 #define LG_Playmode              "Режим відтворення"
 #define LG_Play_all              "Відтворити все"
 #define LG_Repeat_all            "Повторювати усе"
@@ -169,7 +172,8 @@
 #define LG_Picture_folder        "Папка для графiки"
 #define LG_Playlist_folder       "Папка для плейлистів"
 #define LG_Path_To_SCE           "SPlayer cfg editor"
-
+#define LG_Path_To_Lang        ///////////////////  "Language file"
+/*
 ///////////ShowMSG/MsgBoxError///////////
 #define LG_Can_not_find_file    "файл не знайдено!"
 #define LG_Load_a_playlist      "Будь ласка, завантажте плейлiст!"
@@ -183,7 +187,7 @@
 #define LG_Already_Started    ////////////////////////////////////////////   "Уже запущен!"
 #define LG_Error_1		"Помилка 1"
 #define LG_Error_2		"Помилка 2"
-
+*/
 
 #endif //UA
 
@@ -195,7 +199,7 @@
 #ifdef LANG_EN
 
 ///////////MainMenu///////////
-#define LG_Menu                  "Menu"
+/*#define LG_Menu                  "Menu"
 #define LG_SetNextPlayed         "Set next played"
 #define LG_ShowID3               "Attributes"
 #define LG_FM                    "File manager"
@@ -224,7 +228,7 @@
 #define LG_Comment               "Comment"
 #define LG_Number                "Number"
 #define LG_Genre                 "Genre"
-
+*/
 ///////////Config///////////
 #define LG_Default_playlist      "Default playlist"
 #define LG_Default_playlist_2    "Default playlist 2"
@@ -244,6 +248,7 @@
 #define LG_Yes                   "Yes"
 
 #define LG_Show_effects          "Show effects"
+#define LG_Show_info             "Show info"
 #define LG_Playmode              "Playmode"
 #define LG_Play_all              "Play all"
 #define LG_Repeat_all            "Repeat all"
@@ -260,7 +265,8 @@
 #define LG_Picture_folder        "Picture folder"
 #define LG_Playlist_folder       "Playlist folder"
 #define LG_Path_To_SCE           "SPlayer cfg editor"
-
+#define LG_Path_To_Lang          "Language file"
+/*
 ///////////ShowMSG/MsgBoxError///////////
 #define LG_Can_not_find_file     "Can't find file!"
 #define LG_Load_a_playlist       "Load a playlist, please!"
@@ -274,7 +280,7 @@
 #define LG_Already_Started       "Already started!"
 #define LG_Error_1               "Error 1"
 #define LG_Error_2               "Error 2: Bad key!"
-
+*/
 #endif //EN
 
 

@@ -3,10 +3,13 @@
 #include "conf_loader.h"
 #include "main.h"
 #include "mainmenu.h"
+#include "sets_menu.h"
 #include "playlist.h"
-#include "lang.h"
+//#include "lang.h"
+#include "langpack.h"
 #include "SPlayer_ipc.h"
 #include "../inc/xtask_ipc.h"
+#include "mylib.h" 
 
 /*
 typedef struct {
@@ -159,6 +162,8 @@ char sfname[256];
 extern unsigned short SoundVolume;
 unsigned short playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
 extern unsigned short ShowNamesNoConst;
+const char p_3s[]="%s%s%s";
+const char p_4s[]="%s%s%s%s";
 GBSTMR offtm;     // Таймер автоотключения   AAA
 
 // Переписываем время... DemonGloom
@@ -182,6 +187,227 @@ void load_skin();       // Из skin.cfg AAA
 void UpdateCSMname(WSHDR * tname);
 
 void TimeRedraw();
+
+// Избавляемся от тормозов   AAA
+void LoadPng()
+{
+  unsigned int i;
+  for(i=0; i<TOTAL_ITEMS; i++)
+  {
+    sprintf(sfname,p_3s,PIC_DIR,items[i],PNGEXT);
+    DrawImg(0,0,(int)sfname);
+  }
+  for(i=0; i<TOTAL_ITEMS_2; i++)
+  {
+    sprintf(sfname,p_3s,PIC_DIR,items2[i],PNGEXT);
+    DrawImg(0,0,(int)sfname);
+  }
+  for(i=0; i<6; i++)
+  {
+    sprintf(sfname,"%s%s%i%s",PIC_DIR,items1[1],i,PNGEXT);
+    DrawImg(0,0,(int)sfname);
+  }
+  for(i=2; i<5; i++)
+  {
+    sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
+    DrawImg(0,0,(int)sfname);
+    sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
+    DrawImg(0,0,(int)sfname);
+    sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[14],PNGEXT);
+    DrawImg(0,0,(int)sfname);
+   // ShowMSG(0,i);
+  }
+  for(i=5; i<9; i++)
+  {
+    sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
+    DrawImg(0,0,(int)sfname);
+    sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
+    DrawImg(0,0,(int)sfname);
+  }
+  sprintf(sfname,p_4s,PIC_DIR,items1[9],items1[13],PNGEXT);
+  DrawImg(0,0,(int)sfname);
+  sprintf(sfname,p_4s,PIC_DIR,items1[10],items1[13],PNGEXT);
+  DrawImg(0,0,(int)sfname);
+  sprintf(sfname,p_3s,PIC_DIR,items1[11],PNGEXT);
+  DrawImg(0,0,(int)sfname);
+}
+
+//--- Инициализация ленгпака --- Vedan
+char *lgpData[LGP_DATA_NUM];
+int lgpLoaded;
+
+
+void initSetsMenuLangPack();
+void initItemInfoLangPack();
+void initMainMenuLangPack();
+
+void InitLangPack()
+{
+        initItemInfoLangPack();
+        initSetsMenuLangPack();
+        initMainMenuLangPack();
+}
+
+
+void lgpInitLangPack(void)
+{
+  extern const char LANGFILE[128];
+  unsigned int err;
+  int f;
+  lgpLoaded=0;
+  char * buf;
+  FSTATS fstat;
+  if (GetFileStats(LANGFILE, &fstat, &err)!=-1)
+  {
+    if((f=fopen(LANGFILE, A_ReadOnly + A_BIN, P_READ, &err))!=-1)
+    {
+      if (buf =(char *)malloc(fstat.size+1))
+      {
+        buf[fread(f, buf, fstat.size, &err)]=0;
+        fclose(f, &err);
+        char line[128];
+        int lineSize=0;
+        int lp_id=0;
+        int buf_pos = 0;
+        while(buf[buf_pos]!=0 && buf_pos < fstat.size && lp_id < LGP_DATA_NUM)
+        {
+          if (buf[buf_pos]=='\n' || buf[buf_pos]=='\r')
+          {
+            if (lineSize > 0)
+            {
+              lgpData[lp_id] = (char *)malloc(lineSize+1);
+              memcpy(lgpData[lp_id], line, lineSize);
+              lgpData[lp_id][lineSize]=0;
+              lp_id++;
+              lineSize=0;
+            }
+          }
+          else
+            line[lineSize++]=buf[buf_pos];
+          buf_pos++;
+        }
+        if (lineSize > 0 && lp_id < LGP_DATA_NUM) // eof
+        {
+          lgpData[lp_id] = (char *)malloc(lineSize+1);
+          memcpy(lgpData[lp_id], line, lineSize);
+          lgpData[lp_id][lineSize]=0;
+          lp_id++;
+          lineSize=0;
+        }
+        mfree(buf);
+        InitLangPack();
+        lgpLoaded=1;
+        
+        // old langpack
+        if (strlen(lgpData[LGP_LangCode])>2)
+        {
+          mfree(lgpData[LGP_LangCode]);
+          lgpData[LGP_LangCode]=malloc(3);
+          strcpy(lgpData[LGP_LangCode],"ru");
+        }
+        return;
+      }
+      fclose(f, &err);
+    }
+  }
+  ///////////MainMenu///////////
+  lgpData[LGP_Menu]=                 "Menu";
+  lgpData[LGP_SetNextPlayed]=        "SetNextTrack";
+  lgpData[LGP_ShowID3]=              "ShowID3";
+  lgpData[LGP_FM]=                   "FileManager";
+  lgpData[LGP_Settings]=             "Settings";
+  lgpData[LGP_AboutDlg]=             "AboutDlg";
+  lgpData[LGP_Exit_SPlayer]=         "Exit";
+  lgpData[LGP_SELECT]=               "Selest";
+  lgpData[LGP_BACK]=                 "Back";
+  ///////////Menu 1///////////
+  lgpData[LGP_Sets_Menu]=            "Instruments";
+  lgpData[LGP_SetEditPL]=            "EditPList";
+  lgpData[LGP_Coordinates]=          "Coordinates";
+  lgpData[LGP_Colours]=              "Colours";
+  lgpData[LGP_Refresh]=              "Refresh";
+  ///////////Attributes///////////
+  lgpData[LGP_ID3_Tag_Info]=         "ID3_Tag_Info";
+  lgpData[LGP_Full_name]=            "Full_name";
+  lgpData[LGP_Size]=                 "Size";
+  lgpData[LGP_Title]=                "Title";
+  lgpData[LGP_Artist]=               "Artist";
+  lgpData[LGP_Album]=                "Album";
+  lgpData[LGP_Year]=                 "Year";
+  lgpData[LGP_Comment]=              "Comment";
+  lgpData[LGP_Number]=               "Number";
+  lgpData[LGP_Genre]=                "Genre";
+  ///////////Config///////////
+ /* lgpData[LGP_Default_playlist]=     "Default playlist";
+  lgpData[LGP_Default_playlist_2]=   "Default playlist 2";
+  lgpData[LGP_Default_playlist_3]=   "Default playlist 3";
+  lgpData[LGP_Music_folder]=         "Music folder";
+  lgpData[LGP_Idle_coordinates]=     "Idle coordinates";
+  lgpData[LGP_Auto_Exit_Min]=        "Time before close";
+  lgpData[LGP_Speed_Moving]=         "Speed of move cursor";
+  lgpData[LGP_Show_Anim]=            "Show animation";
+  lgpData[LGP_Sets]=                 "Sets";
+  lgpData[LGP_Show_full_names]=      "Show full names";
+  lgpData[LGP_Key_Settings]=         "Key-config settings";
+  lgpData[LGP_LoadKeys]=             "Load key-config from file";
+  lgpData[LGP_KeySet_Path]=          "File key-config";
+
+  lgpData[LGP_No]=                   "No";
+  lgpData[LGP_Yes]=                  "Yes";
+
+  lgpData[LGP_Show_effects]=         "Show effects";
+  lgpData[LGP_Show_info]=            "Show info";
+  lgpData[LGP_Playmode]=             "Playmode";
+  lgpData[LGP_Play_all]=             "Play all";
+  lgpData[LGP_Repeat_all]=           "Repeat all";
+  lgpData[LGP_Random]=               "Random";
+  lgpData[LGP_Repeat_one]=           "Repeat one";
+  lgpData[LGP_Extension_of_playlist]="Extension of playlist";
+  lgpData[LGP_spl]=                  "spl";
+  lgpData[LGP_m3u]=                  "m3u";
+  lgpData[LGP_Default_volume]=       "Default volume";
+  lgpData[LGP_Amount_of_lines]=      "Amount of lines";
+  lgpData[LGP_Size_Of_Font]=         "Size of font";
+  lgpData[LGP_Send_fname]=           "Send filename";
+  lgpData[LGP_Paths]=                "Paths";
+  lgpData[LGP_Picture_folder]=       "Picture folder";
+  lgpData[LGP_Playlist_folder]=      "Playlist folder";
+  lgpData[LGP_Path_To_SCE]=          "SPlayer cfg editor";
+  lgpData[LGP_Path_To_Lang]=         "Language file";*/
+  ///////////ShowMSG/MsgBoxError///////////
+  lgpData[LGP_Can_not_find_file]=    "Can not find file!";
+  lgpData[LGP_Load_a_playlist]=      "Load a playlist!";
+  lgpData[LGP_Keypad_Unlock]=        "Keypad Unlock";
+  lgpData[LGP_Keypad_Lock]=          "Keypad Lock";
+  lgpData[LGP_Config_Updated]=       "SPlayer Config Updated!";
+  lgpData[LGP_PL_Saved]=             "PlayList Saved!";
+  lgpData[LGP_Exit]=                 "Exit?";
+  lgpData[LGP_Is_not_selected]=      "Is not selected!";
+  lgpData[LGP_No_Tags]=              "No Tags!";
+  lgpData[LGP_Already_Started]=      "Already Started!";
+  lgpData[LGP_Error_1]=              "Error_1!";
+  lgpData[LGP_Error_2]=              "Error_2!";
+  lgpData[LGP_Spkeys_er]=            "Spkeys error!";
+  lgpData[LGP_LangCode]=             "en";
+  InitLangPack();
+}
+
+void lgpFreeLangPack(void)
+{
+  if (!lgpLoaded) return;
+  for (int i=0;i<LGP_DATA_NUM;i++)
+  {
+    if (lgpData[i]!=NULL)
+      mfree(lgpData[i]);
+  }
+}
+
+void InitLanguage()
+{
+  lgpFreeLangPack();
+  lgpInitLangPack();
+}
+//---------------------------------------------
 
 // Пауза счетчика DemonGloom
 void PausingTime(unsigned short action)
@@ -380,7 +606,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
     } else {
       // Если нет такого файла!
       if(IsUnlocked()){
-      ShowMSG(1,(int)LG_Can_not_find_file);
+      ShowMSG(1,(int)lgpData[LGP_Can_not_find_file]);
       ToDevelop();}
       NextTrackX();
     }
@@ -389,7 +615,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
 }
 else
 {
-  ShowMSG(1,(int)LG_Load_a_playlist);
+  ShowMSG(1,(int)lgpData[LGP_Load_a_playlist]);
 }
 }
 
@@ -531,7 +757,7 @@ void CheckDoubleRun(void)   // При открытии копии   AAA
   {
     LockSched();
     CloseCSM(MAINCSM_ID);
-    ShowMSG(1,(int)LG_Already_Started);
+    ShowMSG(1,(int)lgpData[LGP_Already_Started]);
     UnlockSched();
   }
   else
@@ -567,105 +793,101 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
 #endif
 #ifndef NO_PNG                         // Сделаем режим без скина - DG
   // --- Делаем типа скин ---
-  char sfname[256];
-  sprintf(sfname,"%s%s",PIC_DIR,"background.png");
+  sprintf(sfname,p_3s,PIC_DIR,items1[0],PNGEXT);
   DrawImg(left,top,(int)sfname);  // Рисуем фон
   // Громкость
-  char vfname[256];
-  sprintf(vfname,"%s%s%i%s",PIC_DIR,"volume",GetVolLevel(),".png");
-  DrawImg(VOLmy_x,VOLmy_y,(int)vfname);
+  sprintf(sfname,"%s%s%i%s",PIC_DIR,items1[1],GetVolLevel(),PNGEXT);
+  DrawImg(VOLmy_x,VOLmy_y,(int)sfname);
   // Статус плеера
   if (Stat_keypressed==1)
   {
     switch(GetPlayingStatus())
     {
     case 0:
-      sprintf(sfname,"%s%s",PIC_DIR,"stop_down.png");
+      sprintf(sfname,p_4s,PIC_DIR,items1[2],items1[13],PNGEXT);
       break;
     case 1:
-      sprintf(sfname,"%s%s",PIC_DIR,"pause_down.png");
+      sprintf(sfname,p_4s,PIC_DIR,items1[3],items1[13],PNGEXT);
       break;
     case 2:
-      sprintf(sfname,"%s%s",PIC_DIR,"play_down.png");
+      sprintf(sfname,p_4s,PIC_DIR,items1[4],items1[13],PNGEXT);
       break;
     }
   } else {
     switch(GetPlayingStatus())
     {
     case 0:
-      sprintf(sfname,"%s%s",PIC_DIR,"stop.png");
+      sprintf(sfname,p_3s,PIC_DIR,items1[2],PNGEXT);
       break;
     case 1:
-      sprintf(sfname,"%s%s",PIC_DIR,"pause.png");
+      sprintf(sfname,p_3s,PIC_DIR,items1[3],PNGEXT);
       break;
     case 2:
-      sprintf(sfname,"%s%s",PIC_DIR,"play.png");
+      sprintf(sfname,p_3s,PIC_DIR,items1[4],PNGEXT);
       break;
     }
   }
   DrawImg(STATmy_x,STATmy_y,(int)sfname);
   // Режим воспроизв   AAA
-  char pfname[256];
   if (Mode_keypressed==1)
   {
     switch(playmode)
     {
     case 0:
-      sprintf(pfname,"%s%s",PIC_DIR,"playall_down.png");
+      sprintf(sfname,p_4s,PIC_DIR,items1[5],items1[13],PNGEXT);
       break;
     case 1:
-      sprintf(pfname,"%s%s",PIC_DIR,"repeat_down.png");
+      sprintf(sfname,p_4s,PIC_DIR,items1[6],items1[13],PNGEXT);
       break;
     case 2:
-      sprintf(pfname,"%s%s",PIC_DIR,"random_down.png");
+      sprintf(sfname,p_4s,PIC_DIR,items1[7],items1[13],PNGEXT);
       break;
     case 3:
-      sprintf(pfname,"%s%s",PIC_DIR,"repeatone_down.png");
+      sprintf(sfname,p_4s,PIC_DIR,items1[8],items1[13],PNGEXT);
       break;
     }
   } else {
     switch(playmode)
     {
     case 0:
-      sprintf(pfname,"%s%s",PIC_DIR,"playall.png");
+      sprintf(sfname,p_3s,PIC_DIR,items1[5],PNGEXT);
       break;
     case 1:
-      sprintf(pfname,"%s%s",PIC_DIR,"repeat.png");
+      sprintf(sfname,p_3s,PIC_DIR,items1[6],PNGEXT);
       break;
     case 2:
-      sprintf(pfname,"%s%s",PIC_DIR,"random.png");
+      sprintf(sfname,p_3s,PIC_DIR,items1[7],PNGEXT);
       break;
     case 3:
-      sprintf(pfname,"%s%s",PIC_DIR,"repeatone.png");
+      sprintf(sfname,p_3s,PIC_DIR,items1[8],PNGEXT);
       break;
     }
   }
-  DrawImg(RANDmy_x,RANDmy_y,(int)pfname);  // Позиционируем все что видим!   AAA
+  DrawImg(RANDmy_x,RANDmy_y,(int)sfname);  // Позиционируем все что видим!   AAA
   // Иконка пред/след трек   AAA
-  char nextfname[256];
   if (N_keypressed==1)
   {
-    sprintf(nextfname,"%s%s",PIC_DIR,"next_down.png");
+    sprintf(sfname,p_4s,PIC_DIR,items1[9],items1[13],PNGEXT);
   }
   else
   {
-    sprintf(nextfname,"%s%s",PIC_DIR,"next.png");
+    sprintf(sfname,p_3s,PIC_DIR,items1[9],PNGEXT);
   }
-  DrawImg(Next_x,Next_y,(int)nextfname);
-  char prevfname[256];
+  DrawImg(Next_x,Next_y,(int)sfname);
+  
   if (P_keypressed==1)
   {
-    sprintf(prevfname,"%s%s",PIC_DIR,"prev_down.png");
+    sprintf(sfname,p_4s,PIC_DIR,items1[10],items1[13],PNGEXT);
   }
   else
   {
-    sprintf(prevfname,"%s%s",PIC_DIR,"prev.png");
+    sprintf(sfname,p_3s,PIC_DIR,items1[10],PNGEXT);
   }
-  DrawImg(Prev_x,Prev_y,(int)prevfname);
+  DrawImg(Prev_x,Prev_y,(int)sfname);
   // Если заблокировано DemonGloom
   if (KeyLock){
-    sprintf(pfname,"%s%s",PIC_DIR,"keylock.png");
-    DrawImg(KeyLock_x,KeyLock_y,(int)pfname);
+    sprintf(sfname,p_3s,PIC_DIR,items1[11],PNGEXT);
+    DrawImg(KeyLock_x,KeyLock_y,(int)sfname);
   }
 #else
   DrawRoundedFrame(left+1,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),color(COLOR_BG));  // Поселим это сюда   AAA
@@ -720,11 +942,11 @@ void QuitCallbackProc(int decision)
 
 /* Блок функций. Неоходимо для конфига клавиш. */
 void DoErrKey() {
-  ShowMSG(1, (int)LG_Error_2);
+  ShowMSG(1, (int)lgpData[LGP_Error_2]);
 }
 
 void DoExit() {
-  MsgBoxYesNo(1,(int)LG_Exit,QuitCallbackProc);
+  MsgBoxYesNo(1,(int)lgpData[LGP_Exit],QuitCallbackProc);
 }
 
 void LoadDefPlaylist() {
@@ -763,7 +985,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     if ((msg->gbsmsg->msg==LONG_PRESS)&&(msg->gbsmsg->submess=='#')){
      KbdUnlock();
      KeyLock=(KeyLock+1)%2;
-     ShowMSG(1,(int)LG_Keypad_Unlock);
+     ShowMSG(1,(int)lgpData[LGP_Keypad_Unlock]);
      REDRAW();}
      return 0;
      }
@@ -811,7 +1033,7 @@ if(EditPL==0)         //  Mr. Anderstand: самому не оч нравится такой вариант...
        if (KeyLock==0){
           KbdLock();
           Mode_keypressed = 0;
-          ShowMSG(1,(int)LG_Keypad_Lock);
+          ShowMSG(1,(int)lgpData[LGP_Keypad_Lock]);
           KeyLock=1;
        }
        if (playmode>0) {playmode-=1;}
@@ -845,10 +1067,10 @@ if(EditPL==0)         //  Mr. Anderstand: самому не оч нравится такой вариант...
     switch(msg->gbsmsg->submess)
     {
     case RIGHT_SOFT:
-      MsgBoxYesNo(1,(int)LG_Exit,QuitCallbackProc);
+      MsgBoxYesNo(1,(int)lgpData[LGP_Exit],QuitCallbackProc);
       break;
     case RED_BUTTON:
-      MsgBoxYesNo(1,(int)LG_Exit,QuitCallbackProc);
+      MsgBoxYesNo(1,(int)lgpData[LGP_Exit],QuitCallbackProc);
       break;
     case LEFT_SOFT:
       MM_Show();
@@ -974,7 +1196,6 @@ extern void kill_data(void *p, void (*func_p)(void *));
 static void ElfKiller(void)      //Добавил static не знаю зачем, главное - работает! :)  AAA
 {
   extern void *ELF_BEGIN;
-  RemoveKeybMsgHook((void *)my_keyhook);               //НАДО!!  AAA . Надо :) DemonGloom
   kill_data(&ELF_BEGIN,(void (*)(void *))mfree_adr());
 }
 
@@ -1047,6 +1268,8 @@ void maincsm_onclose(CSM_RAM *csm)
   GBS_DelTimer(&mytmr);
   StopAllPlayback();
   MemoryFree();
+  lgpFreeLangPack();                                   //Очисть память, выделенную под язык - Vedan
+  RemoveKeybMsgHook((void *)my_keyhook);               //НАДО!!  AAA . Надо :) DemonGloom
   FreeWS(wl.wfilename);
   SUBPROC((void *)ElfKiller);
 }
@@ -1123,13 +1346,13 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
         switch(GetPlayingStatus())
 	{
         case 0:
-          sprintf(sfname,"%s%s",PIC_DIR,"stop_idle.png");
+          sprintf(sfname,p_4s,PIC_DIR,items1[2],items1[14],PNGEXT);
           break;
         case 1:
-          sprintf(sfname,"%s%s",PIC_DIR,"pause_idle.png");
+          sprintf(sfname,p_4s,PIC_DIR,items1[3],items1[14],PNGEXT);
           break;
         case 2:
-          sprintf(sfname,"%s%s",PIC_DIR,"play_idle.png");
+          sprintf(sfname,p_4s,PIC_DIR,items1[4],items1[14],PNGEXT);
           break;
 	}
         DrawCanvas(canvasdata,IDLE_X,IDLE_Y,IDLE_X+GetImgWidth((int)sfname)-1,IDLE_Y+GetImgHeight((int)sfname)-1,1); // Сделаем так   AAA
@@ -1148,11 +1371,13 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
     extern const char *successed_config_filename;
     if (strcmp(successed_config_filename,(char *)msg->data0)==0)
     {
-      ShowMSG(1,(int)LG_Config_Updated);
       InitConfig();
+      InitLanguage();
       
       if(!IsTimerProc(&offtm)) {AutoExit();}
       ResetAutoExit();
+      
+      ShowMSG(1,(int)lgpData[LGP_Config_Updated]);
     }
   }
 #ifdef NEWSGOLD
@@ -1259,11 +1484,13 @@ int main(char *exename, char *fname)
   sprintf(sfname,"%s%s",PIC_DIR,"colour.cfg");
   load_skin(sfname);
   SUBPROC((void*)LoadKeys);
+  SUBPROC((void*)LoadPng);
   playmode = PlayMode;
   SoundVolume = soundvolume;
   ShowNamesNoConst=SHOW_NAMES;
   
   wl.wfilename=AllocWS(128);
+  lgpInitLangPack(); //Загрузка языка - Vedan
  // Memory();
   // Если что-то передали в параметре - загружаем...
   if (fname)

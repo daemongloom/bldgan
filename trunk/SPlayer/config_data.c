@@ -48,6 +48,10 @@ __root const CFG_HDR cfghdr13={CFG_CBOX,LG_Show_effects,0,2};
 __root const unsigned int GrafOn = 1;
 __root const CFG_CBOX_ITEM cfgcbox2[2]={LG_No,LG_Yes};
 
+__root const CFG_HDR cfghdr13_0={CFG_CBOX,LG_Show_info,0,2};  //Показывать информацию или нет - Vedan
+__root const unsigned int InfoOn = 1;
+__root const CFG_CBOX_ITEM cfgcbox2_0[2]={LG_No,LG_Yes};
+
 __root const CFG_HDR cfghdr14={CFG_CBOX,LG_Playmode,0,4};  // Временно убрал варинг Blind007
 __root const int PlayMode = 0;
 __root const CFG_CBOX_ITEM cfgcbox3[4]={LG_Play_all,LG_Repeat_all,LG_Random,LG_Repeat_one};
@@ -92,6 +96,9 @@ __root const char PLAYLISTS[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\Playlists\\";
 
 __root const CFG_HDR cfghdr24={CFG_STR_UTF8,LG_Path_To_SCE,3,127};
 __root const char EXENAME[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\SPlayer cfg editor.elf";
+
+__root const CFG_HDR cfghdr25={CFG_STR_UTF8,LG_Path_To_Lang,3,127};
+__root const char LANGFILE[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\*.txt"; //Путь к текстовому файлу - Vedan
 
 __root const CFG_HDR cfghdr_m20={CFG_LEVEL,"",0,0};
 

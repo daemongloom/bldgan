@@ -62,7 +62,7 @@ void DeleteFiles()
 void LoadDaemonList(const char* path, unsigned int re, unsigned int toPL) // Теперь пашет частично   AAA
 {
  // ShowMSG(0,(int)path);
-  NULLmass(MarkLines, TCFM);
+  
   if(toPL==0) {strcpy(nowpath, path);}
   DIR_ENTRY de;
   unsigned int err;
@@ -86,7 +86,9 @@ void LoadDaemonList(const char* path, unsigned int re, unsigned int toPL) // Теп
         if(((a=='m'||a=='M')&&(b=='p'||b=='P')&&c=='3')||
            ((a=='w'||a=='W')&&(b=='a'||b=='A')&&(c=='v'||c=='V'))||
             ((a=='a'||a=='A')&&(b=='a'||b=='A')&&(c=='c'||c=='C'))||
-             ((a=='m'||a=='M')&&(b=='i'||b=='I')&&(c=='d'||c=='D')))   // Перерываем форматы   AAA
+             ((a=='m'||a=='M')&&(b=='i'||b=='I')&&(c=='d'||c=='D'))||
+              ((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))||
+               ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U')))   // Перерываем форматы   AAA
         {
           strcpy(p1,name);
           fix(p1);
@@ -141,7 +143,7 @@ void CopyFName(WSHDR** mlines, int* mark, unsigned int imax)   // Копируем пути 
 {
   unsigned int err;
   char path[256];
-  for(unsigned int i=0; i<imax+1; i++)
+  for(unsigned int i=1; i<imax+1; i++)
   {
     if(mark[i])
     {
@@ -150,7 +152,15 @@ void CopyFName(WSHDR** mlines, int* mark, unsigned int imax)   // Копируем пути 
       {
         LoadDaemonList(path, 1, 1);
       }else{
-        PastLine(mlines[i], 0);
+        int a=path[strlen(path)-3];
+        int b=path[strlen(path)-2];
+        int c=path[strlen(path)-1];
+        if(((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))||
+           ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U'))){   // Перерываем форматы   AAA
+             LoadPlaylist(path);
+           }else{
+             PastLine(mlines[i], 0);
+           }
       }
     }
   }
@@ -161,6 +171,7 @@ void GO()
 {
 char pn[128];
 WSHDR* ws=AllocWS(256);
+NULLmass(MarkLines, TCFM);
 if(strlen(nowpath)>3)
 {
   nowpath[strlen(nowpath)-1]=0;
@@ -170,7 +181,6 @@ if(strlen(nowpath)>3)
   LoadingDaemonList(pn, 0, 0);
 }else{
   NULLchar(nowpath, 128);
-  NULLmass(MarkLines, TCFM);
   DeleteFiles();
   for(unsigned short i=0; i<5; i++)
   {
@@ -192,7 +202,7 @@ static void OnRedraw(SHOW_FM_GUI *data)
     DrawImg(0,0,(int)sfname1);  // Рисуем фон
     #else
     #endif
-    if(strlen(nowpath)) {ShowNamesNoConst=SHOW_NAMES;}
+    if(strlen(nowpath)) {ShowNamesNoConst=3;}
     else {ShowNamesNoConst=1;}
     PL_Redraw(Files ,&CurFile, 0, MarkLines, &TCFM, 0, 0);  // MarkLines тут не совсем подходит... Надо будет подкорректировать...   AAA
     
@@ -233,11 +243,12 @@ static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//горячо любимый онкей
       if(strlen(nowpath)){
       if (isdir(p, &err)) // Проверка папка или нет AAA
       {
+        NULLmass(MarkLines, TCFM);
         LoadingDaemonList(p, 0, 0);
       }else{
         StopAllPlayback();
         PlayMP3File(Files[CurFile]);
-      }}else{LoadingDaemonList(p, 0, 0);}}
+      }}else{NULLmass(MarkLines, TCFM); LoadingDaemonList(p, 0, 0);}}
       break;
     case UP_BUTTON:
       if(CurFile>1) {CurFile--;}
@@ -266,7 +277,7 @@ static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//горячо любимый онкей
       if(CurFile<TCFM) {CurFile++;}
       break;
     case '*':
-      for(unsigned int i=0; i<TCFM; i++) {MarkLines[i]=!MarkLines[i];}
+      for(unsigned int i=1; i<TCFM+1; i++) {MarkLines[i]=!MarkLines[i];}
       break;
     }
     break;
