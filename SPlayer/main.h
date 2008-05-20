@@ -64,7 +64,59 @@ typedef struct
 
 int ReadID3v1(WSHDR* fnamews, ID3TAGDATA *tag); // Чтение ID3 v1
 
+#define TOTAL_ITEMS_1 15
 
+
+// Лепота... Но за один запуск жрет много   AAA
+static const char * const items1[TOTAL_ITEMS_1] = {
+/*  1*/ "background",
+/*  2*/ "volume",   // x6
+/*  3*/ "stop",     // x3
+/*  4*/ "pause",    // x3
+/*  5*/ "play",     // x3
+/*  6*/ "playall",  // x2
+/*  7*/ "repeat",   // x2
+/*  8*/ "random",   // x2
+/*  9*/ "repeatone",// x2
+/* 10*/ "next",     // x2
+/* 11*/ "prev",     // x2
+/* 12*/ "keylock",
+/* 13*/ "cursor",
+/* 14*/ "_down",
+/* 15*/ "_idle",
+};
+#define PNGEXT ".png"
+
+/*
+static const char * const items1[TOTAL_ITEMS] = {
+ "background.png",
+ "volume",   // x5
+ "stop_down",
+ "pause_down",
+ "play_down",
+ "stop",
+ "pause",
+ "play",
+ "playall_down",
+ "repeat_down",
+ "random_down",
+ "repeatone_down",
+ "playall",
+ "repeat",
+ "random",
+ "repeatone",
+ "next_down",
+ "next",
+ "prev_down",
+ "prev",
+ "keylock",
+ "cursor",
+ "stop_idle",
+ "pause_idle",
+ "play_idle",
+ ".png", // Перед пунктом лепим все новое   AAA
+};
+*/
 #ifdef NEWSGOLD
 #define CBOX_CHECKED 0xE116
 #define CBOX_UNCHECKED 0xE117

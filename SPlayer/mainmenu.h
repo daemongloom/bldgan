@@ -10,4 +10,15 @@ void patch_input(INPUTDIA_DESC* inp);
 // Показать главное меню
 void MM_Show();
 
+#define TOTAL_ITEMS 7
+
+static const char * const items[TOTAL_ITEMS] = {
+/*  1*/ "setnexttrack",
+/*  2*/ "showid3",
+/*  3*/ "fm",
+/*  4*/ "setsmenu",
+/*  5*/ "settings",
+/*  6*/ "about",
+/*  7*/ "exit",
+};
 #endif

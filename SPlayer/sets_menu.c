@@ -1,7 +1,8 @@
 #include "../inc/swilib.h"
 #include "main.h"
-#include "lang.h"
+#include "langpack.h"
 #include "mainmenu.h"
+#include "sets_menu.h"
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 extern const char PIC_DIR[];
@@ -253,18 +254,27 @@ void Refresh()
   GeneralFuncF1(1);
 }
 
-HEADER_DESC sets_menuhdr={0,0,131,21,NULL,(int)LG_Sets_Menu,LGP_NULL};
+HEADER_DESC sets_menuhdr={0,0,131,21,NULL,NULL,LGP_NULL};
 
 int sets_menusoftkeys[]={0,1,2};
 
 extern int icon_array[2];
-
+/*
 static const char * const sets_menutexts[MAX_ITEMS]=
 {
   LG_SetEditPL,
   LG_Coordinates,
   LG_Colours,
   LG_Refresh
+};
+*/
+
+static char * sets_menutexts[MAX_ITEMS]=
+{
+  NULL,
+  NULL,
+  NULL,
+  NULL
 };
 
 void *sets_menuprocs[MAX_ITEMS]={
@@ -276,8 +286,8 @@ void *sets_menuprocs[MAX_ITEMS]={
 
 SOFTKEY_DESC sets_menu_sk[]=
 {
-  {0x0018,0x0000,(int)LG_SELECT},
-  {0x0001,0x0000,(int)LG_BACK},
+  {0x0018,0x0000,NULL},
+  {0x0001,0x0000,NULL},
   {0x003D,0x0000,(int)LGP_DOIT_PIC}
 };
 
@@ -341,12 +351,18 @@ static const MENU_DESC sets_tmenu=
   MAX_ITEMS
 };
 
+/*
+char coordinatespic[128];
+char colourspic[128];
+char refreshpic[128];
+*/
+
+char pic2[TOTAL_ITEMS_2][128];
+
 void Disp_Sets_Menu()
 {
-  char coordinatespic[128];
-  char colourspic[128];
-  char refreshpic[128];
 #ifndef NO_PNG
+  /*
   strcpy(coordinatespic,PIC_DIR);strcat(coordinatespic,"coordinates.png");
   strcpy(colourspic,PIC_DIR);strcat(colourspic,"colours.png");
   strcpy(refreshpic,PIC_DIR);strcat(refreshpic,"refresh.png");
@@ -361,16 +377,31 @@ void Disp_Sets_Menu()
 
   // Картинка Настройки
   stS_ICONS[3] = (int)refreshpic;
+  */
+  for(unsigned int i=0; i<TOTAL_ITEMS_2; i++)
+  {
+    strcpy(pic2[i],PIC_DIR);
+    strcat(pic2[i],items2[i]);
+    strcat(pic2[i],PNGEXT);
+    stS_ICONS[i+1] = (int)pic2[i];
+  }
 
 #else
  // stS_ICONS[0] = 0;
  // menuitems[0].icon = stS_ICONS;
+  /*
   stS_ICONS[1] = 0;
   menuitems[1].icon = stS_ICONS+1;
   stS_ICONS[2] = 0;
   menuitems[2].icon = stS_ICONS+2;
   stS_ICONS[3] = 0;
   menuitems[3].icon = stS_ICONS+3;
+  */
+  for(unsigned int i=1; i<TOTAL_ITEMS_2; i++)
+  {
+    S_ICONS[i] = 0;
+    menuitems[i].icon = S_ICONS+i;
+  }
 #endif  
   
   icon_array[0]=GetPicNByUnicodeSymbol(CBOX_CHECKED);
@@ -379,4 +410,15 @@ void Disp_Sets_Menu()
 //  patch_rect(&sets_menuhdr.rc,0,YDISP,ScreenW()-1,HeaderH()+YDISP);
   patch_header(&sets_menuhdr);
   SetsMenu_ID = CreateMenu(0,0,&sets_tmenu,&sets_menuhdr,0,MAX_ITEMS,0,0);
+}
+
+void initSetsMenuLangPack() //Инициализировать язык для Меню Инструментов - Vedan
+{
+  sets_menu_sk[0].lgp_id=(int)lgpData[LGP_SELECT];
+  sets_menu_sk[1].lgp_id=(int)lgpData[LGP_BACK];
+  sets_menuhdr.lgp_id=(int)lgpData[LGP_Sets_Menu];
+  sets_menutexts[0]=(char *)lgpData[LGP_SetEditPL];
+  sets_menutexts[1]=(char *)lgpData[LGP_Coordinates];
+  sets_menutexts[2]=(char *)lgpData[LGP_Colours];
+  sets_menutexts[3]=(char *)lgpData[LGP_Refresh];
 }

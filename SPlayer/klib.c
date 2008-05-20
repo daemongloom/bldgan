@@ -1,5 +1,6 @@
 #include "..\inc\swilib.h"
 #include "main.h"
+#include "langpack.h"
 
 char *strtolower(char *src, char *dst, int sz)
 {
@@ -78,7 +79,7 @@ int EnumIni(int local, char *ininame, INIPROC proc)
      fclose(f,&err);
      res=1;
   }
-  else {ShowMSG(1,(int)"spkeys error!");}
+  else {ShowMSG(1,(int)lgpData[LGP_Spkeys_er]);}
   if(name)mfree(name);
   if(value)mfree(value);
   return res;
