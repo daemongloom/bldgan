@@ -90,11 +90,19 @@ void LoadDaemonList(const char* path, unsigned int re, unsigned int toPL) // Теп
               ((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))||
                ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U')))   // Перерываем форматы   AAA
         {
+          
           strcpy(p1,name);
           fix(p1);
           utf8_2ws(p,p1,256);
           if(toPL==0) {PastFile(p, 0);}
-          else {PastLine(p, 0);}
+          else {
+            if(((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))||
+               ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U'))){   // Перерываем форматы   AAA
+                 LoadPlaylist(p1);
+               }else{
+                 PastLine(p, 0);
+               }
+          }
         }
       }
       else
