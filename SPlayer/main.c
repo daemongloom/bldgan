@@ -1372,7 +1372,8 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
     if (strcmp(successed_config_filename,(char *)msg->data0)==0)
     {
       InitConfig();
-      InitLanguage();
+    //  InitLanguage();
+      ShowNamesNoConst=SHOW_NAMES;
       
       if(!IsTimerProc(&offtm)) {AutoExit();}
       ResetAutoExit();
@@ -1484,13 +1485,13 @@ int main(char *exename, char *fname)
   sprintf(sfname,"%s%s",PIC_DIR,"colour.cfg");
   load_skin(sfname);
   SUBPROC((void*)LoadKeys);
-  SUBPROC((void*)LoadPng);
+  SUBPROC((void*)lgpInitLangPack); //Загрузка языка - Vedan
+  SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
   playmode = PlayMode;
   SoundVolume = soundvolume;
   ShowNamesNoConst=SHOW_NAMES;
   
   wl.wfilename=AllocWS(128);
-  lgpInitLangPack(); //Загрузка языка - Vedan
  // Memory();
   // Если что-то передали в параметре - загружаем...
   if (fname)

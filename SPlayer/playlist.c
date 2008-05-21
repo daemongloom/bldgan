@@ -632,7 +632,7 @@ void SavePlaylist(char *fn)
     if(EXT==0){sprintf(m,"%s%i%s",fn,j,".spl");}
     else{sprintf(m,"%s%i%s",fn,j,".m3u");}
   }
-  f=fopen(m,A_ReadWrite+A_MMCStream+A_Create+A_BIN,P_READ+P_WRITE,&err);
+  f=fopen(m,A_ReadWrite/*+A_MMCStream*/+A_Create+A_BIN,P_READ+P_WRITE,&err);
   for (i=1;i<TC[CurrentPL]+1;i++)
   {
     ws_2str(playlist_lines[CurrentPL][i],p,256);
@@ -1049,7 +1049,7 @@ char chanel[8],
       }
       DrawScrollString(out_ws,my_x,my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
                    scroll_disp+1,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
-      if(InfoOn)
+      if(InfoOn&&MarkLine)
      {
         
         DrawString(info_pf,my_x,GetFontYSIZE(SizeOfFont)+2+my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+2*GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v+2,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
