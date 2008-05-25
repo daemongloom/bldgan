@@ -148,7 +148,7 @@ extern const unsigned int AUTO_EXIT_MIN;  // Время до автозакрытия   AAA
 //--- настройки из конфига ---
 
 //--- Переменные ---
-extern WSHDR *playlist_lines[TCPL][256];
+extern WSHDR *playlist_lines[TCPL][512];
 extern short phandle;  // Для определения конца воспр.  AAA
 extern unsigned short PlayingStatus;
 extern int CurrentPL;
@@ -191,45 +191,61 @@ void TimeRedraw();
 // Избавляемся от тормозов   AAA
 void LoadPng()
 {
+  unsigned int err;
+  FSTATS fstat;
   unsigned int i;
+  unsigned int l=0;
   for(i=0; i<TOTAL_ITEMS; i++)
   {
     sprintf(sfname,p_3s,PIC_DIR,items[i],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
   }
   for(i=0; i<TOTAL_ITEMS_2; i++)
   {
     sprintf(sfname,p_3s,PIC_DIR,items2[i],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
   }
   for(i=0; i<6; i++)
   {
     sprintf(sfname,"%s%s%i%s",PIC_DIR,items1[1],i,PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
   }
   for(i=2; i<5; i++)
   {
     sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
     sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
     sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[14],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
-   // ShowMSG(0,i);
   }
   for(i=5; i<9; i++)
   {
     sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
     sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
   }
   sprintf(sfname,p_4s,PIC_DIR,items1[9],items1[13],PNGEXT);
+  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
   DrawImg(0,0,(int)sfname);
   sprintf(sfname,p_4s,PIC_DIR,items1[10],items1[13],PNGEXT);
+  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
   DrawImg(0,0,(int)sfname);
   sprintf(sfname,p_3s,PIC_DIR,items1[11],PNGEXT);
+  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
   DrawImg(0,0,(int)sfname);
+  if(l){
+  sprintf(sfname,"%d%s",l,lgpData[LGP_PNG_er]);
+  ShowMSG(1,(int)lgpData[LGP_PNG_er]);}
 }
 
 //--- Инициализация ленгпака --- Vedan
@@ -388,6 +404,7 @@ void lgpInitLangPack(void)
   lgpData[LGP_Error_1]=              "Error_1!";
   lgpData[LGP_Error_2]=              "Error_2!";
   lgpData[LGP_Spkeys_er]=            "Spkeys error!";
+  lgpData[LGP_PNG_er]=               " png-files are absent. It can reduce speed of work";
   lgpData[LGP_LangCode]=             "en";
   InitLangPack();
 }

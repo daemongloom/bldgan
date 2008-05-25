@@ -21,7 +21,7 @@ __root const unsigned int IDLE_X = 5;
 __root const unsigned int IDLE_Y = 120;
 
 __root const CFG_HDR cfghdr04 = {CFG_INT,LG_Auto_Exit_Min,0,2000};
-__root const unsigned int AUTO_EXIT_MIN=30;
+__root const unsigned int AUTO_EXIT_MIN=0;
 
 __root const CFG_HDR cfghdr05 = {CFG_INT,LG_Speed_Moving,0,30};
 #ifdef NEWSGOLD
