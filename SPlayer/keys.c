@@ -49,7 +49,7 @@ const KEY_MAP keynames[] = {
  {'8', "8"},
  {'9', "9"},
  {'*', "*"},
- {'#', "#"},
+ {'#', "#"}
 };
 
 /*
@@ -101,7 +101,7 @@ KEY_PROC procmap[] = {
   NULL,
   CTDownSix,
   ToggleVolume,
-  SwitchPlayModeDown,
+  SwitchPlayModeDown
 };
 
 // Вот не могу понять как эта конструкция работает!
@@ -109,7 +109,7 @@ KEY_PROC procmap[] = {
 
 void DoKey(int key, int ka)
 {
-  for(int cc=0;cc<KEYS_COUNT;cc++)
+  for(int cc=0;cc<KEYS_COUNT+1;cc++)
    if(keynames[cc].key==key)
    {
      /*
@@ -151,7 +151,7 @@ const PROC_MAP keyprocs[] = {
   {"stopall", StopAllPlayback},
   {"nexttrack", NextTrackDown},
   {"prevtrack", PrevTrackDown},
-  {"switchmode", SwitchPlayModeDown},
+  {"switchmode", SwitchPlayModeDown}
 };
 
 void KeysProc(char *name, char *value)
@@ -162,7 +162,7 @@ void KeysProc(char *name, char *value)
   int inkey=-1;
   KEY_PROC keyproc = DoErrKey;
   
-  for(int cc=0;cc<KEYS_COUNT;cc++)
+  for(int cc=0;cc<KEYS_COUNT+1;cc++)
    if(strcmp(keynames[cc].name,name)==0)
    {
      inkey=cc;

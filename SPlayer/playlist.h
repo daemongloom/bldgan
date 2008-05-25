@@ -141,6 +141,9 @@ int LoadPlaylist(const char * fn);
 // Для загрузки пл из главного модуля
 void LoadingPlaylist(const char * fn);
 
+// Для еще одной фичи   AAA
+void LoadPlaylists(const char* path);
+
 // Утечка памяти в самом деле достала...   AAA
 void MemoryFree();
 

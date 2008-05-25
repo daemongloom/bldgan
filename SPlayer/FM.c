@@ -59,7 +59,7 @@ void DeleteFiles()
 }
 
 //LoadDaemonList(" 4:\\Doc\\");
-void LoadDaemonList(const char* path, unsigned int re, unsigned int toPL) // Теперь пашет частично   AAA
+void LoadDaemonList(const char* path, unsigned short re, unsigned short toPL) // Теперь пашет частично   AAA
 {
  // ShowMSG(0,(int)path);
   
@@ -98,7 +98,7 @@ void LoadDaemonList(const char* path, unsigned int re, unsigned int toPL) // Теп
           else {
             if(((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))||
                ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U'))){   // Перерываем форматы   AAA
-                 LoadPlaylist(p1);
+                 LoadPlaylist(name);
                }else{
                  PastLine(p, 0);
                }
@@ -360,5 +360,7 @@ static const RECT Canvas={0,0,0,0};
   CreateGUI(main_gui);
   
   NULLchar(nowpath, 128);
-  GO();
+  NULLmass(MarkLines, TCFM);
+  if(strlen(MUSIC)) {LoadingDaemonList(MUSIC, 0, 0);}
+  else {GO();}
 }

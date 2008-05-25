@@ -4,7 +4,7 @@
 #include "mylib.h" 
 #include "langpack.h"
 
-WSHDR *playlist_lines[TCPL][256];  // Массив указателей на имена файлов в пл   Mr. Anderstand: Воплотим мечту в жизнь!
+WSHDR *playlist_lines[TCPL][512];  // Массив указателей на имена файлов в пл   Mr. Anderstand: Воплотим мечту в жизнь!
 
 // Из конфига
 extern char COLOR_TEXT[];
@@ -13,6 +13,7 @@ extern char COLOR_TEXT_PLAY[];   //И еще AAA
 extern char COLOR_BANDROLL[];    //Цвет полосы прокрутки
 extern char COLOR_BANDROLL_C[];
 extern const int SHOW_NAMES;
+extern const char PLAYLISTS[];
 extern const char PIC_DIR[];           // Для курсора AAA
 extern const int EXT;                  // Расширение по умолчанию
 extern const int soundvolume;          // Громкость
@@ -30,6 +31,7 @@ int PlayedTrack[TCPL];                  // Проигрываемый трек   AAA
 int CurrentPL=0;                     // Текущий пл   AAA
 int PlayedPL=0;                      // Пл воспроизведения   AAA
 unsigned int TC[TCPL];                  // Количество треков в пл 
+unsigned int ready[TCPL];
 extern const unsigned int LinesInPL_C; // Количество треков (макс)
 unsigned int LinesInPL;
 int PlayTime;
@@ -152,7 +154,8 @@ int random(int max)
 
 // Случайный трек DemonGloom
 void RandTrack() 
-{ 
+{
+  if(ready[PlayedPL]){
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
   if(NextPlayedTrack[1]){PlaySetTrack();}
   else{
@@ -170,20 +173,22 @@ void RandTrack()
   }
   }
   }
-  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));
+  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));}
 }
 
 //Повторяющийся трек       Ничего умнее не придумал...  AAA
 void RepeatTrack()
 {
+  if(ready[PlayedPL]){
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
   if(NextPlayedTrack[1]){PlaySetTrack();}
-  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));
+  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));}
 }
 
 // Для plamode==1       Ничего умнее не придумал...  AAA // Не понял я этого режима... DG
 void NextTrackX()
 {
+  if(ready[PlayedPL]){
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
   
   if(PlayedTrack[PlayedPL]<TC[PlayedPL]||NextPlayedTrack[1])
@@ -196,11 +201,13 @@ void NextTrackX()
   {
     PlayedTrack[PlayedPL]=1;
   }
+  }
 }
 
 // Следующий трек пл AAA
 void NextTrack()
 {
+  if(ready[PlayedPL]){
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
 //  if (CurrentTrack==(PlayedTrack-1)){// Перенос курсора на следующую песню  // И зачем? То пытаемся не повторять ошибок
 //    CurrentTrack=PlayedTrack;        // встроенного плеера, а тут... И Где логика если у следующей функции нет аналогичного свойства??  AAA
@@ -211,16 +218,17 @@ void NextTrack()
   if(PlayedTrack[PlayedPL]<TC[PlayedPL]) {PlayedTrack[PlayedPL]++;}
   else {PlayedTrack[PlayedPL]=1;}
   }
-  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));
+  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));}
 }
 
 // Предыдущий трек пл AAA
 void PreviousTrack()
 {
+  if(ready[PlayedPL]){
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
   if(PlayedTrack[PlayedPL]>1) {PlayedTrack[PlayedPL]--;}
   else {PlayedTrack[PlayedPL]=TC[PlayedPL];}
-  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));
+  PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));}
 }
 
 // Пауза/Воспроизведение
@@ -231,7 +239,7 @@ void TogglePlayback()
   {
   case 0:
     // Если стоп, то воспроизводим текущий...
-    PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL] = 1)); //Чуток изменил   AAA
+    if(ready[PlayedPL]) {PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL] = 1));} //Чуток изменил   AAA
     break;
   case 1:
     // Если пауза - продолжаем воспроизведение...
@@ -480,6 +488,7 @@ void CTUpSix()
 //Воспроизвести AAA
 void PlayTrackUnderC()
 {
+  if(ready[CurrentPL]){
   Stat_keypressed = 1;
   StopAllPlayback();
   if(PlayedPL!=CurrentPL)
@@ -489,6 +498,11 @@ void PlayTrackUnderC()
   }
   PlayedTrack[PlayedPL] = CurrentTrack[CurrentPL];
   PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));
+  }else{
+    char p[256];
+    ws_2str(GetCurrentTrack(CurrentTrack[CurrentPL]),p,256);
+    LoadingPlaylist(p);
+  }
 }
 
 // Выдаем текущий статус
@@ -885,9 +899,14 @@ void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsign
   int i;
  // char* str;
  // ID3TAGDATA *ShowTag;
-  //---- Информация о воспроизводящемся файле (формат, канал, частота дискретизации), вывод закошен под AIMP, просьба не менять  - Vedan
-  WSHDR * info_pf = AllocWS(32); 
-  if(InfoOn)
+  
+  
+  // Имя файла...
+  if (AllLines[CurList]>0)
+  {
+    //---- Информация о воспроизводящемся файле (формат, канал, частота дискретизации), вывод закошен под AIMP, просьба не менять  - Vedan
+    WSHDR * info_pf = AllocWS(32); 
+    if(InfoOn)
   {
 // Ддя информации
 char chanel[8],
@@ -920,10 +939,6 @@ char chanel[8],
     wsprintf(info_pf,"%t%t%t",format,chanel,freq); //Строка информации (фомат, канал, частота)
   }
   
-  
-  // Имя файла...
-  if (AllLines[CurList]>0)
-  {
     my_x = CTmy_x;
     my_y = CTmy_y;
 
@@ -1083,6 +1098,9 @@ char chanel[8],
     if(n==0) {n=s;}
     if(d==0) {d=2*s;}
     FreeWS(out_ws);
+    FreeWS(info_pf);
+  }else{
+    LoadPlaylists(PLAYLISTS);
   }
   // Плейлист
   WSHDR * pl_c = AllocWS(64);
@@ -1095,7 +1113,6 @@ char chanel[8],
   }
   DrawString(pl_c,NUMmy_x,NUMmy_y,w,NUMmy_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
   FreeWS(pl_c);
-  FreeWS(info_pf);
   BandRoll(CurLine[CurList], AllLines[CurList]);
 }
 
@@ -1185,6 +1202,52 @@ void LoadingPlaylist(const char * fn)
           DeleteLine();
         }
   LoadPlaylist(fn);
+  ready[CurrentPL]=1;
+}
+
+//LoadDaemonList(" 4:\\Doc\\");
+void LoadPlaylists(const char* path) // Для еще одной фичи   AAA
+{
+  DIR_ENTRY de;
+  unsigned int err;
+  char name[256];
+  strcpy(name,path);
+  strcat(name,"*");
+  if(FindFirstFile(&de,name,&err))
+  {
+    do
+    {
+      char* p1=malloc(256);
+      WSHDR* p=AllocWS(256);
+      strcpy(name,path);
+      strcat(name,de.file_name);
+      
+      if (!isdir(name, &err))//(de.file_attr&FA_DIRECTORY)
+      {
+        int a=de.file_name[strlen(de.file_name)-3];
+        int b=de.file_name[strlen(de.file_name)-2];
+        int c=de.file_name[strlen(de.file_name)-1];
+        if(((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))||
+               ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U')))   // Перерываем форматы   AAA
+        {
+          strcpy(p1,name);
+          fix(p1);
+          utf8_2ws(p,p1,256);
+          PastLine(p, 0);
+        }
+      }
+      else
+      {
+        strcat(name,"\\"); LoadPlaylists(name);
+      }
+      FreeWS(p);
+      mfree(p1);
+    }
+    while(FindNextFile(&de,&err));
+  }
+  FindClose(&de,&err);
+  if(TC[CurrentPL]>0) {CTtoFirst(); PTtoFirst();}
+  ready[CurrentPL]=0;
 }
 
 // Утечка памяти в самом деле достала...   AAA
