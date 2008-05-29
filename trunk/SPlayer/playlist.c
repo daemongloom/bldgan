@@ -37,6 +37,7 @@ unsigned int LinesInPL;
 int PlayTime;
 unsigned short NextPlayedTrack[2];   // № трека и пл в очереди
 unsigned short ShowNamesNoConst;       // В константе не получается изменять   AAA
+extern const char p_3s[];
 
 extern unsigned short CTmy_x;     // Координаты CurrentTrack
 extern unsigned short CTmy_y;
@@ -61,7 +62,7 @@ extern const unsigned int GrafOn1; // 1,если включена анимация   AAA
 extern const unsigned int InfoOn; // 1,если включен показ информации   Vedan
 unsigned short stop=1; // 1, если останавливаем листание   AAA
 extern unsigned short Stat_keypressed;
-extern const char p_3s[];
+unsigned short FM_o=0;
 // Всякие "мелкие" переменные
 
 extern unsigned int MAINGUI_ID;
@@ -277,8 +278,9 @@ void StopAllPlayback()
 // Постановка в очередь   AAA
 void SetNextPlayed()
 {
-  NextPlayedTrack[0]=CurrentPL;
-  NextPlayedTrack[1]=CurrentTrack[CurrentPL];
+//  NextPlayedTrack[0]=CurrentPL;
+  //NextPlayedTrack[1]=CurrentTrack[CurrentPL];
+  WSHDR*w=AllocWS(128);
 }
 
 // Воспроизведение поставленного в очередь   AAA
@@ -490,7 +492,7 @@ void PlayTrackUnderC()
 {
   if(ready[CurrentPL]){
   Stat_keypressed = 1;
-  StopAllPlayback();
+  if(phandle!=-1)PlayMelody_StopPlayback(phandle);
   if(PlayedPL!=CurrentPL)
   {
     PlayedTrack[PlayedPL] = 0;
@@ -630,12 +632,10 @@ void ascii2ws(char *s, WSHDR *ws)
 void SavePlaylist(char *fn)
 {
   int j=0;
-  int i;
   int f;
   char* p=malloc(256);
   char m[256];
-  char s[]={0x0D}; 
-  char s2[]={0x0A};                                // Сделал совместимость с m3u 
+  char s[]={0x0D,0x0A}; // Сделал совместимость с m3u 
   if(EXT==0){sprintf(m,"%s%s",fn,".spl");}
   else{sprintf(m,"%s%s",fn,".m3u");}                      // ----------- 
   FSTATS fstats;
@@ -647,12 +647,12 @@ void SavePlaylist(char *fn)
     else{sprintf(m,"%s%i%s",fn,j,".m3u");}
   }
   f=fopen(m,A_ReadWrite/*+A_MMCStream*/+A_Create+A_BIN,P_READ+P_WRITE,&err);
-  for (i=1;i<TC[CurrentPL]+1;i++)
+  if(EXT==1){fwrite(f,"#EXTM3U",7,&err); fwrite(f,s,2,&err);}
+  for (unsigned int i=0;i<TC[CurrentPL];i++)
   {
-    ws_2str(playlist_lines[CurrentPL][i],p,256);
+    ws_2str(playlist_lines[CurrentPL][i+1],p,256);
     fwrite(f,p,strlen(p),&err);
-    fwrite(f,s,1,&err);
-    fwrite(f,s2,1,&err);
+    fwrite(f,s,2,&err);
   }
   mfree(p);
   fclose(f,&err);
@@ -1100,7 +1100,7 @@ char chanel[8],
     FreeWS(out_ws);
     FreeWS(info_pf);
   }else{
-    LoadPlaylists(PLAYLISTS);
+    if(!FM_o) {LoadPlaylists(PLAYLISTS);}
   }
   // Плейлист
   WSHDR * pl_c = AllocWS(64);
@@ -1203,6 +1203,15 @@ void LoadingPlaylist(const char * fn)
         }
   LoadPlaylist(fn);
   ready[CurrentPL]=1;
+}
+
+// Чистим пл   AAA
+void CleanPlaylist()
+{
+  while(TC[CurrentPL]>0)
+        {
+          DeleteLine();
+        }
 }
 
 //LoadDaemonList(" 4:\\Doc\\");

@@ -117,6 +117,9 @@ void MoveLineRight();
 // Перемещаем строку в предыдущий пл   AAA
 void MoveLineLeft();
 
+// Возвращает имя файла по полному пути...
+void FullpathToFilename(WSHDR * fnamews, WSHDR * wsFName);
+
 // Убираем странный символ (всвязи с переходом на WSHDR)   AAA
 void fix(char* p);
 
@@ -143,6 +146,9 @@ void LoadingPlaylist(const char * fn);
 
 // Для еще одной фичи   AAA
 void LoadPlaylists(const char* path);
+
+// Чистим пл   AAA
+void CleanPlaylist();
 
 // Утечка памяти в самом деле достала...   AAA
 void MemoryFree();

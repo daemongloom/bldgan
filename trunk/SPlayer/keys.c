@@ -2,6 +2,7 @@
 #include "main.h"
 #include "mainmenu.h"
 #include "playlist.h"
+#include "FM.h"
 
 /*
   Будующий конфиг клавиш. Blind007
@@ -98,10 +99,12 @@ KEY_PROC procmap[] = {
   PrevTrackDown,
   TogglePlayback,
   NextTrackDown,
-  NULL,
+  ShowFM,
   CTDownSix,
   ToggleVolume,
-  SwitchPlayModeDown
+  SwitchPlayModeDown,
+  SetNextPlayed,
+  CleanPlaylist
 };
 
 // Вот не могу понять как эта конструкция работает!
@@ -109,7 +112,7 @@ KEY_PROC procmap[] = {
 
 void DoKey(int key, int ka)
 {
-  for(int cc=0;cc<KEYS_COUNT+1;cc++)
+  for(int cc=0;cc<KEYS_COUNT;cc++)
    if(keynames[cc].key==key)
    {
      /*
@@ -151,7 +154,10 @@ const PROC_MAP keyprocs[] = {
   {"stopall", StopAllPlayback},
   {"nexttrack", NextTrackDown},
   {"prevtrack", PrevTrackDown},
-  {"switchmode", SwitchPlayModeDown}
+  {"switchmode", SwitchPlayModeDown},
+  {"fm", ShowFM},
+  {"nextplayed", SetNextPlayed},
+  {"cleanpl", CleanPlaylist}
 };
 
 void KeysProc(char *name, char *value)
@@ -162,7 +168,7 @@ void KeysProc(char *name, char *value)
   int inkey=-1;
   KEY_PROC keyproc = DoErrKey;
   
-  for(int cc=0;cc<KEYS_COUNT+1;cc++)
+  for(int cc=0;cc<KEYS_COUNT;cc++)
    if(strcmp(keynames[cc].name,name)==0)
    {
      inkey=cc;

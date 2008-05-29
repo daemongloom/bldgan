@@ -36,6 +36,7 @@ int CurFile=1;       // Текущий элемент   AAA
 unsigned int TCFM=0; // Количество элементов   AAA
 char nowpath[128];
 extern unsigned short ShowNamesNoConst;
+extern unsigned short FM_o;
 //////////////////////////Переменные//////////////////////////////
 
 void PastFile(WSHDR *p, unsigned short i)
@@ -57,7 +58,65 @@ void DeleteFiles()
     TCFM--;
   }
 }
-
+/*
+void Sortir(WSHDR** mass)
+{
+  WSHDR* buf=AllocWS(256);
+  char* a=malloc(256);
+  char* b=malloc(256);
+  for(unsigned int j=0;j<TCFM;j++)
+  {
+    for(unsigned int i=0;i<TCFM;i++)
+    {
+      
+        unsigned int j=0;
+        for(unsigned int k=0;k<j+1;k++)
+        {
+          ws_2str(mass[i],a,256);
+          ws_2str(mass[i+1],b,256);
+          if(a[j]>b[j])
+          {
+            wstrcpy(buf,mass[i]);
+            wstrcpy(mass[i],mass[i+1]);
+            wstrcpy(mass[i+1],buf);
+          }else{
+            if(a[j]==b[j]) {j++;}
+          }
+        }
+      
+    }
+  }
+  FreeWS(buf);
+  mfree(a);
+  mfree(b);
+}*/
+/*
+void Sortir(WSHDR** mass)
+{
+  WSHDR* buf=AllocWS(256);
+  for(unsigned int j=0;j<TCFM;j++)
+  {
+    for(unsigned int i=0;i<TCFM;i++)
+    {
+      
+        unsigned int j=0;
+        for(unsigned int k=0;k<j+1;k++)
+        {
+          if(mass[i][j]>mass[i+1][j])
+          {
+            wstrcpy(buf,mass[i]);
+            wstrcpy(mass[i],mass[i+1]);
+            wstrcpy(mass[i+1],buf);
+          }else{
+            if(mass[i]==mass[i+1]) {j++;}
+          }
+        }
+      
+    }
+  }
+  FreeWS(buf);
+}
+*/
 //LoadDaemonList(" 4:\\Doc\\");
 void LoadDaemonList(const char* path, unsigned short re, unsigned short toPL) // Теперь пашет частично   AAA
 {
@@ -122,6 +181,7 @@ void LoadDaemonList(const char* path, unsigned short re, unsigned short toPL) //
     while(FindNextFile(&de,&err));
   }
   FindClose(&de,&err);
+ // Sortir(Files);
 }
 
 void LoadingDaemonList(const char* path, unsigned int re, unsigned int toPL)
@@ -269,8 +329,9 @@ static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//горячо любимый онкей
     case RIGHT_BUTTON:
       
       break;
-    case LEFT_BUTTON:
-      
+    case '1':
+      NULLchar(nowpath, 128);
+      GO();
       break;
     case '2':
       if(CurFile-6>0) {CurFile-=6;}
@@ -299,6 +360,7 @@ void FreeMemFM()
 {
   DeleteFiles();
   CurFile=1;
+  FM_o=0;
   NULLmass(MarkLines, TCFM);
   ShowNamesNoConst=SHOW_NAMES;
 }
@@ -359,6 +421,7 @@ static const RECT Canvas={0,0,0,0};
   
   CreateGUI(main_gui);
   
+  FM_o=1;
   NULLchar(nowpath, 128);
   NULLmass(MarkLines, TCFM);
   if(strlen(MUSIC)) {LoadingDaemonList(MUSIC, 0, 0);}
