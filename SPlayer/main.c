@@ -245,7 +245,7 @@ void LoadPng()
   DrawImg(0,0,(int)sfname);
   if(l){
   sprintf(sfname,"%d%s",l,lgpData[LGP_PNG_er]);
-  ShowMSG(1,(int)lgpData[LGP_PNG_er]);}
+  ShowMSG(1,(int)sfname);}
 }
 
 //--- Инициализация ленгпака --- Vedan
@@ -521,6 +521,8 @@ int findmp3length(char *playy) {
 
 }
 
+
+
 void PlayMP3File(WSHDR * fname)
 {
 if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
@@ -582,12 +584,15 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       SetPlayingStatus(2);
       PlayMelody_ChangeVolume(phandle,GetVolLevel());  // Что бы была нормальная громкость - иначе криво...
 #endif
+     // FILE_PROP* wlk=malloc(sizeof(FILE_PROP));
+     // GetFileProp(wlk,sndFName,sndPath);
       UpdateCSMname(sndFName); // Покажем что играем XTask Blind007
+     // mfree(wlk);
       // Покажем что играем тем кому нужно :)))   AAA
       if(FnameIPC)
       {
         // Вылавливаем имя трека   AAA
-        char *trackname=malloc(256);
+        char *trackname=malloc(128);
       //  strncpy(trackname, p, strlen(p)-4);   // Мочим расширение   AAA
         // Выловили имя трека   AAA
         ID3TAGDATA *StatTag;
@@ -598,15 +603,18 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
         mfree(StatTag);
         gipc.data=(void*)trackname;
         }else{
-        gipc.data=(void*)p;
+          WSHDR * ws1=AllocWS(256);
+          FullpathToFilename(fname, ws1);
+          ws_2str(ws1,trackname,128);
+        //  ShowMSG(1,(int)trackname);
+          gipc.data=(void*)trackname;
+          FreeWS(ws1);
         }
         
         gipc.name_to=ipc_grantee_name;
         gipc.name_from=ipc_my_name;
         
         GBS_SendMessage(MMI_CEPID,MSG_IPC,0,&gipc);
-        
-       // ShowMSG(1,(int)trackname);
         
         mfree(trackname);
       }

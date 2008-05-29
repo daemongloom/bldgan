@@ -80,6 +80,12 @@ void ShowID3()
   GeneralFuncF1(1);
 }
 
+void FM()
+{
+  ShowFM();
+  GeneralFuncF1(1);
+}
+
 void Sets_Menu()
 {
   Disp_Sets_Menu();
@@ -113,7 +119,7 @@ void AboutDlg()
   FreeWS(ews);
   */
   ShowMSG(0,(int)"(r)\nIlya_ZX\n-Shadow-\nCaptain SISka\nVedan\nGanster and The_Zen");
-  ShowMSG(0,(int)"SPlayer v0.7.8.6\n(c): \nAnderstand\nBlind007\nDemonGloom");
+  ShowMSG(0,(int)"SPlayer v0.9.0.0\n(c): \nAnderstand\nBlind007\nDemonGloom");
   GeneralFuncF1(1);
 };
 /////////////////////////////////////////////Ξα ύλότε///////////////////////////////////////////////////
@@ -168,7 +174,7 @@ MENUITEM_DESC menuitems[N_ITEMS]=
 void *menuprocs[N_ITEMS]={
                           (void *)SetNextPlayedOn,
                           (void *)ShowID3,
-                          (void *)ShowFM,
+                          (void *)FM,
                           (void *)Sets_Menu,
                           (void *)Settings,
                           (void *)AboutDlg,
