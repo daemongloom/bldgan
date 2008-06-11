@@ -186,21 +186,6 @@ void LoadDaemonList(const char* path, unsigned short re, unsigned short toPL) //
 
 void LoadingDaemonList(const char* path, unsigned int re, unsigned int toPL)
 {
-  /*  if(TC[CurrentPL]>0)
-    {
-      MsgBoxYesNo(1,(int)"«аменить?",Change);
-      if(change)
-      {
-        CTtoFirst();
-        PTtoFirst();
-        while(TC[CurrentPL]>0)
-        {
-          DeleteLine();
-        }
-      }
-    }else{
-      CTtoFirst();
-    }*/
   DeleteFiles();  // ѕеред загрузкой все стираем   AAA
   LoadDaemonList(path, re, toPL);
 }
@@ -237,9 +222,9 @@ void CopyFName(WSHDR** mlines, int* mark, unsigned int imax)   //  опируем пути 
 
 void GO()
 {
-char pn[128];
-WSHDR* ws=AllocWS(256);
-NULLmass(MarkLines, TCFM);
+  char pn[128];
+  WSHDR* ws=AllocWS(256);
+  NULLmass(MarkLines, TCFM);
 if(strlen(nowpath)>3)
 {
   nowpath[strlen(nowpath)-1]=0;
@@ -263,7 +248,7 @@ static void OnRedraw(SHOW_FM_GUI *data)
 {
   if (data->gui.state==2)//это нужно дл€ того, чтобы действи€ происходили только в этом гуе
   {
-    DrawRoundedFrame(0,0,ScreenW()-1,ScreenH()-1,0,0,0,GetPaletteAdrByColorIndex(1),color(COLOR_BG));
+    DrawRoundedFrame(0,0,ScreenW()-1,ScreenH()-1,0,0,0,GetPaletteAdrByColorIndex(1),COLOR_BG);
     #ifndef NO_PNG
     char sfname1[256];
     sprintf(sfname1,"%s%s",PIC_DIR,"background.png");

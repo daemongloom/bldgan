@@ -2,6 +2,7 @@
 #include "main.h"
 #include "mainmenu.h"
 #include "langpack.h"
+#include "lang.h"
 #include "playlist.h"
 #include "ID3Genres.h"
 #include "item_info.h"
@@ -119,7 +120,10 @@ void AboutDlg()
   FreeWS(ews);
   */
   ShowMSG(0,(int)"(r)\nIlya_ZX\n-Shadow-\nCaptain SISka\nVedan\nGanster and The_Zen");
-  ShowMSG(0,(int)"SPlayer v0.9.0.0\n(c): \nAnderstand\nBlind007\nDemonGloom");
+  char info[128];
+  sprintf(info,"SPlayer v%s\n(c): \nAnderstand\nBlind007\nDemonGloom",LG_Version);
+  ShowMSG(0,(int)info);
+ /* ShowMSG(0,(int)"SPlayer v0.9.0.0\n(c): \nAnderstand\nBlind007\nDemonGloom");*/
   GeneralFuncF1(1);
 };
 /////////////////////////////////////////////Ξα ύλότε///////////////////////////////////////////////////

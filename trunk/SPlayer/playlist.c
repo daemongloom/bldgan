@@ -54,7 +54,6 @@ unsigned short BRC_w;  //=2;
 // Полоса прокрутки
 
 // Всякие "мелкие" переменные
-extern unsigned short w;
 extern unsigned int playmode;
 extern unsigned short copy;
 extern const unsigned int GrafOn; // 1,если включены эффекты типа скролла   AAA
@@ -278,9 +277,8 @@ void StopAllPlayback()
 // Постановка в очередь   AAA
 void SetNextPlayed()
 {
-//  NextPlayedTrack[0]=CurrentPL;
-  //NextPlayedTrack[1]=CurrentTrack[CurrentPL];
-  WSHDR*w=AllocWS(128);
+  NextPlayedTrack[0]=CurrentPL;
+  NextPlayedTrack[1]=CurrentTrack[CurrentPL];
 }
 
 // Воспроизведение поставленного в очередь   AAA
@@ -829,7 +827,28 @@ void FullpathToFilename(WSHDR * fnamews, WSHDR * wsFName)
   mfree(fname);
 }
 
-// Возвращает имя файла по полному пути...
+// Возвращает имя файла по полному пути...        Теперь быстрее работает   AAA
+void FullpathToFile(WSHDR * fnamews, WSHDR * wsFName)
+{
+  char* fname=malloc(256);
+  ws_2str(fnamews,fname,256);
+  unsigned int len=strlen(fname);
+
+  if(fname[len-1]=='\\') {fname[len]=0; fname[len-1]='\0';}
+  
+  const char *p=strrchr(fname,0x1f)+1;
+  const char *p2=strrchr(fname,'\\')+1;
+  if (p2>p){
+    utf8_2ws(wsFName,p2,strlen(p2)+1);
+  }else{
+    utf8_2ws(wsFName,p,strlen(p)+2);
+  }
+  
+  if(fname[len-1]=='\0') {wsprintf(wsFName,"%w\\",wsFName);}
+  
+  mfree(fname);
+}
+/*
 void FullpathToFile(WSHDR * fnamews, WSHDR * wsFName)
 {
   unsigned int err;
@@ -855,7 +874,7 @@ void FullpathToFile(WSHDR * fnamews, WSHDR * wsFName)
       wsprintf(wsFName,"%w\\",wsFName);
   }
   mfree(fname);
-}
+}*/
 
 void fix(char* p)  // Убираем странный символ (всвязи с переходом на WSHDR)   AAA
 {
@@ -889,7 +908,7 @@ WSHDR * GetTrackByNumber(WSHDR**mass, int number)
 // Нет функциям океренной величины!!   AAA
 void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsigned int* AllLines, int CurList, int MarkList)
 {
-  
+  unsigned short w = ScreenW();
   unsigned short my_x;
   unsigned short my_y;
   unsigned short k;
@@ -1030,10 +1049,10 @@ char chanel[8],
     if (MarkLine[CurList]==i||MarkLines[i]==1)
     {
       DrawScrollString(out_ws,my_x,my_y+c+(p2-p3*v)*v3,w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
-                   1,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
+                   1,SizeOfFont,0,COLOR_TEXT_PLAY,0);
     }else{
       DrawScrollString(out_ws,my_x,my_y+c+(p2-p3*v)*v3,w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
-                   1,SizeOfFont,0,color(COLOR_TEXT_CURSOR),0);
+                   1,SizeOfFont,0,COLOR_TEXT_CURSOR,0);
     }
     p2=0;
     }else{
@@ -1063,11 +1082,11 @@ char chanel[8],
 	  }
       }
       DrawScrollString(out_ws,my_x,my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
-                   scroll_disp+1,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
+                   scroll_disp+1,SizeOfFont,0,COLOR_TEXT_PLAY,0);
       if(InfoOn&&MarkLine)
      {
         
-        DrawString(info_pf,my_x,GetFontYSIZE(SizeOfFont)+2+my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+2*GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v+2,SizeOfFont,0,color(COLOR_TEXT_PLAY),0);
+        DrawString(info_pf,my_x,GetFontYSIZE(SizeOfFont)+2+my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+2*GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v+2,SizeOfFont,0,COLOR_TEXT_PLAY,0);
      }
       
       
@@ -1088,7 +1107,7 @@ char chanel[8],
 	  }
         }
       DrawScrollString(out_ws,my_x,my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
-                   scroll_disp+1,SizeOfFont,0,color(COLOR_TEXT),0);
+                   scroll_disp+1,SizeOfFont,0,COLOR_TEXT,0);
     }
     c+=s;
     }
@@ -1111,7 +1130,7 @@ char chanel[8],
   for(unsigned int i=0; i<AllLines[CurList]+1; i++) {if(MarkLines[i]==1) {nLines++;}}
   wsprintf(pl_c,"%i/%i;%i(%i)",CurLine[CurList],AllLines[CurList],nLines,TC[CurrentPL]);
   }
-  DrawString(pl_c,NUMmy_x,NUMmy_y,w,NUMmy_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
+  DrawString(pl_c,NUMmy_x,NUMmy_y,w,NUMmy_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
   FreeWS(pl_c);
   BandRoll(CurLine[CurList], AllLines[CurList]);
 }
@@ -1122,8 +1141,8 @@ void BandRoll(int CurLine, int AllLines)
   if(AllLines>6)
   {
     int yy=CurLine*(BR2_y-BR1_y)/AllLines;
-    DrawRoundedFrame(BR_x,BR1_y,BR_x+BR_w-1,BR2_y,0,0,0,0,color(COLOR_BANDROLL));
-    DrawRoundedFrame(BRC_x,BR1_y+yy-(BR2_y-BR1_y)/AllLines,BRC_x+BRC_w-1,BR1_y+yy,0,0,0,0,color(COLOR_BANDROLL_C));
+    DrawRoundedFrame(BR_x,BR1_y,BR_x+BR_w-1,BR2_y,0,0,0,0,COLOR_BANDROLL);
+    DrawRoundedFrame(BRC_x,BR1_y+yy-(BR2_y-BR1_y)/AllLines,BRC_x+BRC_w-1,BR1_y+yy,0,0,0,0,COLOR_BANDROLL_C);
   }
 }
 
@@ -1197,10 +1216,7 @@ void LoadingPlaylist(const char * fn)
     }*/
   CTtoFirst();
   PTtoFirst();
-  while(TC[CurrentPL]>0)
-        {
-          DeleteLine();
-        }
+  CleanPlaylist();
   LoadPlaylist(fn);
   ready[CurrentPL]=1;
 }
