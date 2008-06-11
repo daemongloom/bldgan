@@ -4,7 +4,7 @@
 {=  Главный модуль программы                   =}
 {= Авторы: Николай Трубинов                    =}
 {=         Николай Козаченко                   =}
-{= Дата: 2008.05.16                            =}
+{= Дата: 2008.06.07                            =}
 {===============================================}
 
 unit Unit1;
@@ -105,6 +105,7 @@ type
     RadioButton2: TRadioButton;
     SpeedButton8: TSpeedButton;
     SpeedButton10: TSpeedButton;
+    Button2: TButton;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -159,6 +160,7 @@ type
     procedure N37Click(Sender: TObject);
     procedure RadioButton2Click(Sender: TObject);
     procedure AutoModeClick(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -321,31 +323,55 @@ end;
 procedure TForm1.DrawField;
 var i,j: integer;
     p: array [1..3] of TPoint;
+const alphabet: string='АБВГДЕЖЗИК';
 begin
    Form1.Autosize:=true;
    // Выводим буковки и циферки
    with Image1.Canvas do begin
       Font.Color := clGreen;
       for i:=1 to fsize_w do
-         TextOut((i-1)*asize+23,0,Chr(Ord('А')+(i-1)));
+         TextOut((i-1)*asize+23,0,alphabet[i]);
       for i:=1 to fsize_h do
          TextOut(0,(i-1)*asize+23,IntToStr(i));
    end;
    // Заливаем фон
-   FieldBox.Canvas.Brush.Color := clBlack;
+   FieldBox.Canvas.Brush.Color := clGray;
    FieldBox.Canvas.Rectangle(0,0,FieldBox.Width,FieldBox.Height);
    // Рисуем сетку и ставим предметы
    FieldBox.Canvas.Brush.Color := clGreen;
    for i:=1 to fsize_w do begin
       for j:=1 to fsize_h do begin
          FieldBox.Canvas.Pen.Color := clWhite;
+         FieldBox.Canvas.Brush.Style := bsSolid;
          case field[i,j].ElemT of
            EMPTY: FieldBox.Canvas.Brush.Color := ClearButton.ButtonColor;
            RUBSH: FieldBox.Canvas.Brush.Color := DirtyButton.ButtonColor;
-           eSTUL,eSTUL+Offset: begin FieldBox.Canvas.Brush.Color := InsertStul.ButtonColor; FieldBox.Canvas.Pen.Color := clBlack; end;
-           eSTOL,eSTOL+Offset: begin FieldBox.Canvas.Brush.Color := InsertStol.ButtonColor; FieldBox.Canvas.Pen.Color := clBlack; end;
-           eDIVAN,eDIVAN+Offset: begin FieldBox.Canvas.Brush.Color := InsertDivan.ButtonColor; FieldBox.Canvas.Pen.Color := clBlack; end;
-           eSHKAF,eSHKAF+Offset: begin FieldBox.Canvas.Brush.Color := InsertShkaf.ButtonColor; FieldBox.Canvas.Pen.Color := clBlack; end;
+           eSTUL: begin
+              FieldBox.Canvas.Brush.Color := InsertStul.ButtonColor;
+              FieldBox.Canvas.Pen.Color := clBlack;
+           end;
+           eSTUL+Offset: begin
+              FieldBox.Canvas.Brush.Color := InsertStul.ButtonColor;
+              FieldBox.Canvas.Pen.Color := clBlack;
+              FieldBox.Canvas.Brush.Style := bsDiagCross;
+           end;
+           eSTOL: begin
+              FieldBox.Canvas.Brush.Color := InsertStol.ButtonColor;
+              FieldBox.Canvas.Pen.Color := clBlack;
+           end;
+           eSTOL+Offset: begin
+              FieldBox.Canvas.Brush.Color := InsertStol.ButtonColor;
+              FieldBox.Canvas.Pen.Color := clBlack;
+              FieldBox.Canvas.Brush.Style := bsDiagCross;
+           end;
+           eDIVAN,eDIVAN+Offset: begin
+              FieldBox.Canvas.Brush.Color := InsertDivan.ButtonColor;
+              FieldBox.Canvas.Pen.Color := clBlack;
+           end;
+           eSHKAF,eSHKAF+Offset: begin
+              FieldBox.Canvas.Brush.Color := InsertShkaf.ButtonColor;
+              FieldBox.Canvas.Pen.Color := clBlack;
+           end;
          end;
          if (field[i,j].ElemT<>ePYLS) and (field[i,j].ElemT<>ePYLS+Offset)
           then FieldBox.Canvas.Rectangle((i-1)*asize,(j-1)*asize,i*asize,j*asize)
@@ -492,8 +518,10 @@ begin
       ins_pos.Y := yp;
       // Вставляем элемент на поле, если можно
       if (field[xp,yp].ElemT=EMPTY) or (field[xp,yp].ElemT=RUBSH) then begin
-         if field[xp,yp].ElemT=RUBSH then field[xp,yp].ElemT := ElemT+Offset
-            else field[xp,yp].ElemT := ElemT;
+         if field[xp,yp].ElemT=RUBSH then begin
+            field[xp,yp].ElemT := ElemT+Offset;
+            if (ElemT=eDIVAN) or (ElemT=eSHKAF) then field[xp,yp].ElemT := field[xp,yp].ElemT - Offset;
+         end else field[xp,yp].ElemT := ElemT;
          field[xp,yp].Rot := Rot;
          case ElemT of
             ePYLS: begin
@@ -1560,6 +1588,18 @@ begin
       Inc(Result);
       Delete(s,1,1);
    end
+end;
+
+// На кнопочке рисуется статистика, количество грязных ячеек
+procedure TForm1.Button2Click(Sender: TObject);
+var DCount: integer;
+    i,j: integer;
+begin
+   DCount:=0;
+   for i:=1 to fsize_w do
+      for j:=1 to fsize_h do
+         if (field[i,j].ElemT-Offset)>=0 then Inc(DCount);
+   Button2.Caption := IntToStr(DCount);      
 end;
 
 end.
