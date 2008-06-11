@@ -458,6 +458,16 @@ object Form1: TForm1
     OnExit = Edit1Exit
     OnKeyUp = Edit1KeyUp
   end
+  object Button2: TButton
+    Left = 344
+    Top = 80
+    Width = 75
+    Height = 25
+    Caption = 'Button2'
+    TabOrder = 9
+    Visible = False
+    OnClick = Button2Click
+  end
   object MainMenu1: TMainMenu
     BiDiMode = bdLeftToRight
     ParentBiDiMode = False

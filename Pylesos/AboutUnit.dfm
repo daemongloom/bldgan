@@ -3,7 +3,7 @@ object Form2: TForm2
   Top = 126
   BorderStyle = bsToolWindow
   Caption = #1054' '#1087#1088#1086#1075#1088#1072#1084#1084#1077
-  ClientHeight = 270
+  ClientHeight = 275
   ClientWidth = 369
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -30,11 +30,12 @@ object Form2: TForm2
     WordWrap = True
   end
   object Label2: TLabel
-    Left = 32
+    Left = 8
     Top = 8
-    Width = 308
-    Height = 16
+    Width = 353
+    Height = 15
     Alignment = taCenter
+    AutoSize = False
     Caption = #1055#1045#1056#1052#1057#1050#1048#1049' '#1043#1054#1057#1059#1044#1040#1056#1057#1058#1042#1045#1053#1053#1067#1049' '#1059#1053#1048#1042#1045#1056#1057#1048#1058#1045#1058
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlue
@@ -45,10 +46,13 @@ object Form2: TForm2
     WordWrap = True
   end
   object Label3: TLabel
-    Left = 72
+    Left = 8
     Top = 32
-    Width = 224
-    Height = 16
+    Width = 353
+    Height = 17
+    Align = alCustom
+    Alignment = taCenter
+    AutoSize = False
     Caption = #1052#1077#1093#1072#1085#1080#1082#1086'-'#1084#1072#1090#1077#1084#1072#1090#1080#1095#1077#1089#1082#1080#1081' '#1092#1072#1082#1091#1083#1100#1090#1077#1090
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clPurple
@@ -62,7 +66,8 @@ object Form2: TForm2
     Top = 56
     Width = 353
     Height = 129
-    Color = clInfoBk
+    Alignment = taCenter
+    Color = clSilver
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clNavy
     Font.Height = -13
