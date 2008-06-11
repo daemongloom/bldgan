@@ -67,10 +67,10 @@ __root const int soundvolume=2;
 __root const CFG_HDR cfghdr16={CFG_INT,LG_Default_volume,0,14};
 __root const int soundvolume=6;
 #endif
-
+/*
 __root const CFG_HDR cfghdr17 = {CFG_INT,LG_Amount_of_lines,0,10000};
 __root const unsigned int LinesInPL_C = 256;
-
+*/
 __root const CFG_HDR cfghdr18 = {CFG_INT,LG_Size_Of_Font,0,20};
 #ifdef NEWSGOLD
 __root const unsigned int SizeOfFont = 11;
