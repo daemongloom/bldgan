@@ -13,7 +13,7 @@ typedef void (*INIPROC) (char *name, char *value); // Процедура обработки ини-фа
 
 // Общие функции модуля MAIN.C
 
-#define color(x) (char *)(&(x))
+//#define color(x) (char *)(&(x))
 
 // Для модуля main.c
 typedef struct
@@ -65,7 +65,7 @@ typedef struct
 int ReadID3v1(WSHDR* fnamews, ID3TAGDATA *tag); // Чтение ID3 v1
 
 #define TOTAL_ITEMS_1 15
-
+#define ALLPNG 40
 
 // Лепота... Но за один запуск жрет много   AAA
 static const char * const items1[TOTAL_ITEMS_1] = {

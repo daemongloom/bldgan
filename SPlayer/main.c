@@ -5,7 +5,7 @@
 #include "mainmenu.h"
 #include "sets_menu.h"
 #include "playlist.h"
-//#include "lang.h"
+#include "lang.h"
 #include "langpack.h"
 #include "SPlayer_ipc.h"
 #include "../inc/xtask_ipc.h"
@@ -71,8 +71,6 @@ unsigned short Stat_keypressed = 0; // нажата ли клавиша изменения статуса?
 unsigned short Mode_keypressed = 0; // нажата ли клавиша изменения режима проигрывания?
 unsigned short N_keypressed = 0;
 unsigned short P_keypressed = 0;
-
-unsigned short w;
 
 //--- Собственно, переменные координат AAA ---
 unsigned short VOLmy_x;
@@ -164,6 +162,8 @@ unsigned short playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешат
 extern unsigned short ShowNamesNoConst;
 const char p_3s[]="%s%s%s";
 const char p_4s[]="%s%s%s%s";
+unsigned short pngloadcomp=0;
+unsigned short Npng=0;
 GBSTMR offtm;     // Таймер автоотключения   AAA
 
 // Переписываем время... DemonGloom
@@ -195,54 +195,78 @@ void LoadPng()
   FSTATS fstat;
   unsigned int i;
   unsigned int l=0;
+  sprintf(sfname,p_3s,PIC_DIR,items1[0],PNGEXT);
+  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+  DrawImg(0,0,(int)sfname);
+  Npng++;
+  sprintf(sfname,p_3s,PIC_DIR,items1[12],PNGEXT);
+  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+  DrawImg(0,0,(int)sfname);
+  Npng++;
   for(i=0; i<TOTAL_ITEMS; i++)
   {
     sprintf(sfname,p_3s,PIC_DIR,items[i],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
+    Npng++;REDRAW();
   }
   for(i=0; i<TOTAL_ITEMS_2; i++)
   {
     sprintf(sfname,p_3s,PIC_DIR,items2[i],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
+    Npng++;REDRAW();
   }
   for(i=0; i<6; i++)
   {
     sprintf(sfname,"%s%s%i%s",PIC_DIR,items1[1],i,PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
+    Npng++;REDRAW();
   }
   for(i=2; i<5; i++)
   {
     sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
+    Npng++;
     sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
+    Npng++;
     sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[14],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
+    Npng++;REDRAW();
   }
   for(i=5; i<9; i++)
   {
     sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
+    Npng++;
     sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
     DrawImg(0,0,(int)sfname);
+    Npng++;REDRAW();
   }
-  sprintf(sfname,p_4s,PIC_DIR,items1[9],items1[13],PNGEXT);
-  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-  DrawImg(0,0,(int)sfname);
-  sprintf(sfname,p_4s,PIC_DIR,items1[10],items1[13],PNGEXT);
-  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-  DrawImg(0,0,(int)sfname);
+  for(i=9;i<11;i++)
+  {
+    sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+    DrawImg(0,0,(int)sfname);
+    Npng++;
+    sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+    DrawImg(0,0,(int)sfname);
+    Npng++;REDRAW();
+  }
   sprintf(sfname,p_3s,PIC_DIR,items1[11],PNGEXT);
   if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
   DrawImg(0,0,(int)sfname);
+  Npng++;
+  pngloadcomp=1;
+  REDRAW();
   if(l){
   sprintf(sfname,"%d%s",l,lgpData[LGP_PNG_er]);
   ShowMSG(1,(int)sfname);}
@@ -496,10 +520,10 @@ void TimeRedraw()
   }
   }
   wsprintf(time_disp,"%02i:%02i",nm,ns);
-  DrawString(time_disp,time_x,time_y,time_x+Get_WS_width(time_disp,FONT_SMALL),time_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
+  DrawString(time_disp,time_x,time_y,time_x+Get_WS_width(time_disp,FONT_SMALL),time_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
 #ifdef X75
   wsprintf(time_disp,"%02i:%02i",fm,fs);
-  DrawString(time_disp,length_x,length_y,length_x+Get_WS_width(time_disp,FONT_SMALL),length_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,color(COLOR_TEXT),0);
+  DrawString(time_disp,length_x,length_y,length_x+Get_WS_width(time_disp,FONT_SMALL),length_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
 #endif
   FreeWS(time_disp);
   if(IsGuiOnTop(MAINGUI_ID)) GBS_StartTimerProc(&mytmr,216,EXT_REDRAW);}
@@ -621,13 +645,6 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
 //      BeginTime = SetBeginTime(); // Время начала играния файла Blind007
       FreeWS(sndPath);
       FreeWS(sndFName);
- /*     int PlayTime = GetWavkaLength((char*)sndPath,(char*)sndFName);
-  WSHDR * t = AllocWS(64);
-  wsprintf(t,"%i",PlayTime);
-  DrawString(t,NUMmy_x,NUMmy_y+10,NUMmy_x+50,NUMmy_y+GetFontYSIZE(FONT_SMALL)+10,FONT_SMALL,0,
-           color(COLOR_TEXT),0);
-  FreeWS(t);
-  REDRAW();*/
     } else {
       // Если нет такого файла!
       if(IsUnlocked()){
@@ -808,7 +825,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
 {
   if(IsGuiOnTop(MAINGUI_ID))
   {
-  w = ScreenW();
+  unsigned short w = ScreenW();
   unsigned short h = ScreenH();
   unsigned short left = 0;
 #ifdef ELKA
@@ -816,7 +833,10 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
 #else
   unsigned short top = 0;
 #endif
+    if(pngloadcomp==1)
+    {
 #ifndef NO_PNG                         // Сделаем режим без скина - DG
+  DrawRoundedFrame(left,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),COLOR_BG);  // Поселим это сюда   AAA
   // --- Делаем типа скин ---
   sprintf(sfname,p_3s,PIC_DIR,items1[0],PNGEXT);
   DrawImg(left,top,(int)sfname);  // Рисуем фон
@@ -915,7 +935,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
     DrawImg(KeyLock_x,KeyLock_y,(int)sfname);
   }
 #else
-  DrawRoundedFrame(left+1,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),color(COLOR_BG));  // Поселим это сюда   AAA
+  
 #endif
                                      // Здесь будут универсальные строки, одинаковые как для png, так и для их отсутствия
 #ifdef X75
@@ -932,6 +952,18 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   
     PL_Redraw(playlist_lines[CurrentPL],CurrentTrack,PlayedTrack,0,TC,CurrentPL,PlayedPL);
     TimeRedraw();
+    }else{
+      WSHDR*SP=AllocWS(64);
+      DrawRoundedFrame(left,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),GetPaletteAdrByColorIndex(1));  // Поселим это сюда   AAA
+      wsprintf(SP,"%s","SPlayer");
+      DrawString(SP,left,2*h/5,w,2*h/5+GetFontYSIZE(1),1,2,GetPaletteAdrByColorIndex(0),0);
+      DrawRoundedFrame(w/5,3*h/5,4*w/5,3*h/5+h/12,0,0,0,GetPaletteAdrByColorIndex(1),GetPaletteAdrByColorIndex(0));
+      int ii=3*w/5*Npng/ALLPNG;
+      DrawRoundedFrame(w/5+2,3*h/5+2,ii+w/5-2,3*h/5+h/12-2,0,0,0,0,GetPaletteAdrByColorIndex(1));
+      str_2ws(SP,LG_Version,strlen(LG_Version));
+      DrawString(SP,left,11*h/12,w-2,11*h/12+GetFontYSIZE(FONT_SMALL),FONT_SMALL,4,GetPaletteAdrByColorIndex(0),0);
+      FreeWS(SP);
+    }
   }
 }
 
