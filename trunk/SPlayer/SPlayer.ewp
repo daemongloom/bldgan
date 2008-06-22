@@ -3203,6 +3203,12 @@
     <name>$PROJ_DIR$\mainmenu.h</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\mylib.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\pic.c</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\playlist.c</name>
   </file>
   <file>

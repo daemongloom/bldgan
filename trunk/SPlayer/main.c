@@ -169,17 +169,9 @@ GBSTMR offtm;     // Таймер автоотключения   AAA
 // Переписываем время... DemonGloom
 TWavLen wl;
 GBSTMR mytmr;
-int fm; // Длительность
-int fs;
-int sh; // Начальные
-int sm;
-int ss;
-int nh; // Новые
-int nm;
-int ns;
-int ph; // Сдвиг для паузы
-int pm;
-int ps;
+// Сделал иначе   AAA
+int tm=0;  // Время
+int ln=0;  // Длительность
 
 //--- Переменные ---
 
@@ -449,86 +441,21 @@ void InitLanguage()
   lgpInitLangPack();
 }
 //---------------------------------------------
-
-// Пауза счетчика DemonGloom
-void PausingTime(unsigned short action)
+// Отсчет времени. Теперь по-моему и вроде без глюков+приведено к общему виду для удобства использования   AAA
+unsigned short sttmr=0;  // Почему-то неверно начинал счет   AAA
+void EXT_REDRAW()
 {
-  // action == 0 - поставили паузу
-  // action == 1 - сняли паузу
-  TDate date;
-  TTime time;
-  GetDateTime(&date,&time);
-  ns=time.sec-ss;
-  if (ns<0){
-    ns=60+ns;
-    time.min--;
-  }
-  if (ns>60){
-    ns=ns-60;
-    time.min++;
-  }
-  nm=time.min-sm;
-  if (nm<0){
-    nm=60+nm;
-    time.hour--;
-  }
-  if (nm>60){
-    nm=nm-60;
-    time.hour++;
-  }
-  nh=time.hour-sh;
-  if (nh<0){
-    nh=24+nh;
-  }
-  if (action==0)
-  {
-    ph=nh;
-    pm=nm;
-    ps=ns;
-  } else 
-  {
-    GetDateTime(&date,&time);
-    ss=time.sec-ps;
-    sh=time.hour-ph;
-    sm=time.min-pm;
-    TimeRedraw();
-  }
+  if(IsGuiOnTop(MAINGUI_ID)) REDRAW();
+  if(tm||sttmr) {tm++;}
+  else {sttmr=1;}
+  GBS_StartTimerProc(&mytmr,216,EXT_REDRAW);
 }
-// Отрисовка времени DemonGloom
-void EXT_REDRAW(){REDRAW();}
 
-void TimeRedraw()
+void StopTMR(unsigned short s)
 {
-  WSHDR * time_disp = AllocWS(32);
-  if (PlayingStatus==2){
-  TDate date;
-  TTime time; 
-  GetDateTime(&date,&time);
-  ns=time.sec-ss;
-  if (ns<0){
-    ns=60+ns;
-    time.min--;
-  }
-  nm=time.min-sm;
-  if (nm<0){
-    nm=60+nm;
-    time.hour--;
-  }
-  nh=time.hour-sh;
-  if (nh<0){
-    nh=24+nh;
-  }
-  }
-  wsprintf(time_disp,"%02i:%02i",nm,ns);
-  DrawString(time_disp,time_x,time_y,time_x+Get_WS_width(time_disp,FONT_SMALL),time_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
-#ifdef X75
-  wsprintf(time_disp,"%02i:%02i",fm,fs);
-  DrawString(time_disp,length_x,length_y,length_x+Get_WS_width(time_disp,FONT_SMALL),length_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
-#endif
-  FreeWS(time_disp);
-  if(IsGuiOnTop(MAINGUI_ID)) GBS_StartTimerProc(&mytmr,216,EXT_REDRAW);}
-
-// Играем MP3 файл
+  GBS_DelTimer(&mytmr);
+  if(s) {tm=0; ln=0; sttmr=0;}
+}
 
 int findmp3length(char *playy) { 
   #ifdef NEWSGOLD 
@@ -545,8 +472,7 @@ int findmp3length(char *playy) {
 
 }
 
-
-
+// Играем MP3 файл
 void PlayMP3File(WSHDR * fname)
 {
 if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного пл   AAA
@@ -555,24 +481,14 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
   {
     FSTATS fstats;
     unsigned int err;
-    
-    ph=0;
-    pm=0;
-    ps=0;
-    nh=0;
-    nm=0;
-    ns=0;
-    TDate date;
-    TTime time; 
-    GetDateTime(&date,&time);
-    ss=time.sec;
-    sh=time.hour;
-    sm=time.min;
 
     char * fnamech=malloc(256);
     ws_2str(fname,fnamech,256);
     if (GetFileStats(fnamech,&fstats,&err)!=-1) // Проверка файла на существование
     {
+      StopTMR(1);
+      EXT_REDRAW();
+      
       PLAYFILE_OPT pfopt;
       WSHDR* sndPath=AllocWS(128);
       WSHDR* sndFName=AllocWS(128);
@@ -590,9 +506,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       pfopt.volume=GetVolLevel();
       char *pp=strrchr(fnamech,':')-1;
 #ifdef X75
-      fs=findmp3length(pp);
-      fm=(fs-(fs%60))/60;
-      fs=fs%60;
+      ln=findmp3length(pp);
 #endif
 #ifdef NEWSGOLD
       pfopt.unk6=1;
@@ -949,9 +863,28 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
 			COLOR_PROG_MAIN_FRAME,
 			COLOR_PROG_MAIN);
 #endif
+  /*
+    WSHDR*mws=AllocWS(256);
+    wsprintf(mws,"%s","0:\\1.png");
+    IMGHDR *img;
+    img=CreateImgHdrByAnyFile(mws,140,180,90);
+    DrwImg2(img,0,20);
+    mfree(img->bitmap);
+    mfree(img);
+    FreeWS(mws);
+  
+    */
+    
+    WSHDR * time_disp = AllocWS(32);
+    wsprintf(time_disp,"%02i:%02i",tm/60,tm%60);
+    DrawString(time_disp,time_x,time_y,time_x+Get_WS_width(time_disp,FONT_SMALL),time_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
+#ifdef X75
+    wsprintf(time_disp,"%02i:%02i",ln/60,ln%60);
+    DrawString(time_disp,length_x,length_y,length_x+Get_WS_width(time_disp,FONT_SMALL),length_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
+#endif
+    FreeWS(time_disp);
   
     PL_Redraw(playlist_lines[CurrentPL],CurrentTrack,PlayedTrack,0,TC,CurrentPL,PlayedPL);
-    TimeRedraw();
     }else{
       WSHDR*SP=AllocWS(64);
       DrawRoundedFrame(left,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),GetPaletteAdrByColorIndex(1));  // Поселим это сюда   AAA
