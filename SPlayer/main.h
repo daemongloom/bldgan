@@ -133,8 +133,6 @@ void SendNULL();    // Послать по окончании воспр.   AAA
 
 void ToDevelop();   // Развернуть   AAA
 
-void PausingTime(unsigned short action);
-
 void QuitCallbackProc(int decision);
 
 void DoErrKey();
@@ -156,5 +154,13 @@ char *strtolower(char *src, char *dst, int sz);
 int EnumIni(int local, char *ininame, INIPROC proc);
 
 void LoadKeys();
+
+IMGHDR* CreateImgHdrByAnyFile (WSHDR * path,short width, short height, int rot);
+
+void DrwImg(IMGHDR *img, int x, int y, char *pen, char *brush);
+
+void EXT_REDRAW();
+
+void StopTMR(unsigned short s);
 
 #endif

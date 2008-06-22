@@ -199,6 +199,7 @@ void NextTrackX()
   }
   else
   {
+    StopTMR(1);
     PlayedTrack[PlayedPL]=1;
   }
   }
@@ -239,14 +240,14 @@ void TogglePlayback()
   {
   case 0:
     // Если стоп, то воспроизводим текущий...
-    if(ready[PlayedPL]) {PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL] = 1));} //Чуток изменил   AAA
+    if(ready[PlayedPL]) {PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL] = 1)); PlayingStatus = 2;} //Чуток изменил   AAA
     break;
   case 1:
     // Если пауза - продолжаем воспроизведение...
     if (phandle!=-1)
     {
       PlayMelody_ResumePlayBack(phandle);
-      PausingTime(1);
+      EXT_REDRAW();
       PlayingStatus = 2;
     }
     break;
@@ -255,7 +256,7 @@ void TogglePlayback()
     if (phandle!=-1)
     {
       PlayMelody_PausePlayback(phandle);
-      PausingTime(0);
+      StopTMR(0);
       PlayingStatus = 1;
     }
     break;
@@ -266,6 +267,7 @@ void TogglePlayback()
 void StopAllPlayback()
 {
   SendNULL();
+  StopTMR(1);
   Stat_keypressed = 1;
   if(PlayingStatus==0)return;
   if (phandle!=-1){
