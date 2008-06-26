@@ -1,3 +1,6 @@
+#pragma swi_number=126
+__swi __arm int rand(void);
+
 #pragma swi_number=0x8248
 __swi __arm char *RamFormatTrack();
 
