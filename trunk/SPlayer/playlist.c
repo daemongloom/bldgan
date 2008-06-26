@@ -1,4 +1,4 @@
-#include "../inc/swilib.h"
+#include "include.h"
 #include "main.h"
 #include "playlist.h"
 #include "mylib.h" 
@@ -152,23 +152,26 @@ int random(int max)
   return((time.hour+time.min*time.sec+time.millisec+date.day+date.month+date.year+time.millisec*time.sec)%max+1);
 }
 
+
+
 // Случайный трек DemonGloom
 void RandTrack() 
 {
-  if(ready[PlayedPL]){
-  if(phandle!=-1)PlayMelody_StopPlayback(phandle);
-  if(NextPlayedTrack[1]){PlaySetTrack();}
-  else{
-  int prevtrack=PlayedTrack[PlayedPL];
-  while (PlayedTrack[PlayedPL]==prevtrack) {
-    PlayedTrack[PlayedPL]=random(TC[PlayedPL]);
-  }
-  if(PlayedTrack[PlayedPL]>TC[PlayedPL])PlayedTrack[PlayedPL]=1;
-  if (CurrentPL==PlayedPL){
-  if (CurrentTrack[CurrentPL]==prevtrack){  // Перенос курсора на следующую песню
+  if(ready[PlayedPL])
+  {
+   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
+   if(NextPlayedTrack[1]){PlaySetTrack();}
+   else{int prevtrack=PlayedTrack[PlayedPL];
+   while (PlayedTrack[PlayedPL]==prevtrack) 
+   {PlayedTrack[PlayedPL]=random(TC[PlayedPL]);}
+   if(PlayedTrack[PlayedPL]>TC[PlayedPL])PlayedTrack[PlayedPL]=1;
+   if (CurrentPL==PlayedPL){
+   if (CurrentTrack[CurrentPL]==prevtrack)
+   {  // Перенос курсора на следующую песню
     CurrentTrack[CurrentPL]=PlayedTrack[PlayedPL];
     }
-  if (0==prevtrack){  // Перенос курсора на следующую песню
+  if (0==prevtrack)
+  {  // Перенос курсора на следующую песню
     CurrentTrack[CurrentPL]=PlayedTrack[PlayedPL];
   }
   }
@@ -231,6 +234,110 @@ void PreviousTrack()
   else {PlayedTrack[PlayedPL]=TC[PlayedPL];}
   PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));}
 }
+
+//--------------------------------Перемока--------------------------------Vedan
+extern int tm;         // Время
+unsigned int mlsc=0,   // Миллисекунды
+             StopCount=0,
+             IsRewind=0,
+             IsDoIt=0;
+#define END     1
+#define BEGIN  -1
+#define IsSTOP  0
+#define IsPAUSE 1
+#define IsPLAY  2
+
+void StopRewind()       // Остановка перемотки :) 
+{
+  if(IsRewind)
+  {
+    IsDoIt = 0;
+    StopCount = 0;
+    PlayMelody_SetPosition(phandle, mlsc);
+    PlayingStatus = IsPLAY;
+    EXT_REDRAW();
+    IsRewind = 0;
+  }
+}
+
+void DoRewinded(short int Mode)
+{
+    if(!StopCount)
+    {
+      mlsc=tm*1000+1000*Mode;
+      tm=mlsc/1000;      
+    }
+    if(tm<=0)
+    {
+      tm=mlsc=0;
+      StopCount=1;
+    }
+}
+
+// Перемотка в конец    
+void StartRewindToEnd()
+{
+  IsRewind=1;
+  switch(PlayingStatus)
+  {
+  case IsSTOP:
+    // Если стоп, то радостно перематываем...
+    DoRewinded(END);
+    break;
+  case IsPAUSE:
+    // Если пауза - перематываем :) ...
+    if (phandle!=-1)
+    {
+      DoRewinded(END);
+    }
+    break;
+  case IsPLAY:
+    // Если играет, ставим паузу и перематываем !! :)
+    if (phandle!=-1)
+    {
+      if(!IsDoIt)//Просто зачем делать одно и тоже
+      {
+        PlayMelody_PausePlayback(phandle);
+        PlayingStatus = IsPAUSE;
+        StopTMR(0);
+        IsDoIt = 1;
+      }
+      DoRewinded(END);
+    }
+    break;
+  }
+}
+
+// Перемотка в начало    
+void StartRewindToBegin()
+{
+  IsRewind=1;
+  switch(PlayingStatus)
+  {
+  case IsSTOP: DoRewinded(BEGIN); break;
+  case IsPAUSE:
+    if (phandle!=-1)
+    {
+      DoRewinded(BEGIN);
+    }
+    break;
+  case IsPLAY:
+    if (phandle!=-1)
+    {
+      if(!IsDoIt)
+      {
+        PlayMelody_PausePlayback(phandle);
+        PlayingStatus = IsPAUSE;
+        StopTMR(0);
+        IsDoIt = 1;
+      }
+      DoRewinded(BEGIN);
+    }
+    break;
+  }
+}
+//------------------------------------------------------------------------------
+
 
 // Пауза/Воспроизведение
 void TogglePlayback()

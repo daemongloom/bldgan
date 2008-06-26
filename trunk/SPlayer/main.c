@@ -1,5 +1,5 @@
-#include "../inc/swilib.h"
-#include "../inc/playsound.h"
+#include "include.h"
+#include "../../inc/playsound.h"
 #include "conf_loader.h"
 #include "main.h"
 #include "mainmenu.h"
@@ -8,8 +8,8 @@
 #include "lang.h"
 #include "langpack.h"
 #include "SPlayer_ipc.h"
-#include "../inc/xtask_ipc.h"
 #include "mylib.h" 
+#include "../../inc/xtask_ipc.h"
 
 /*
 typedef struct {
@@ -160,6 +160,8 @@ char sfname[256];
 extern unsigned short SoundVolume;
 unsigned short playmode;     // 0 - играем все, 1 - повторить все, 2 - перемешать, 3 - повторять один  AAA
 extern unsigned short ShowNamesNoConst;
+const char p_w[]="%w";
+const char p_2s[]="%s%s";
 const char p_3s[]="%s%s%s";
 const char p_4s[]="%s%s%s%s";
 unsigned short pngloadcomp=0;
@@ -471,7 +473,8 @@ int findmp3length(char *playy) {
   #endif 
 
 }
-
+unsigned int lenght_mp3=0;
+WSHDR* sndLenght;
 // Играем MP3 файл
 void PlayMP3File(WSHDR * fname)
 {
@@ -492,6 +495,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       PLAYFILE_OPT pfopt;
       WSHDR* sndPath=AllocWS(128);
       WSHDR* sndFName=AllocWS(128);
+      
       char s[128];
       
       const char *p=strrchr(fnamech,'\\')+1;
@@ -505,6 +509,23 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       pfopt.play_first=0;
       pfopt.volume=GetVolLevel();
       char *pp=strrchr(fnamech,':')-1;
+      /* Делал получение длительности, Anderstand, постмотри
+#ifdef NEWSGOLD 
+      //wsprintf (w_0_1,perc_ss_menu,list_path,procfile);
+      //WSHDR *fn=w_0_1;
+      //wsprintf (w_0_2,perc_s_menu,list_path);
+      //WSHDR *folder=w_0_2;
+      
+      sndLenght=AllocWS(32);
+      //wsprintf (sndLenght,p_2s,sndPath,sndFName);
+      FILE_PROP GD;
+      zeromem(&GD, sizeof(GD));
+      GD.type=0x1800;
+      GD.duration_mp3_ws=sndLenght;  
+      GD.duration_mp3=lenght_mp3;  
+      GetFileProp(&GD, fname, sndPath); 
+#endif
+      */
 #ifdef X75
       ln=findmp3length(pp);
 #endif
@@ -878,6 +899,15 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
     WSHDR * time_disp = AllocWS(32);
     wsprintf(time_disp,"%02i:%02i",tm/60,tm%60);
     DrawString(time_disp,time_x,time_y,time_x+Get_WS_width(time_disp,FONT_SMALL),time_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
+    /*
+#ifdef NEWSGOLD
+    //sndLenght;  
+    //GD.duration_mp3=lenght_mp3;
+    //wsprintf(time_disp,"%02i:%02i",ln/60,ln%60);
+    wsprintf(time_disp,p_w,sndLenght);
+    DrawString(sndLenght,length_x,length_y,length_x+Get_WS_width(time_disp,FONT_SMALL),length_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
+#endif 
+    */
 #ifdef X75
     wsprintf(time_disp,"%02i:%02i",ln/60,ln%60);
     DrawString(time_disp,length_x,length_y,length_x+Get_WS_width(time_disp,FONT_SMALL),length_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
@@ -980,7 +1010,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
      return 0;
      }
   else{
-if(EditPL==0)         //  Mr. Anderstand: самому не оч нравится такой вариант...
+if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
 {
   if (msg->gbsmsg->msg==KEY_UP) {
      stop=1;              //  Mr. Anderstand: а это??
@@ -988,6 +1018,7 @@ if(EditPL==0)         //  Mr. Anderstand: самому не оч нравится такой вариант...
      P_keypressed = 0;
      N_keypressed = 0;
      Mode_keypressed = 0;
+     StopRewind();
      REDRAW();
   }
   if (msg->gbsmsg->msg==KEY_DOWN)
@@ -999,6 +1030,12 @@ if(EditPL==0)         //  Mr. Anderstand: самому не оч нравится такой вариант...
   {
     switch(msg->gbsmsg->submess)
     {
+      case RIGHT_BUTTON:
+        StartRewindToEnd();
+      break;
+      case LEFT_BUTTON:
+        StartRewindToBegin();
+      break;
       case UP_BUTTON:
         stop=0;
         CTUpSpeed();

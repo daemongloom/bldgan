@@ -3173,6 +3173,9 @@
     <name>$PROJ_DIR$\ID3Tags.c</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\..\..\SPlayer\include.h</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\item_info.c</name>
   </file>
   <file>
