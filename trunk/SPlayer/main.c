@@ -72,6 +72,11 @@ unsigned short Mode_keypressed = 0; // нажата ли клавиша изменения режима проигр
 unsigned short N_keypressed = 0;
 unsigned short P_keypressed = 0;
 
+///////////////////////////////////////////////////////////////////////////////
+unsigned short coord[ncoord];
+char COLOR[ncolor][4];
+
+/*
 //--- Собственно, переменные координат AAA ---
 unsigned short VOLmy_x;
 unsigned short VOLmy_y;
@@ -125,11 +130,10 @@ char COLOR_PROG_BG_FRAME[4];               // Ободок
 char COLOR_PROG_MAIN[4];             // Сам прогресс
 char COLOR_PROG_MAIN_FRAME[4];             // Ободок
 //--- Цвета AAA ---
+*/
+/////////////////////////////////////////////////////////////////////////////////
 
 //--- настройки из конфига ---
-//extern const char COLOR_BG[];
-//extern const char COLOR_TEXT[];
-//extern const char I_BACKGROUND[];
 extern const char PIC_DIR[];
 extern const char PLAYLISTS[];
 extern const char DEFAULT_PLAYLIST[];
@@ -148,6 +152,7 @@ extern const unsigned int AUTO_EXIT_MIN;  // Время до автозакрытия   AAA
 //--- Переменные ---
 extern WSHDR *playlist_lines[TCPL][512];
 extern short phandle;  // Для определения конца воспр.  AAA
+void* pha;               // Для Obs   AAA
 extern unsigned short PlayingStatus;
 extern int CurrentPL;
 extern int PlayedPL;
@@ -164,9 +169,16 @@ const char p_w[]="%w";
 const char p_2s[]="%s%s";
 const char p_3s[]="%s%s%s";
 const char p_4s[]="%s%s%s%s";
+#ifndef NO_PNG
+unsigned short pngloadcomp1=1;
 unsigned short pngloadcomp=0;
 unsigned short Npng=0;
-GBSTMR offtm;     // Таймер автоотключения   AAA
+#else
+unsigned short pngloadcomp=1;
+#endif
+
+GBSTMR offtm;     // Таймер автоотключения   AAA       удаляется при остановке
+GBSTMR voltm;     // Громкость правим   AAA            удаляется после запуска
 
 // Переписываем время... DemonGloom
 TWavLen wl;
@@ -185,85 +197,90 @@ void TimeRedraw();
 // Избавляемся от тормозов   AAA
 void LoadPng()
 {
+#ifndef NO_PNG
+  pngloadcomp1=0;
   unsigned int err;
   FSTATS fstat;
   unsigned int i;
   unsigned int l=0;
   sprintf(sfname,p_3s,PIC_DIR,items1[0],PNGEXT);
   if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-  DrawImg(0,0,(int)sfname);
+  else{DrawImg(0,0,(int)sfname);}
   Npng++;
   sprintf(sfname,p_3s,PIC_DIR,items1[12],PNGEXT);
   if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-  DrawImg(0,0,(int)sfname);
+  else{DrawImg(0,0,(int)sfname);}
   Npng++;
+  sprintf(sfname,p_3s,PIC_DIR,items1[1],PNGEXT);
+  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+  else{DrawImg(0,0,(int)sfname);}
+  Npng++;REDRAW();
+  sprintf(sfname,"%s%s1%s",PIC_DIR,items1[1],PNGEXT);
+  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+  else{DrawImg(0,0,(int)sfname);}
+  Npng++;
+  
   for(i=0; i<TOTAL_ITEMS; i++)
   {
     sprintf(sfname,p_3s,PIC_DIR,items[i],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    DrawImg(0,0,(int)sfname);
+    else{DrawImg(0,0,(int)sfname);}
     Npng++;REDRAW();
   }
   for(i=0; i<TOTAL_ITEMS_2; i++)
   {
     sprintf(sfname,p_3s,PIC_DIR,items2[i],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    DrawImg(0,0,(int)sfname);
-    Npng++;REDRAW();
-  }
-  for(i=0; i<6; i++)
-  {
-    sprintf(sfname,"%s%s%i%s",PIC_DIR,items1[1],i,PNGEXT);
-    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    DrawImg(0,0,(int)sfname);
+    else{DrawImg(0,0,(int)sfname);}
     Npng++;REDRAW();
   }
   for(i=2; i<5; i++)
   {
     sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    DrawImg(0,0,(int)sfname);
+    else{DrawImg(0,0,(int)sfname);}
     Npng++;
     sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    DrawImg(0,0,(int)sfname);
+    else{DrawImg(0,0,(int)sfname);}
     Npng++;
     sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[14],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    DrawImg(0,0,(int)sfname);
+    else{DrawImg(0,0,(int)sfname);}
     Npng++;REDRAW();
   }
   for(i=5; i<9; i++)
   {
     sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    DrawImg(0,0,(int)sfname);
+    else{DrawImg(0,0,(int)sfname);}
     Npng++;
     sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    DrawImg(0,0,(int)sfname);
+    else{DrawImg(0,0,(int)sfname);}
     Npng++;REDRAW();
   }
   for(i=9;i<11;i++)
   {
     sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    DrawImg(0,0,(int)sfname);
+    else{DrawImg(0,0,(int)sfname);}
     Npng++;
     sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
     if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    DrawImg(0,0,(int)sfname);
+    else{DrawImg(0,0,(int)sfname);}
     Npng++;REDRAW();
   }
   sprintf(sfname,p_3s,PIC_DIR,items1[11],PNGEXT);
   if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-  DrawImg(0,0,(int)sfname);
+  else{DrawImg(0,0,(int)sfname);}
   Npng++;
   pngloadcomp=1;
   REDRAW();
   if(l){
   sprintf(sfname,"%d%s",l,lgpData[LGP_PNG_er]);
   ShowMSG(1,(int)sfname);}
+#endif
 }
 
 //--- Инициализация ленгпака --- Vedan
@@ -473,7 +490,14 @@ int findmp3length(char *playy) {
   #endif 
 
 }
-unsigned int lenght_mp3=0;
+
+void SetVol()
+{
+  Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
+  GBS_DelTimer(&voltm);
+}
+
+
 WSHDR* sndLenght;
 // Играем MP3 файл
 void PlayMP3File(WSHDR * fname)
@@ -507,46 +531,51 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       pfopt.repeat_num=1;
       pfopt.time_between_play=0;
       pfopt.play_first=0;
-      pfopt.volume=GetVolLevel();
-      char *pp=strrchr(fnamech,':')-1;
-      /* Делал получение длительности, Anderstand, постмотри
-#ifdef NEWSGOLD 
-      //wsprintf (w_0_1,perc_ss_menu,list_path,procfile);
-      //WSHDR *fn=w_0_1;
-      //wsprintf (w_0_2,perc_s_menu,list_path);
-      //WSHDR *folder=w_0_2;
-      
-      sndLenght=AllocWS(32);
-      //wsprintf (sndLenght,p_2s,sndPath,sndFName);
-      FILE_PROP GD;
-      zeromem(&GD, sizeof(GD));
-      GD.type=0x1800;
-      GD.duration_mp3_ws=sndLenght;  
-      GD.duration_mp3=lenght_mp3;  
-      GetFileProp(&GD, fname, sndPath); 
-#endif
-      */
-#ifdef X75
-      ln=findmp3length(pp);
-#endif
+      pfopt.volume=0;//GetVolLevel();
+
 #ifdef NEWSGOLD
       pfopt.unk6=1;
       pfopt.unk7=1;
       pfopt.unk9=2;
       SetPHandle(PlayFile(0xC, sndPath, sndFName, GBS_GetCurCepid(), MSG_PLAYFILE_REPORT, &pfopt)); // Вместо 0xC было 0x10 ... Пробуйте так!!
       SetPlayingStatus(2);
-      PlayMelody_ChangeVolume(phandle,GetVolLevel());  // Что бы была нормальная громкость - иначе криво...
+      pha=GetPlayObjById(phandle);
+      GBS_StartTimerProc(&voltm,1,SetVol);
+     // Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
+      
+    
+      // Делал получение длительности, Anderstand, постмотри
+      //wsprintf (w_0_1,perc_ss_menu,list_path,procfile);
+      //WSHDR *fn=w_0_1;
+      //wsprintf (w_0_2,perc_s_menu,list_path);
+      //WSHDR *folder=w_0_2;
+      
+    //  sndLenght=AllocWS(32);
+    //  FILE_PROP GD;
+    //  zeromem(&GD, sizeof(GD));
+    //  GD.type=0x1800;
+    //  GD.duration_mp3_ws=sndLenght;
+    //  GD.duration_mp3=ln;
+   //   GetFileProp(&GD, sndFName, sndPath);
+     /* 
+      FILE_PROP*GD=malloc(sizeof(FILE_PROP));
+      GetFileProp(GD, sndFName, sndPath);
+      ln=GD->duration_mp3;
+      wstrcpy(sndLenght,GD->bitrate_ws);
+      mfree(GD);
+      */
+     // GetPlayObjDuration(pha, &ln);
 #else 
       pfopt.unk4=0x80000000;
       pfopt.unk5=1;
       SetPHandle(PlayFile(0xC, sndPath, sndFName, 0,GBS_GetCurCepid(), MSG_PLAYFILE_REPORT, &pfopt));
       SetPlayingStatus(2);
-      PlayMelody_ChangeVolume(phandle,GetVolLevel());  // Что бы была нормальная громкость - иначе криво...
+      if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
+      char *pp=strrchr(fnamech,':')-1;
+      ln=findmp3length(pp);
 #endif
-     // FILE_PROP* wlk=malloc(sizeof(FILE_PROP));
-     // GetFileProp(wlk,sndFName,sndPath);
+      
       UpdateCSMname(sndFName); // Покажем что играем XTask Blind007
-     // mfree(wlk);
       // Покажем что играем тем кому нужно :)))   AAA
       if(FnameIPC)
       {
@@ -596,6 +625,67 @@ else
 }
 }
 
+// Грузим координаты из skin.cfg AAA
+void load_skin(char const * fname)              // Извращенец... Такое создать... DG
+{
+  unsigned short i=0;
+  unsigned short j=0;
+  char *data; 
+  unsigned int err;
+  int handle;
+  FSTATS fstats;
+  if (GetFileStats(fname,&fstats,&err)!=-1) // Проверка файла на существование
+  {
+    handle=fopen(fname, A_ReadOnly, P_READ,&err); // x65-75 for read MMC instead P_READ - 0
+    if(handle!=-1)
+    {
+      data=malloc(0xFF);
+      if(data)
+      {
+        fread(handle,data,0xFF,&err); // Экономим память! :)  Пошли вы куда подальше... Сами же забываете добавлять!!! DG
+        if(data[2]==0x01)
+        {
+          coord[0]=data[3];
+          coord[1]=data[4]+data[5];
+          coord[2]=data[6]+data[7];
+          coord[3]=data[8];
+          coord[4]=data[9];
+          coord[5]=data[10];
+          // Полоса прокрутки
+          coord[6]=data[11];
+          i=7;
+          j=12;
+          while(1)
+          {
+            coord[i++]=data[j++];
+            coord[i++]=data[j]+data[j+1];
+            j+=2;
+            if(i==ncoord)break;
+          }
+        }
+        else
+        {
+          unsigned short num=3;
+          for(i=0;i<ncolor;i++)
+          {
+            for(j=0;j<4;j++)
+            {
+              COLOR[i][j]=data[num++];
+            }
+          }
+        }
+      }
+      mfree(data);
+    }
+    fclose(handle,&err);
+  }
+  else
+  {
+    ShowMSG(1,(int)"Can't find file!");
+  }
+}
+
+/*
 // Грузим координаты из skin.cfg AAA
 void load_skin(char const* cfgname)              // Извращенец... Такое создать... DG
 {
@@ -705,7 +795,7 @@ void load_skin(char const* cfgname)              // Извращенец... Такое создать.
     fclose(handle,&err);
   }
 }
-
+*/
 void SendNULL()   // Послать по окончании воспр.   AAA
 {
     if(FnameIPC)
@@ -770,14 +860,31 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
 #endif
     if(pngloadcomp==1)
     {
+      DrawRoundedFrame(left,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),COLOR[2]);  // Поселим это сюда   AAA
 #ifndef NO_PNG                         // Сделаем режим без скина - DG
-  DrawRoundedFrame(left,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),COLOR_BG);  // Поселим это сюда   AAA
   // --- Делаем типа скин ---
   sprintf(sfname,p_3s,PIC_DIR,items1[0],PNGEXT);
   DrawImg(left,top,(int)sfname);  // Рисуем фон
   // Громкость
-  sprintf(sfname,"%s%s%i%s",PIC_DIR,items1[1],GetVolLevel(),PNGEXT);
-  DrawImg(VOLmy_x,VOLmy_y,(int)sfname);
+#ifdef NEWSGOLD
+  unsigned short nvol=15;
+#else
+  unsigned short nvol=14;
+#endif
+  sprintf(sfname,p_3s,PIC_DIR,items1[1],PNGEXT);
+  DrawImg(coord[9],coord[10],(int)sfname);
+  unsigned short wi=GetImgWidth((int)sfname);
+  unsigned short hi=GetImgHeight((int)sfname);
+  sprintf(sfname,"%s%s1%s",PIC_DIR,items1[1],PNGEXT);
+  if(wi>hi)
+  {
+    unsigned short pos=(wi-GetImgWidth((int)sfname)-2)*GetVolLevel()/nvol+1;
+    DrawImg(coord[9]+pos,coord[10]+hi*3/5,(int)sfname);
+  }else{
+    unsigned short pos=(hi-GetImgHeight((int)sfname)-2)*(nvol-GetVolLevel())/nvol+1;
+    DrawImg(coord[9]+wi/5,coord[10]+pos,(int)sfname);
+  }
+
   // Статус плеера
   if (Stat_keypressed==1)
   {
@@ -807,7 +914,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
       break;
     }
   }
-  DrawImg(STATmy_x,STATmy_y,(int)sfname);
+  DrawImg(coord[11],coord[12],(int)sfname);
   // Режим воспроизв   AAA
   if (Mode_keypressed==1)
   {
@@ -843,7 +950,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
       break;
     }
   }
-  DrawImg(RANDmy_x,RANDmy_y,(int)sfname);  // Позиционируем все что видим!   AAA
+  DrawImg(coord[15],coord[16],(int)sfname);  // Позиционируем все что видим!   AAA
   // Иконка пред/след трек   AAA
   if (N_keypressed==1)
   {
@@ -853,7 +960,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   {
     sprintf(sfname,p_3s,PIC_DIR,items1[9],PNGEXT);
   }
-  DrawImg(Next_x,Next_y,(int)sfname);
+  DrawImg(coord[19],coord[20],(int)sfname);
   
   if (P_keypressed==1)
   {
@@ -863,26 +970,30 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   {
     sprintf(sfname,p_3s,PIC_DIR,items1[10],PNGEXT);
   }
-  DrawImg(Prev_x,Prev_y,(int)sfname);
+  DrawImg(coord[21],coord[22],(int)sfname);
   // Если заблокировано DemonGloom
   if (KeyLock){
     sprintf(sfname,p_3s,PIC_DIR,items1[11],PNGEXT);
-    DrawImg(KeyLock_x,KeyLock_y,(int)sfname);
+    DrawImg(coord[17],coord[18],(int)sfname);
   }
 #else
-  
+    // Громкость
+#ifdef NEWSGOLD
+  unsigned short nvol=15;
+#else
+  unsigned short nvol=14;
+#endif
+  unsigned short pos=(30-4-2)*GetVolLevel()/nvol+1;
+  DrawRoundedFrame(coord[9],coord[10],coord[9]+30,coord[10]+13,4,4,0,GetPaletteAdrByColorIndex(1),COLOR[2]);
+  DrawRoundedFrame(coord[9]+pos,coord[10]+13*3/5,coord[9]+4+pos,coord[10]+13*4/5,4,4,0,GetPaletteAdrByColorIndex(0),COLOR[2]);
 #endif
                                      // Здесь будут универсальные строки, одинаковые как для png, так и для их отсутствия
 #ifdef X75
   // Прогрессбар DG
-  DrawRoundedFrame(progress_x,progress_y,progress_x2,progress_y2,2,2,0,
-			COLOR_PROG_BG_FRAME,
-			COLOR_PROG_BG);
-  int ii=(progress_x2-progress_x)*(ns+nm*60);
-  ii=ii/(fs+fm*60);
-  DrawRoundedFrame(progress_x,progress_y,ii+progress_x,progress_y2,2,2,0,
-			COLOR_PROG_MAIN_FRAME,
-			COLOR_PROG_MAIN);
+  DrawRoundedFrame(coord[27],coord[28],coord[29],coord[30],2,2,0,COLOR[9],COLOR[8]);
+  int ii=(coord[29]-coord[27])*tm;
+  ii=ii/ln;
+  DrawRoundedFrame(coord[27],coord[28],ii+coord[27],coord[30],2,2,0,COLOR[11],COLOR[10]);
 #endif
   /*
     WSHDR*mws=AllocWS(256);
@@ -898,24 +1009,22 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
     
     WSHDR * time_disp = AllocWS(32);
     wsprintf(time_disp,"%02i:%02i",tm/60,tm%60);
-    DrawString(time_disp,time_x,time_y,time_x+Get_WS_width(time_disp,FONT_SMALL),time_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
-    /*
-#ifdef NEWSGOLD
+    DrawString(time_disp,coord[23],coord[24],coord[23]+Get_WS_width(time_disp,FONT_SMALL),coord[24]+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR[0],0);
+    
     //sndLenght;  
     //GD.duration_mp3=lenght_mp3;
-    //wsprintf(time_disp,"%02i:%02i",ln/60,ln%60);
-    wsprintf(time_disp,p_w,sndLenght);
-    DrawString(sndLenght,length_x,length_y,length_x+Get_WS_width(time_disp,FONT_SMALL),length_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
-#endif 
-    */
-#ifdef X75
     wsprintf(time_disp,"%02i:%02i",ln/60,ln%60);
-    DrawString(time_disp,length_x,length_y,length_x+Get_WS_width(time_disp,FONT_SMALL),length_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
-#endif
+   // wsprintf(time_disp,p_w,sndLenght);
+    DrawString(time_disp,coord[25],coord[26],coord[25]+Get_WS_width(time_disp,FONT_SMALL),coord[26]+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR[0],0);
+
     FreeWS(time_disp);
   
     PL_Redraw(playlist_lines[CurrentPL],CurrentTrack,PlayedTrack,0,TC,CurrentPL,PlayedPL);
-    }else{
+    CrPopup();
+    }
+#ifndef NO_PNG
+    else{
+      if(pngloadcomp1)SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
       WSHDR*SP=AllocWS(64);
       DrawRoundedFrame(left,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),GetPaletteAdrByColorIndex(1));  // Поселим это сюда   AAA
       wsprintf(SP,"%s","SPlayer");
@@ -927,6 +1036,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
       DrawString(SP,left,11*h/12,w-2,11*h/12+GetFontYSIZE(FONT_SMALL),FONT_SMALL,4,GetPaletteAdrByColorIndex(0),0);
       FreeWS(SP);
     }
+#endif
   }
 }
 
@@ -1055,6 +1165,7 @@ if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
         CTDownSix();
       break;
       case '9':
+       // PlayPopup(10, 10, 120, 120, );
       break;
       case '#':
        if (KeyLock==0){
@@ -1370,6 +1481,8 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
 	{
 	  void *canvasdata=((void **)idata)[DISPLACE_OF_IDLECANVAS/4];
 #endif
+
+#ifndef NO_PNG          
         switch(GetPlayingStatus())
 	{
         case 0:
@@ -1384,6 +1497,10 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
 	}
         DrawCanvas(canvasdata,IDLE_X,IDLE_Y,IDLE_X+GetImgWidth((int)sfname)-1,IDLE_Y+GetImgHeight((int)sfname)-1,1); // Сделаем так   AAA
 	DrawImg(IDLE_X,IDLE_Y,(int)sfname);
+#else
+        DrawCanvas(canvasdata,IDLE_X,IDLE_Y,IDLE_X+16,IDLE_Y+16,1); // Сделаем так   AAA
+#endif
+        
 #ifdef ELKA
 #else
 	}
@@ -1513,7 +1630,7 @@ int main(char *exename, char *fname)
   load_skin(sfname);
   SUBPROC((void*)LoadKeys);
   SUBPROC((void*)lgpInitLangPack); //Загрузка языка - Vedan
-  SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
+ // SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
   playmode = PlayMode;
   SoundVolume = soundvolume;
   ShowNamesNoConst=SHOW_NAMES;

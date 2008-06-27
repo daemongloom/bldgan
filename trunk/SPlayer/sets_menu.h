@@ -4,6 +4,8 @@
 // Показать меню настроек
 void Disp_Sets_Menu();
 
+#ifndef NO_PNG ////////////////////////
+
 #define TOTAL_ITEMS_2 3
 
 static const char * const items2[TOTAL_ITEMS_2] = {
@@ -12,3 +14,5 @@ static const char * const items2[TOTAL_ITEMS_2] = {
 /*  3*/ "refresh",
 };
 #endif
+
+#endif ////////////////////////////////

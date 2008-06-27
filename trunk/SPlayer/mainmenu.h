@@ -10,6 +10,8 @@ void patch_input(INPUTDIA_DESC* inp);
 // Показать главное меню
 void MM_Show();
 
+#ifndef NO_PNG /////////////////////////////////////
+
 #define TOTAL_ITEMS 7
 
 static const char * const items[TOTAL_ITEMS] = {
@@ -22,3 +24,5 @@ static const char * const items[TOTAL_ITEMS] = {
 /*  7*/ "exit",
 };
 #endif
+
+#endif /////////////////////////////////////////////
