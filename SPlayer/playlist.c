@@ -7,11 +7,6 @@
 WSHDR *playlist_lines[TCPL][512];  // Массив указателей на имена файлов в пл   Mr. Anderstand: Воплотим мечту в жизнь!
 
 // Из конфига
-extern char COLOR_TEXT[];
-extern char COLOR_TEXT_CURSOR[]; //Еще добавил  AAA
-extern char COLOR_TEXT_PLAY[];   //И еще AAA
-extern char COLOR_BANDROLL[];    //Цвет полосы прокрутки
-extern char COLOR_BANDROLL_C[];
 extern const int SHOW_NAMES;
 extern const char PLAYLISTS[];
 extern const char PIC_DIR[];           // Для курсора AAA
@@ -25,6 +20,7 @@ unsigned short SoundVolume;           // Громкость
 unsigned short SVforToggle = 0;       // Прежняя громкость
 unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 - играем)   // Было char стало unsigned short! :D   AAA
 short phandle = -1;                   // Что играем
+extern void* pha;
 
 int CurrentTrack[TCPL];                 // Текущий трек
 int PlayedTrack[TCPL];                  // Проигрываемый трек   AAA
@@ -39,6 +35,15 @@ unsigned short NextPlayedTrack[2];   // № трека и пл в очереди
 unsigned short ShowNamesNoConst;       // В константе не получается изменять   AAA
 extern const char p_3s[];
 
+extern unsigned short coord[ncoord];
+extern char COLOR[ncolor][4];
+/*
+extern char COLOR_TEXT[];
+extern char COLOR_TEXT_CURSOR[]; //Еще добавил  AAA
+extern char COLOR_TEXT_PLAY[];   //И еще AAA
+extern char COLOR_BANDROLL[];    //Цвет полосы прокрутки
+extern char COLOR_BANDROLL_C[];
+
 extern unsigned short CTmy_x;     // Координаты CurrentTrack
 extern unsigned short CTmy_y;
 extern unsigned short s;          // Смещение по вертикали
@@ -52,7 +57,7 @@ unsigned short BR_w;  //=1;
 unsigned short BRC_x;  //=128;
 unsigned short BRC_w;  //=2;
 // Полоса прокрутки
-
+*/
 // Всякие "мелкие" переменные
 extern unsigned int playmode;
 extern unsigned short copy;
@@ -106,7 +111,7 @@ void DisableScroll(void)
 }
 
 // --- Скроллинг ---
-
+/*
 // Поднимаем громкость
 void VolumeUp()
 {
@@ -140,6 +145,56 @@ void ToggleVolume()
     SVforToggle = SoundVolume;
     SoundVolume = 0;
     if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
+  }
+  REDRAW();
+}
+*/
+// Поднимаем громкость
+void VolumeUp()
+{
+#ifdef NEWSGOLD
+  if(SoundVolume<15)SoundVolume++;
+  if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
+#else
+  if(SoundVolume<14)SoundVolume++;
+  if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
+#endif
+  REDRAW();
+}
+
+// Опускаем громкость
+void VolumeDown()
+{
+  if(SoundVolume>0)SoundVolume--;
+#ifdef NEWSGOLD
+  if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
+#else
+  if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
+#endif
+  REDRAW();
+}
+
+// Громкость на ноль
+void ToggleVolume()
+{
+  if(SVforToggle!=0)
+  {
+    SoundVolume = SVforToggle;
+    SVforToggle = 0;
+#ifdef NEWSGOLD
+    if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
+#else
+    if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
+#endif
+  } else 
+  {
+    SVforToggle = SoundVolume;
+    SoundVolume = 0;
+#ifdef NEWSGOLD
+    if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
+#else
+    if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
+#endif
   }
   REDRAW();
 }
@@ -459,11 +514,11 @@ void PL(void)
   if(i<4&&GrafOn1)
   {
     i++;
-    n-=s/4;
+    n-=coord[6]/4;
     p=n;
     p3=n;
     
-    d-=s/2;
+    d-=coord[6]/2;
     p1=d;
     
     REDRAW();
@@ -676,7 +731,7 @@ int GetMP3Tag_v1(const char * fname, MP3Tagv1 * tag)
 /*
  Здесь собственно работа с плейлистом...
 */
-
+/*
 // Выделим память   AAA
 void Memory()
 {
@@ -689,18 +744,18 @@ void Memory()
     }
   }
 }
-
+*/
 // Свобода пл!
 void FreePlaylist(void)
 {
-   /* for(unsigned int i=0;i<5;i++)
-    {
-      for(unsigned int j=0;j<256;j++)
-      {
-        FreeWS(playlist_lines[i][j]);
-        playlist_lines[i][j]=NULL;
-      }
-    }*/
+   // for(unsigned int i=0;i<5;i++)
+   // {
+   //   for(unsigned int j=0;j<256;j++)
+   //   {
+   //     FreeWS(playlist_lines[i][j]);
+   //     playlist_lines[i][j]=NULL;
+  //    }
+ //   }
   for(unsigned int i=0; i<TCPL; i++) {
   while(TC[CurrentPL]>0)
         {
@@ -1067,8 +1122,8 @@ char chanel[8],
     wsprintf(info_pf,"%t%t%t",format,chanel,freq); //Строка информации (фомат, канал, частота)
   }
   
-    my_x = CTmy_x;
-    my_y = CTmy_y;
+    my_x = coord[7];
+    my_y = coord[8];
 
     WSHDR * out_ws = AllocWS(128);
 /*
@@ -1158,19 +1213,23 @@ char chanel[8],
     if (MarkLine[CurList]==i||MarkLines[i]==1)
     {
       DrawScrollString(out_ws,my_x,my_y+c+(p2-p3*v)*v3,w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
-                   1,SizeOfFont,0,COLOR_TEXT_PLAY,0);
+                   1,SizeOfFont,0,COLOR[5],0);
     }else{
       DrawScrollString(out_ws,my_x,my_y+c+(p2-p3*v)*v3,w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
-                   1,SizeOfFont,0,COLOR_TEXT_CURSOR,0);
+                   1,SizeOfFont,0,COLOR[4],0);
     }
     p2=0;
     }else{
+
       short v4=1;
       if(v3!=0) {v4=0;}
+#ifndef NO_PNG
       char sfname[256];
       sprintf(sfname,p_3s,PIC_DIR,items1[12],PNGEXT);
       DrawImg(my_x-1,my_y+c-3+p*v*v4,(int)sfname);
-      
+#else
+      DrawRoundedFrame(my_x-1,my_y+c-3+p*v*v4,w-5,my_y+coord[6]*2+c-3+p*v*v4,4,4,0,GetPaletteAdrByColorIndex(1),COLOR[2]);
+#endif
       p2=-p1*v1;
       
     if (MarkLine[CurList]==CurLine[CurList]||MarkLines[CurLine[CurList]]==1)
@@ -1191,11 +1250,11 @@ char chanel[8],
 	  }
       }
       DrawScrollString(out_ws,my_x,my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
-                   scroll_disp+1,SizeOfFont,0,COLOR_TEXT_PLAY,0);
+                   scroll_disp+1,SizeOfFont,0,COLOR[5],0);
       if(InfoOn&&MarkLine)
      {
         
-        DrawString(info_pf,my_x,GetFontYSIZE(SizeOfFont)+2+my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+2*GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v+2,SizeOfFont,0,COLOR_TEXT_PLAY,0);
+        DrawString(info_pf,my_x,GetFontYSIZE(SizeOfFont)+2+my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+2*GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v+2,SizeOfFont,0,COLOR[5],0);
      }
       
       
@@ -1216,15 +1275,15 @@ char chanel[8],
 	  }
         }
       DrawScrollString(out_ws,my_x,my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
-                   scroll_disp+1,SizeOfFont,0,COLOR_TEXT,0);
+                   scroll_disp+1,SizeOfFont,0,COLOR[0],0);
     }
-    c+=s;
+    c+=coord[6];
     }
-    c+=s;
+    c+=coord[6];
     }
     }
-    if(n==0) {n=s;}
-    if(d==0) {d=2*s;}
+    if(n==0) {n=coord[6];}
+    if(d==0) {d=2*coord[6];}
     FreeWS(out_ws);
     FreeWS(info_pf);
   }else{
@@ -1239,7 +1298,7 @@ char chanel[8],
   for(unsigned int i=0; i<AllLines[CurList]+1; i++) {if(MarkLines[i]==1) {nLines++;}}
   wsprintf(pl_c,"%i/%i;%i(%i)",CurLine[CurList],AllLines[CurList],nLines,TC[CurrentPL]);
   }
-  DrawString(pl_c,NUMmy_x,NUMmy_y,w,NUMmy_y+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR_TEXT,0);
+  DrawString(pl_c,coord[13],coord[14],w,coord[14]+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR[0],0);
   FreeWS(pl_c);
   BandRoll(CurLine[CurList], AllLines[CurList]);
 }
@@ -1249,9 +1308,9 @@ void BandRoll(int CurLine, int AllLines)
 {
   if(AllLines>6)
   {
-    int yy=CurLine*(BR2_y-BR1_y)/AllLines;
-    DrawRoundedFrame(BR_x,BR1_y,BR_x+BR_w-1,BR2_y,0,0,0,0,COLOR_BANDROLL);
-    DrawRoundedFrame(BRC_x,BR1_y+yy-(BR2_y-BR1_y)/AllLines,BRC_x+BRC_w-1,BR1_y+yy,0,0,0,0,COLOR_BANDROLL_C);
+    int yy=CurLine*(coord[2]-coord[1])/AllLines;
+    DrawRoundedFrame(coord[0],coord[1],coord[0]+coord[3]-1,coord[2],0,0,0,0,COLOR[6]);
+    DrawRoundedFrame(coord[4],coord[1]+yy-(coord[2]-coord[1])/AllLines,coord[4]+coord[5]-1,coord[1]+yy,0,0,0,0,COLOR[7]);
   }
 }
 

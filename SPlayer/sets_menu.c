@@ -304,6 +304,7 @@ void sets_menuitemhandler(void *data, int curitem, void *unk)
   void *item=AllocMenuItem(data);
   ws=AllocMenuWS(data,strlen(sets_menutexts[curitem]));
   wsprintf(ws,"%t",sets_menutexts[curitem]);
+#ifndef NO_PNG
   switch(curitem)
   {
   case 0:
@@ -319,6 +320,14 @@ void sets_menuitemhandler(void *data, int curitem, void *unk)
     SetMenuItemIconArray(data,item,stS_ICONS+3);
     break;
   }
+#else
+  switch(curitem)
+  {
+  case 0:
+    SetMenuItemIconArray(data,item,icon_array+(EditPL?0:1));
+    break;
+  }
+#endif
   SetMenuItemText(data, item, ws, curitem);
 }
 
@@ -357,7 +366,9 @@ char colourspic[128];
 char refreshpic[128];
 */
 
+#ifndef NO_PNG
 char pic2[TOTAL_ITEMS_2][128];
+#endif
 
 void Disp_Sets_Menu()
 {
@@ -397,11 +408,10 @@ void Disp_Sets_Menu()
   stS_ICONS[3] = 0;
   menuitems[3].icon = stS_ICONS+3;
   */
-  for(unsigned int i=1; i<TOTAL_ITEMS_2; i++)
+/*  for(unsigned int i=1; i<TOTAL_ITEMS_2; i++)
   {
-    S_ICONS[i] = 0;
-    menuitems[i].icon = S_ICONS+i;
-  }
+    stS_ICONS[i] = 0;
+  }*/
 #endif  
   
   icon_array[0]=GetPicNByUnicodeSymbol(CBOX_CHECKED);

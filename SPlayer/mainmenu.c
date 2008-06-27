@@ -262,7 +262,11 @@ static const MENU_DESC tmenu=
   8,mmenu_keyhook,mmenu_ghook,NULL,
   mmenusoftkeys,
   &mmenu_skt,
+#ifndef NO_PNG
   0x11,
+#else
+  0x10,
+#endif
   menuitemhandler,
   NULL, //menuitems,
   NULL, //menuprocs,
@@ -280,7 +284,9 @@ char aboutpic[128];
 char exitpic[128];
 */
 
+#ifndef NO_PNG
 char pic[TOTAL_ITEMS][128];
+#endif
 
 void MM_Show()  // Люблю порядок... Ниче так килобайт почти из воздуха! :)   AAA
 {
@@ -348,11 +354,10 @@ void MM_Show()  // Люблю порядок... Ниче так килобайт почти из воздуха! :)   AAA
   S_ICONS[6] = 0;
   menuitems[6].icon = S_ICONS+6;
   */
-  for(unsigned int i=0; i<TOTAL_ITEMS; i++)
+/*  for(unsigned int i=0; i<TOTAL_ITEMS; i++)
   {
     S_ICONS[i] = 0;
-    menuitems[i].icon = S_ICONS+i;
-  }
+  }*/
 #endif  
   
   icon_array[0]=GetPicNByUnicodeSymbol(CBOX_CHECKED);

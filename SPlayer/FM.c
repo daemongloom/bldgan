@@ -29,7 +29,7 @@ void patch_rect(RECT*rc,int x,int y, int x2, int y2)
 WSHDR* Files[256];   // Ìàññèâ ïóòåé ê ôàéëàì/ïàïêàì   AAA
 extern const char PIC_DIR[];
 extern const char MUSIC[];
-extern char COLOR_BG[4];
+//extern char COLOR_BG[4];
 extern const int SHOW_NAMES;
 int MarkLines[256];  // Ìàññèâ-ìàğêåğ äëÿ âûäåëåíèÿ ôàéëîâ   AAA
 int CurFile=1;       // Òåêóùèé ıëåìåíò   AAA
@@ -37,6 +37,8 @@ unsigned int TCFM=0; // Êîëè÷åñòâî ıëåìåíòîâ   AAA
 char nowpath[128];
 extern unsigned short ShowNamesNoConst;
 extern unsigned short FM_o;
+extern const char p_3s[];
+extern char COLOR[ncolor][4];
 //////////////////////////Ïåğåìåííûå//////////////////////////////
 
 void PastFile(WSHDR *p, unsigned short i)
@@ -248,11 +250,16 @@ static void OnRedraw(SHOW_FM_GUI *data)
 {
   if (data->gui.state==2)//ıòî íóæíî äëÿ òîãî, ÷òîáû äåéñòâèÿ ïğîèñõîäèëè òîëüêî â ıòîì ãóå
   {
-    DrawRoundedFrame(0,0,ScreenW()-1,ScreenH()-1,0,0,0,GetPaletteAdrByColorIndex(1),COLOR_BG);
+    #ifdef ELKA
+    unsigned short top = 24;
+    #else
+    unsigned short top = 0;
+    #endif
+    DrawRoundedFrame(0,top,ScreenW()-1,ScreenH()-1,0,0,0,GetPaletteAdrByColorIndex(1),COLOR[2]);
     #ifndef NO_PNG
     char sfname1[256];
-    sprintf(sfname1,"%s%s",PIC_DIR,"background.png");
-    DrawImg(0,0,(int)sfname1);  // Ğèñóåì ôîí
+    sprintf(sfname1,p_3s,PIC_DIR,items1[0],PNGEXT);
+    DrawImg(0,top,(int)sfname1);  // Ğèñóåì ôîí
     #else
     #endif
     if(strlen(nowpath)) {ShowNamesNoConst=3;}
@@ -361,9 +368,9 @@ static void OnClose(SHOW_FM_GUI *data,void (*mfree_adr)(void *))
 
 static void OnFocus(SHOW_FM_GUI *data,void *(*malloc_adr)(int),void (*mfree_adr)(void *))
 {
-    #ifdef ELKA
-    DisableIconBar(1);//ıò óáèòü èêîíáàğ,ìîæíî è óáğàòü
-    #endif
+  // #ifdef ELKA
+  //  DisableIconBar(1);//ıò óáèòü èêîíáàğ,ìîæíî è óáğàòü
+  //  #endif
     DisableIDLETMR();
     data->gui.state=2;
 }
@@ -371,9 +378,9 @@ static void OnFocus(SHOW_FM_GUI *data,void *(*malloc_adr)(int),void (*mfree_adr)
 //Unfocus
 static void OnUnfocus(SHOW_FM_GUI *data,void (*mfree_adr)(void *))
 {
-    #ifdef ELKA
-    DisableIconBar(0);
-    #endif
+  //  #ifdef ELKA
+  //  DisableIconBar(0);
+  //  #endif
         if (data->gui.state!=2) return;
         data->gui.state=1;
 }
