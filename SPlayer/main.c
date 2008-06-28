@@ -179,6 +179,7 @@ unsigned short pngloadcomp=1;
 
 GBSTMR offtm;     // Таймер автоотключения   AAA       удаляется при остановке
 GBSTMR voltm;     // Громкость правим   AAA            удаляется после запуска
+GBSTMR lentm;     // Длительность правим   AAA         удаляется после запуска
 
 // Переписываем время... DemonGloom
 TWavLen wl;
@@ -488,7 +489,6 @@ int findmp3length(char *playy) {
   GetWavLen(&wl); 
   return (wl.length/1000);
   #endif 
-
 }
 
 void SetVol()
@@ -496,9 +496,13 @@ void SetVol()
   Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
   GBS_DelTimer(&voltm);
 }
+void SetDur()
+{
+  GetPlayObjDuration((( int**)pha)[0x3d0/4], &ln);
+  ln/=1000;
+  GBS_DelTimer(&lentm);
+}
 
-
-WSHDR* sndLenght;
 // Играем MP3 файл
 void PlayMP3File(WSHDR * fname)
 {
@@ -541,30 +545,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       SetPlayingStatus(2);
       pha=GetPlayObjById(phandle);
       GBS_StartTimerProc(&voltm,1,SetVol);
-     // Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
-      
-    
-      // Делал получение длительности, Anderstand, постмотри
-      //wsprintf (w_0_1,perc_ss_menu,list_path,procfile);
-      //WSHDR *fn=w_0_1;
-      //wsprintf (w_0_2,perc_s_menu,list_path);
-      //WSHDR *folder=w_0_2;
-      
-    //  sndLenght=AllocWS(32);
-    //  FILE_PROP GD;
-    //  zeromem(&GD, sizeof(GD));
-    //  GD.type=0x1800;
-    //  GD.duration_mp3_ws=sndLenght;
-    //  GD.duration_mp3=ln;
-   //   GetFileProp(&GD, sndFName, sndPath);
-     /* 
-      FILE_PROP*GD=malloc(sizeof(FILE_PROP));
-      GetFileProp(GD, sndFName, sndPath);
-      ln=GD->duration_mp3;
-      wstrcpy(sndLenght,GD->bitrate_ws);
-      mfree(GD);
-      */
-     // GetPlayObjDuration(pha, &ln);
+      GBS_StartTimerProc(&lentm,100,SetDur);
 #else 
       pfopt.unk4=0x80000000;
       pfopt.unk5=1;
@@ -988,13 +969,8 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   DrawRoundedFrame(coord[9]+pos,coord[10]+13*3/5,coord[9]+4+pos,coord[10]+13*4/5,4,4,0,GetPaletteAdrByColorIndex(0),COLOR[2]);
 #endif
                                      // Здесь будут универсальные строки, одинаковые как для png, так и для их отсутствия
-#ifdef X75
-  // Прогрессбар DG
-  DrawRoundedFrame(coord[27],coord[28],coord[29],coord[30],2,2,0,COLOR[9],COLOR[8]);
-  int ii=(coord[29]-coord[27])*tm;
-  ii=ii/ln;
-  DrawRoundedFrame(coord[27],coord[28],ii+coord[27],coord[30],2,2,0,COLOR[11],COLOR[10]);
-#endif
+
+
   /*
     WSHDR*mws=AllocWS(256);
     wsprintf(mws,"%s","0:\\1.png");
@@ -1006,17 +982,19 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
     FreeWS(mws);
   
     */
-    
+    // Прогрессбар DG
+    DrawRoundedFrame(coord[27],coord[28],coord[29],coord[30],2,2,0,COLOR[9],COLOR[8]);
+    int ii=(coord[29]-coord[27])*tm;
+    ii=ii/ln;
+    DrawRoundedFrame(coord[27],coord[28],ii+coord[27],coord[30],2,2,0,COLOR[11],COLOR[10]);  
+  
+  
     WSHDR * time_disp = AllocWS(32);
     wsprintf(time_disp,"%02i:%02i",tm/60,tm%60);
     DrawString(time_disp,coord[23],coord[24],coord[23]+Get_WS_width(time_disp,FONT_SMALL),coord[24]+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR[0],0);
     
-    //sndLenght;  
-    //GD.duration_mp3=lenght_mp3;
     wsprintf(time_disp,"%02i:%02i",ln/60,ln%60);
-   // wsprintf(time_disp,p_w,sndLenght);
     DrawString(time_disp,coord[25],coord[26],coord[25]+Get_WS_width(time_disp,FONT_SMALL),coord[26]+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR[0],0);
-
     FreeWS(time_disp);
   
     PL_Redraw(playlist_lines[CurrentPL],CurrentTrack,PlayedTrack,0,TC,CurrentPL,PlayedPL);

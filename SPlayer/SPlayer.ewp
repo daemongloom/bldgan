@@ -3021,7 +3021,7 @@
         </option>
         <option>
           <name>OutputFile</name>
-          <state>SPlayer_newsgold.elf</state>
+          <state>SPlayer_newsgold_NO_PNG.elf</state>
         </option>
         <option>
           <name>OutputFormat</name>
@@ -3846,7 +3846,7 @@
         </option>
         <option>
           <name>OutputFile</name>
-          <state>SPlayer_ELKA.elf</state>
+          <state>SPlayer_ELKA_NO_PNG.elf</state>
         </option>
         <option>
           <name>OutputFormat</name>
@@ -4670,7 +4670,7 @@
         </option>
         <option>
           <name>OutputFile</name>
-          <state>SPlayer_SGold.elf</state>
+          <state>SPlayer_SGold_NO_PNG.elf</state>
         </option>
         <option>
           <name>OutputFormat</name>
