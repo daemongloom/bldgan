@@ -291,7 +291,8 @@ void PreviousTrack()
 }
 
 //--------------------------------Перемока--------------------------------Vedan
-extern int tm;         // Время
+extern int tm,         // Время
+           ln;         // Длительность
 unsigned int mlsc=0,   // Миллисекунды
              StopCount=0,
              IsRewind=0,
@@ -325,6 +326,11 @@ void DoRewinded(short int Mode)
     if(tm<=0)
     {
       tm=mlsc=0;
+      StopCount=1;
+    }
+    if(tm>=ln)
+    {
+      tm=ln;
       StopCount=1;
     }
 }
