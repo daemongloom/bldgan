@@ -178,8 +178,7 @@ unsigned short pngloadcomp=1;
 #endif
 
 GBSTMR offtm;     // Таймер автоотключения   AAA       удаляется при остановке
-GBSTMR voltm;     // Громкость правим   AAA            удаляется после запуска
-GBSTMR lentm;     // Длительность правим   AAA         удаляется после запуска
+GBSTMR lvtm;      // Длительность/громкость правим   AAA         удаляется после запуска
 
 // Переписываем время... DemonGloom
 TWavLen wl;
@@ -466,6 +465,8 @@ unsigned short sttmr=0;  // Почему-то неверно начинал счет   AAA
 void EXT_REDRAW()
 {
   if(IsGuiOnTop(MAINGUI_ID)) REDRAW();
+ /* GetPlayObjPosition((( int**)pha)[0x3d0/4], &tm);   // Лагает   AAA
+  tm/=1000;*/
   if(tm||sttmr) {tm++;}
   else {sttmr=1;}
   GBS_StartTimerProc(&mytmr,216,EXT_REDRAW);
@@ -491,16 +492,20 @@ int findmp3length(char *playy) {
   #endif 
 }
 
-void SetVol()
+int setdur=1;
+void SetDV()
 {
+  if(setdur){
+  pha=GetPlayObjById(phandle);
   Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
-  GBS_DelTimer(&voltm);
-}
-void SetDur()
-{
+  setdur=0;
+  GBS_StartTimerProc(&lvtm,70,SetDV);
+  }else{
   GetPlayObjDuration((( int**)pha)[0x3d0/4], &ln);
   ln/=1000;
-  GBS_DelTimer(&lentm);
+  GBS_DelTimer(&lvtm);
+  setdur=1;
+  }
 }
 
 // Играем MP3 файл
@@ -518,7 +523,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
     if (GetFileStats(fnamech,&fstats,&err)!=-1) // Проверка файла на существование
     {
       StopTMR(1);
-      EXT_REDRAW();
+     // EXT_REDRAW();
       
       PLAYFILE_OPT pfopt;
       WSHDR* sndPath=AllocWS(128);
@@ -543,9 +548,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       pfopt.unk9=2;
       SetPHandle(PlayFile(0xC, sndPath, sndFName, GBS_GetCurCepid(), MSG_PLAYFILE_REPORT, &pfopt)); // Вместо 0xC было 0x10 ... Пробуйте так!!
       SetPlayingStatus(2);
-      pha=GetPlayObjById(phandle);
-      GBS_StartTimerProc(&voltm,1,SetVol);
-      GBS_StartTimerProc(&lentm,100,SetDur);
+      GBS_StartTimerProc(&lvtm,70,SetDV);
 #else 
       pfopt.unk4=0x80000000;
       pfopt.unk5=1;
@@ -555,37 +558,49 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       char *pp=strrchr(fnamech,':')-1;
       ln=findmp3length(pp);
 #endif
+      EXT_REDRAW();
       
       UpdateCSMname(sndFName); // Покажем что играем XTask Blind007
       // Покажем что играем тем кому нужно :)))   AAA
       if(FnameIPC)
       {
         // Вылавливаем имя трека   AAA
-        char *trackname=malloc(128);
+        
       //  strncpy(trackname, p, strlen(p)-4);   // Мочим расширение   AAA
         // Выловили имя трека   AAA
         ID3TAGDATA *StatTag;
         if(FnameIPC==2) {
-        StatTag=malloc(sizeof(ID3TAGDATA));
-        ReadID3v1(GetPlayedTrack(PlayedTrack[PlayedPL]), StatTag);
-        if(strlen(StatTag->artist)&&strlen(StatTag->title)) {sprintf(trackname,"%s - %s",StatTag->artist,StatTag->title);}
-        mfree(StatTag);
-        gipc.data=(void*)trackname;
-        }else{
-          WSHDR * ws1=AllocWS(256);
-          FullpathToFilename(fname, ws1);
-          ws_2str(ws1,trackname,128);
-        //  ShowMSG(1,(int)trackname);
+          char *trackname=malloc(256);
+          StatTag=malloc(sizeof(ID3TAGDATA));
+          ReadID3v1(GetPlayedTrack(PlayedTrack[PlayedPL]), StatTag);
+          if(strlen(StatTag->artist)&&strlen(StatTag->title)) {sprintf(trackname,"%s - %s",StatTag->artist,StatTag->title);}
+          mfree(StatTag);
+          
+          ShowMSG(1,(int)trackname);
+          
+          gipc.name_to=ipc_grantee_name;
+          gipc.name_from=ipc_my_name;
           gipc.data=(void*)trackname;
+          GBS_SendMessage(MMI_CEPID,MSG_IPC,0,&gipc);
+          
+          mfree(trackname);
+        }else{
+          WSHDR * ws1=AllocWS(128);
+          FullpathToFilename(fname, ws1);
+          char *name = malloc(wstrlen(ws1) * 2 + 1);
+          int len;
+          ws_2utf8(ws1, name, &len, wstrlen(ws1) * 2 + 1);
+          
+          ShowMSG(1,(int)convUTF8_to_ANSI_STR(name));
+          
+          gipc.name_to=ipc_grantee_name;
+          gipc.name_from=ipc_my_name;
+          gipc.data=(void*)convUTF8_to_ANSI_STR(name);
+          GBS_SendMessage(MMI_CEPID,MSG_IPC,0,&gipc);
+          
           FreeWS(ws1);
+          mfree(name);
         }
-        
-        gipc.name_to=ipc_grantee_name;
-        gipc.name_from=ipc_my_name;
-        
-        GBS_SendMessage(MMI_CEPID,MSG_IPC,0,&gipc);
-        
-        mfree(trackname);
       }
 //      BeginTime = SetBeginTime(); // Время начала играния файла Blind007
       FreeWS(sndPath);
@@ -1078,6 +1093,12 @@ void SwitchPlayModeDown() {
   else {playmode=0;}
   Mode_keypressed = 1;
 }
+
+void SavePL()
+{
+  sprintf(list,"%s%s",PLAYLISTS,"playlist");
+  SavePlaylist(list);
+}
 /* Блок функций. Неоходимо для конфига клавиш. */
 
 
@@ -1119,10 +1140,8 @@ if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
     switch(msg->gbsmsg->submess)
     {
       case RIGHT_BUTTON:
-        StartRewindToEnd();
       break;
       case LEFT_BUTTON:
-        StartRewindToBegin();
       break;
       case UP_BUTTON:
         stop=0;
@@ -1136,8 +1155,6 @@ if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
         CTUpSix();
       break;
       case '3':
-        sprintf(list,"%s%s",PLAYLISTS,"playlist");
-        SavePlaylist(list);
       break;
       case '8':
         CTDownSix();

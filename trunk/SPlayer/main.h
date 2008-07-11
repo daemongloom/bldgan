@@ -176,6 +176,8 @@ void NextTrackDown();
 
 void SwitchPlayModeDown();
 
+void SavePL();
+
 void DoKey(int key, int ka);
 
 char *strtolower(char *src, char *dst, int sz);

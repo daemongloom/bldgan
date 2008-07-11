@@ -30,11 +30,14 @@ __root const unsigned int SCROLL_MULT=2;
 __root const unsigned int SCROLL_MULT=10;
 #endif
 
-__root const CFG_HDR cfghdr06={CFG_CBOX,LG_Show_Anim,0,2};
+__root const CFG_HDR cfghdr06 = {CFG_INT,LG_Speed_Rewind,0,316};
+__root const unsigned int SPEED_REW=20;
+
+__root const CFG_HDR cfghdr07={CFG_CBOX,LG_Show_Anim,0,2};
 __root const unsigned int GrafOn1 = 1;
 __root const CFG_CBOX_ITEM cfgcbox7[2]={LG_No,LG_Yes};
 
-__root const CFG_HDR cfghdr07={CFG_STR_UTF8,LG_Music_folder,3,127};
+__root const CFG_HDR cfghdr08={CFG_STR_UTF8,LG_Music_folder,3,127};
 __root const char MUSIC[128] = "0:\\Sounds\\";
 
 //Level 1

@@ -131,6 +131,9 @@ void FullpathToFilename(WSHDR * fnamews, WSHDR * wsFName);
 // Убираем странный символ (всвязи с переходом на WSHDR)   AAA
 void fix(char* p);
 
+// From SieJC
+char* convUTF8_to_ANSI_STR(char *UTF8_str);
+
 // Возвращется трек по номеру в пл
 WSHDR * GetCurrentTrack();
 
@@ -161,4 +164,5 @@ void CleanPlaylist();
 // Утечка памяти в самом деле достала...   AAA
 void MemoryFree();
 
+//void ascii2ws(char *s, WSHDR *ws);
 #endif

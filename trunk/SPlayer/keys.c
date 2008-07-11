@@ -104,7 +104,10 @@ KEY_PROC procmap[] = {
   ToggleVolume,
   SwitchPlayModeDown,
   SetNextPlayed,
-  CleanPlaylist
+  CleanPlaylist,
+  StartRewindToEnd,
+  StartRewindToBegin,
+  SavePL
 };
 
 // Вот не могу понять как эта конструкция работает!
@@ -157,7 +160,10 @@ const PROC_MAP keyprocs[] = {
   {"switchmode", SwitchPlayModeDown},
   {"fm", ShowFM},
   {"nextplayed", SetNextPlayed},
-  {"cleanpl", CleanPlaylist}
+  {"cleanpl", CleanPlaylist},
+  {"rewindtoend", StartRewindToEnd},
+  {"rewindtobegin", StartRewindToBegin},
+  {"savepl", SavePL}
 };
 
 void KeysProc(char *name, char *value)
