@@ -14,6 +14,7 @@ extern const int EXT;                  // Расширение по умолчанию
 extern const int soundvolume;          // Громкость
 extern const unsigned int SizeOfFont;  // Шрифт AAA
 extern const unsigned int SCROLL_MULT; // Скорость листания   перенес в конфиг  AAA
+extern const unsigned int SPEED_REW;   // Скорость перемотки  AAA
 
 // Мои переменные
 unsigned short SoundVolume;           // Громкость
@@ -77,6 +78,7 @@ extern unsigned int MAINGUI_ID;
 GBSTMR tmr_scroll;
 GBSTMR tmr_displacement;
 GBSTMR tmr_cursor_move;
+GBSTMR tmr_rew;
 volatile int scroll_disp;
 volatile int max_scroll_disp;
 
@@ -297,8 +299,9 @@ unsigned int mlsc=0,   // Миллисекунды
              StopCount=0,
              IsRewind=0,
              IsDoIt=0;
-#define END     1
-#define BEGIN  -1
+int ModeRew;
+//#define END     1
+//#define BEGIN  -1
 #define IsSTOP  0
 #define IsPAUSE 1
 #define IsPLAY  2
@@ -313,14 +316,16 @@ void StopRewind()       // Остановка перемотки :)
     PlayingStatus = IsPLAY;
     EXT_REDRAW();
     IsRewind = 0;
+    GBS_DelTimer(&tmr_rew);
   }
 }
 
-void DoRewinded(short int Mode)
+void DoRewinded()
 {
+  DisableScroll();
     if(!StopCount)
     {
-      mlsc=tm*1000+1000*Mode;
+      mlsc=tm*1000+1000*ModeRew;
       tm=mlsc/1000;      
     }
     if(tm<=0)
@@ -333,23 +338,26 @@ void DoRewinded(short int Mode)
       tm=ln;
       StopCount=1;
     }
+    REDRAW();
+    GBS_StartTimerProc(&tmr_rew,SPEED_REW,DoRewinded);
 }
 
 // Перемотка в конец    
 void StartRewindToEnd()
 {
   IsRewind=1;
+  ModeRew=1;
   switch(PlayingStatus)
   {
   case IsSTOP:
     // Если стоп, то радостно перематываем...
-    DoRewinded(END);
+    DoRewinded();
     break;
   case IsPAUSE:
     // Если пауза - перематываем :) ...
     if (phandle!=-1)
     {
-      DoRewinded(END);
+      DoRewinded();
     }
     break;
   case IsPLAY:
@@ -358,12 +366,10 @@ void StartRewindToEnd()
     {
       if(!IsDoIt)//Просто зачем делать одно и тоже
       {
-        PlayMelody_PausePlayback(phandle);
-        PlayingStatus = IsPAUSE;
-        StopTMR(0);
+        TogglePlayback();
         IsDoIt = 1;
       }
-      DoRewinded(END);
+      DoRewinded();
     }
     break;
   }
@@ -373,13 +379,16 @@ void StartRewindToEnd()
 void StartRewindToBegin()
 {
   IsRewind=1;
+  ModeRew=-1;
   switch(PlayingStatus)
   {
-  case IsSTOP: DoRewinded(BEGIN); break;
+  case IsSTOP:
+    DoRewinded();
+  break;
   case IsPAUSE:
     if (phandle!=-1)
     {
-      DoRewinded(BEGIN);
+      DoRewinded();
     }
     break;
   case IsPLAY:
@@ -387,12 +396,10 @@ void StartRewindToBegin()
     {
       if(!IsDoIt)
       {
-        PlayMelody_PausePlayback(phandle);
-        PlayingStatus = IsPAUSE;
-        StopTMR(0);
+        TogglePlayback();
         IsDoIt = 1;
       }
-      DoRewinded(BEGIN);
+      DoRewinded();
     }
     break;
   }
@@ -801,7 +808,6 @@ void SavePlaylist(char *fn)
 {
   int j=0;
   int f;
-  char* p=malloc(256);
   char m[256];
   char s[]={0x0D,0x0A}; // Сделал совместимость с m3u 
   if(EXT==0){sprintf(m,"%s%s",fn,".spl");}
@@ -818,11 +824,13 @@ void SavePlaylist(char *fn)
   if(EXT==1){fwrite(f,"#EXTM3U",7,&err); fwrite(f,s,2,&err);}
   for (unsigned int i=0;i<TC[CurrentPL];i++)
   {
-    ws_2str(playlist_lines[CurrentPL][i+1],p,256);
+    char *p = malloc(wstrlen(playlist_lines[CurrentPL][i+1]) * 2 + 1);
+    int len;
+    ws_2utf8(playlist_lines[CurrentPL][i+1], p, &len, wstrlen(playlist_lines[CurrentPL][i+1]) * 2 + 1);
     fwrite(f,p,strlen(p),&err);
     fwrite(f,s,2,&err);
+    mfree(p);
   }
-  mfree(p);
   fclose(f,&err);
   ShowMSG(1,(int)lgpData[LGP_PL_Saved]);
 }
@@ -982,10 +990,13 @@ void MoveLineLeft()
 // Возвращает имя файла по полному пути...
 void FullpathToFilename(WSHDR * fnamews, WSHDR * wsFName)
 {
-  char* fname=malloc(256);
-  ws_2str(fnamews,fname,256);
+ // char* fname=malloc(256);
+ // ws_2str(fnamews,fname,256);
+  char *fname = malloc(wstrlen(fnamews) * 2 + 1);
+  int len;
+  ws_2utf8(fnamews, fname, &len, wstrlen(fnamews) * 2 + 1);
 
-      const char *p=strrchr(fname,0x1f)+1;
+     /* const char *p=strrchr(fname,0x1f)+1;
       const char *p2=strrchr(fname,'\\')+1;                         // Фикс для убирания этого странного символа... Теперь русский стал нормально
        if (p2>p){
          int length=strrchr(fname,'.')-strrchr(fname,'\\')-1;
@@ -993,58 +1004,29 @@ void FullpathToFilename(WSHDR * fnamews, WSHDR * wsFName)
        }else{
          int length=strrchr(fname,'.')-strrchr(fname,'\\')-2;
          utf8_2ws(wsFName,p,length);
-       }
+       }*/
+  const char *p=strrchr(fname,'\\')+1;
+  int length=strrchr(fname,'.')-strrchr(fname,'\\')-1;
+  utf8_2ws(wsFName,p,length);
   mfree(fname);
 }
 
-// Возвращает имя файла по полному пути...        Теперь быстрее работает   AAA
+// Возвращает имя файла по полному пути...        Теперь быстрее работает. Снова переделал   AAA
 void FullpathToFile(WSHDR * fnamews, WSHDR * wsFName)
 {
-  char* fname=malloc(256);
-  ws_2str(fnamews,fname,256);
+  char *fname = malloc(wstrlen(fnamews) * 2 + 1);
+  int len1;
+  ws_2utf8(fnamews, fname, &len1, wstrlen(fnamews) * 2 + 1);
   unsigned int len=strlen(fname);
 
   if(fname[len-1]=='\\') {fname[len]=0; fname[len-1]='\0';}
-  
-  const char *p=strrchr(fname,0x1f)+1;
-  const char *p2=strrchr(fname,'\\')+1;
-  if (p2>p){
-    utf8_2ws(wsFName,p2,strlen(p2)+1);
-  }else{
-    utf8_2ws(wsFName,p,strlen(p)+2);
-  }
-  
+
+  const char *p=strrchr(fname,'\\')+1;
+  utf8_2ws(wsFName,p,strlen(p)+1);
   if(fname[len-1]=='\0') {wsprintf(wsFName,"%w\\",wsFName);}
   
   mfree(fname);
 }
-/*
-void FullpathToFile(WSHDR * fnamews, WSHDR * wsFName)
-{
-  unsigned int err;
-  char* fname=malloc(256);
-  ws_2str(fnamews,fname,256);
-
-  if (!isdir(fname, &err))
-  {
-      const char *p=strrchr(fname,0x1f)+1;
-      const char *p2=strrchr(fname,'\\')+1;                         // Фикс для убирания этого странного символа... Теперь русский стал нормально
-       if (p2>p){
-         int length=strrchr(fname,'.')-strrchr(fname,'\\')-1;
-         utf8_2ws(wsFName,p2,length);
-       }else{
-         int length=strrchr(fname,'.')-strrchr(fname,'\\')-2;
-         utf8_2ws(wsFName,p,length);
-       }
-  }else{
-    fix(fname);
-      fname[strlen(fname)-1]=0;
-      const char *p=strrchr(fname,'\\')+1;
-      utf8_2ws(wsFName,p,strlen(p));
-      wsprintf(wsFName,"%w\\",wsFName);
-  }
-  mfree(fname);
-}*/
 
 void fix(char* p)  // Убираем странный символ (всвязи с переходом на WSHDR)   AAA
 {
@@ -1056,6 +1038,93 @@ void fix(char* p)  // Убираем странный символ (всвязи с переходом на WSHDR)   AA
   }
   strcpy(p,p1);
   mfree(p1);
+}
+
+// From SieJC
+// Строковый вариант
+char* convUTF8_to_ANSI_STR(char *UTF8_str)
+{
+  // Рассматривая строку UTF8 как обычную, определяем её длину
+  if(!UTF8_str)return NULL;
+  int st_len = strlen(UTF8_str);
+
+  // Выделяем память - на всякий случай дохера
+  int lastchar = 0;
+  int dummy;
+  char* tmp_out = malloc(st_len+1);
+  zeromem(tmp_out,st_len+1);
+  char chr, chr2, chr3;
+  for(int i=0;i<st_len;i++)
+  {
+  chr = (*(UTF8_str+i));
+
+	if (chr<0x80)
+        {
+          *(tmp_out+lastchar)=chr;
+          lastchar++;
+          goto L_END_CYCLE;
+        }
+	if (chr<0xc0)
+        {
+          ShowMSG(1,(int)"Bad UTF-8 Encoding encountered (chr<0xC0)");
+          mfree(tmp_out);
+          return NULL;
+        }
+	
+        chr2 = *(UTF8_str+i+1);
+
+        if (chr2<0x80)
+        {
+          ShowMSG(1,(int)"Bad UTF-8 Encoding encountered (chr2<0x80)");
+          mfree(tmp_out);
+          return NULL;
+        }
+	
+	if (chr<0xe0) {
+	    // cx, dx
+                  if ((chr == 0xD0)&&(chr2 == 0x81)){*(tmp_out+lastchar) = 0xA8;}//Ё
+             else if ((chr == 0xD0)&&(chr2 == 0x86)){*(tmp_out+lastchar) = 0xB2;}//І
+             else if ((chr == 0xD0)&&(chr2 == 0x87)){*(tmp_out+lastchar) = 0xAF;}//Ї
+             else if ((chr == 0xD0)&&(chr2 == 0x84)){*(tmp_out+lastchar) = 0xAA;}//Є
+             else if ((chr == 0xD1)&&(chr2 == 0x91)){*(tmp_out+lastchar) = 0xB8;}//ё
+             else if ((chr == 0xD1)&&(chr2 == 0x96)){*(tmp_out+lastchar) = 0xB3;}//і
+             else if ((chr == 0xD1)&&(chr2 == 0x97)){*(tmp_out+lastchar) = 0xBF;}//ї
+             else if ((chr == 0xD1)&&(chr2 == 0x94)){*(tmp_out+lastchar) = 0xBA;}//є
+             else if ((chr == 0xD2)&&(chr2 == 0x91)){*(tmp_out+lastchar) = 0xE3;}//ґ->г
+             else if ((chr == 0xD2)&&(chr2 == 0x90)){*(tmp_out+lastchar) = 0xC3;}//Ґ->Г
+             else
+          {
+	    char test1 = (chr & 0x1f)<<6;
+            char test2 = chr2 & 0x3f;
+            *(tmp_out+lastchar)= test1 | test2 + 127 + 0x31;
+          }
+            i++;
+            lastchar++;
+            goto L_END_CYCLE;
+	}
+	if (chr<0xf0) {
+	    // cx, dx
+	    chr3= *(UTF8_str+i+2);
+
+	    if (chr3<0x80)
+            {
+              ShowMSG(1,(int)"Bad UTF-8 Encoding encountered");
+              mfree(tmp_out);
+              return NULL;
+            }
+	    else
+            {
+              *(tmp_out+lastchar) =  ((chr & 0x0f)<<12) | ((chr2 &0x3f) <<6) | (chr3 &0x3f);
+              i=i+2;
+            }
+	}
+
+  L_END_CYCLE:
+    dummy++;
+  }
+  st_len = strlen(tmp_out);
+  tmp_out = realloc(tmp_out,st_len+1);
+  return tmp_out;
 }
 
 // Возвращется трек по номеру в пл
