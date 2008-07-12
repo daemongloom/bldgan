@@ -61,6 +61,7 @@ const char ipc_grantee_name[]=IPC_GRANTEE_NAME;
 const char ipc_control_name[]=IPC_CONTROL_NAME;
 IPC_REQ gipc;
 
+extern short ModeRew;
 extern unsigned short stop; // 1, если останавливаем листание   AAA
 unsigned short copy=0; // 1, если копируем   AAA
 unsigned short move=0; // 1, если перемещаем   AAA
@@ -1098,6 +1099,18 @@ void SavePL()
 {
   sprintf(list,"%s%s",PLAYLISTS,"playlist");
   SavePlaylist(list);
+}
+
+void StartRewindToBegin()
+{
+  ModeRew=-1;
+  StartRewind();
+}
+
+void StartRewindToEnd()
+{
+  ModeRew=1;
+  StartRewind();
 }
 /* Блок функций. Неоходимо для конфига клавиш. */
 

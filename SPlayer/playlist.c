@@ -68,6 +68,7 @@ extern const unsigned int InfoOn; // 1,если включен показ информации   Vedan
 unsigned short stop=1; // 1, если останавливаем листание   AAA
 extern unsigned short Stat_keypressed;
 unsigned short FM_o=0;
+short ModeRew;
 // Всякие "мелкие" переменные
 
 extern unsigned int MAINGUI_ID;
@@ -297,23 +298,15 @@ extern int tm,         // Время
            ln;         // Длительность
 unsigned int mlsc=0,   // Миллисекунды
              StopCount=0,
-             IsRewind=0,
-             IsDoIt=0;
-int ModeRew;
-//#define END     1
-//#define BEGIN  -1
-#define IsSTOP  0
-#define IsPAUSE 1
-#define IsPLAY  2
+             IsRewind=0;
 
 void StopRewind()       // Остановка перемотки :) 
 {
   if(IsRewind)
   {
-    IsDoIt = 0;
     StopCount = 0;
     PlayMelody_SetPosition(phandle, mlsc);
-    PlayingStatus = IsPLAY;
+    PlayingStatus = 2;
     EXT_REDRAW();
     IsRewind = 0;
     GBS_DelTimer(&tmr_rew);
@@ -342,63 +335,26 @@ void DoRewinded()
     GBS_StartTimerProc(&tmr_rew,SPEED_REW,DoRewinded);
 }
 
-// Перемотка в конец    
-void StartRewindToEnd()
+// Перемотка   // Оптимизировал   AAA
+void StartRewind()
 {
   IsRewind=1;
-  ModeRew=1;
   switch(PlayingStatus)
   {
-  case IsSTOP:
-    // Если стоп, то радостно перематываем...
-    DoRewinded();
-    break;
-  case IsPAUSE:
+  case 1:
     // Если пауза - перематываем :) ...
     if (phandle!=-1)
     {
       DoRewinded();
     }
     break;
-  case IsPLAY:
+  case 2:
     // Если играет, ставим паузу и перематываем !! :)
     if (phandle!=-1)
     {
-      if(!IsDoIt)//Просто зачем делать одно и тоже
-      {
-        TogglePlayback();
-        IsDoIt = 1;
-      }
-      DoRewinded();
-    }
-    break;
-  }
-}
-
-// Перемотка в начало    
-void StartRewindToBegin()
-{
-  IsRewind=1;
-  ModeRew=-1;
-  switch(PlayingStatus)
-  {
-  case IsSTOP:
-    DoRewinded();
-  break;
-  case IsPAUSE:
-    if (phandle!=-1)
-    {
-      DoRewinded();
-    }
-    break;
-  case IsPLAY:
-    if (phandle!=-1)
-    {
-      if(!IsDoIt)
-      {
-        TogglePlayback();
-        IsDoIt = 1;
-      }
+      PlayMelody_PausePlayback(phandle);
+      StopTMR(0);
+      PlayingStatus = 1;
       DoRewinded();
     }
     break;

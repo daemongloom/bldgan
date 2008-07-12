@@ -178,6 +178,10 @@ void SwitchPlayModeDown();
 
 void SavePL();
 
+void StartRewindToEnd();
+
+void StartRewindToBegin();
+
 void DoKey(int key, int ka);
 
 char *strtolower(char *src, char *dst, int sz);
