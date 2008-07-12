@@ -338,13 +338,14 @@ void DoRewinded()
 // Перемотка   // Оптимизировал   AAA
 void StartRewind()
 {
-  IsRewind=1;
+  
   switch(PlayingStatus)
   {
   case 1:
     // Если пауза - перематываем :) ...
     if (phandle!=-1)
     {
+      IsRewind=1;
       DoRewinded();
     }
     break;
@@ -352,6 +353,7 @@ void StartRewind()
     // Если играет, ставим паузу и перематываем !! :)
     if (phandle!=-1)
     {
+      IsRewind=1;
       PlayMelody_PausePlayback(phandle);
       StopTMR(0);
       PlayingStatus = 1;
