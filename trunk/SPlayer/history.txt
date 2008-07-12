@@ -1,3 +1,6 @@
+12.07.08 Anderstand
+*Оптимизировал перемотку
+
 11.07.08 Anderstand
 *Фиксы кодировок (респект BalakinUser)
 +Функции перемотки в файле конфига клавиш "rewindtoend","rewindtobegin" и сохранения пл "savepl"

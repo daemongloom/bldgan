@@ -3,14 +3,6 @@
 
 #define TCPL 5             // Количество пл   AAA
 
-void StopRewind();       // Остановить перемотку :) - Vedan
-
-// Перемотка в конец    - Vedan
-void StartRewindToEnd();
-
-// Перемотка в начало    - Vedan
-void StartRewindToBegin();
-
 // Оказалось его перед закрытием еще и останавливать надо... А то такое начинается! :D  AAA
 void DisableScroll(void);
 
@@ -37,6 +29,12 @@ void NextTrack();
 
 // Предыдущий трек пл  AAA
 void PreviousTrack();
+
+// Остановить перемотку :) - Vedan
+void StopRewind();
+
+// Перемотка - Vedan   // Оптимизировал   AAA
+void StartRewind();
 
 // Пауза/Воспроизведение
 void TogglePlayback();
