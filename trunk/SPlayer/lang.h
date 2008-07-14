@@ -5,8 +5,11 @@
 #ifndef _LANG_H_
 #define _LANG_H_
 
-
+#ifdef X75
+#define LG_Version              "0.9.8.0"
+#else
 #define LG_Version              "1.0.0.0"
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //
