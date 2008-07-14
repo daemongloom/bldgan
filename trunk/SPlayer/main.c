@@ -566,12 +566,10 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       if(FnameIPC)
       {
         // Вылавливаем имя трека   AAA
-        
-      //  strncpy(trackname, p, strlen(p)-4);   // Мочим расширение   AAA
-        // Выловили имя трека   AAA
-        ID3TAGDATA *StatTag;
-        if(FnameIPC==2) {
+        if(FnameIPC==2)
+        {
           char *trackname=malloc(256);
+          ID3TAGDATA *StatTag;
           StatTag=malloc(sizeof(ID3TAGDATA));
           ReadID3v1(GetPlayedTrack(PlayedTrack[PlayedPL]), StatTag);
           if(strlen(StatTag->artist)&&strlen(StatTag->title)) {sprintf(trackname,"%s - %s",StatTag->artist,StatTag->title);}
@@ -579,26 +577,45 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
           
           ShowMSG(1,(int)trackname);
           
+          WSHDR *ws1 = AllocWS(strlen(trackname) + 1);
+          wsprintf(ws1, "%t", trackname);
+          
+          char *name = malloc(wstrlen(ws1) * 2 + 1);
+          int len;
+          ws_2utf8(ws1, name, &len, wstrlen(ws1) * 2 + 1);
+          
+          char *p=malloc(256);
+          strcpy(p,name);
+          
+          
           gipc.name_to=ipc_grantee_name;
           gipc.name_from=ipc_my_name;
-          gipc.data=(void*)trackname;
+          gipc.data=(void*)p;
           GBS_SendMessage(MMI_CEPID,MSG_IPC,0,&gipc);
           
+          mfree(p);
+          mfree(name);
+          FreeWS(ws1);
           mfree(trackname);
         }else{
           WSHDR * ws1=AllocWS(128);
           FullpathToFilename(fname, ws1);
+          
           char *name = malloc(wstrlen(ws1) * 2 + 1);
           int len;
           ws_2utf8(ws1, name, &len, wstrlen(ws1) * 2 + 1);
+          
+          char *p=malloc(256);
+          strcpy(p,name);
           
           ShowMSG(1,(int)convUTF8_to_ANSI_STR(name));
           
           gipc.name_to=ipc_grantee_name;
           gipc.name_from=ipc_my_name;
-          gipc.data=(void*)convUTF8_to_ANSI_STR(name);
+          gipc.data=(void*)p;
           GBS_SendMessage(MMI_CEPID,MSG_IPC,0,&gipc);
           
+          mfree(p);
           FreeWS(ws1);
           mfree(name);
         }
