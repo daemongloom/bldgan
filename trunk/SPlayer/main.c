@@ -62,6 +62,8 @@ const char ipc_control_name[]=IPC_CONTROL_NAME;
 IPC_REQ gipc;
 
 extern short ModeRew;
+extern short ModeMove;
+extern short SpeedMove;
 extern unsigned short stop; // 1, если останавливаем листание   AAA
 unsigned short copy=0; // 1, если копируем   AAA
 unsigned short move=0; // 1, если перемещаем   AAA
@@ -171,7 +173,6 @@ const char p_2s[]="%s%s";
 const char p_3s[]="%s%s%s";
 const char p_4s[]="%s%s%s%s";
 #ifndef NO_PNG
-unsigned short pngloadcomp1=1;
 unsigned short pngloadcomp=0;
 unsigned short Npng=0;
 #else
@@ -199,7 +200,6 @@ void TimeRedraw();
 void LoadPng()
 {
 #ifndef NO_PNG
-  pngloadcomp1=0;
   unsigned int err;
   FSTATS fstat;
   unsigned int i;
@@ -278,6 +278,7 @@ void LoadPng()
   Npng++;
   pngloadcomp=1;
   REDRAW();
+ // Log(0, " 330");
   if(l){
   sprintf(sfname,"%d%s",l,lgpData[LGP_PNG_er]);
   ShowMSG(1,(int)sfname);}
@@ -1035,7 +1036,6 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
     }
 #ifndef NO_PNG
     else{
-      if(pngloadcomp1)SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
       WSHDR*SP=AllocWS(64);
       DrawRoundedFrame(left,top,w-1,h-1,0,0,0,GetPaletteAdrByColorIndex(1),GetPaletteAdrByColorIndex(1));  // Поселим это сюда   AAA
       wsprintf(SP,"%s","SPlayer");
@@ -1129,6 +1129,30 @@ void StartRewindToEnd()
   ModeRew=1;
   StartRewind();
 }
+
+void PrevPL()
+{
+  ModeMove=-1;
+  MovePL();
+}
+
+void NextPL()
+{
+  ModeMove=1;
+  MovePL();
+}
+
+void CTDownSpeed(void)
+{
+  SpeedMove=1;
+  CTSpeed();
+}
+
+void CTUpSpeed(void)
+{
+  SpeedMove=-1;
+  CTSpeed();
+}
 /* Блок функций. Неоходимо для конфига клавиш. */
 
 
@@ -1170,8 +1194,10 @@ if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
     switch(msg->gbsmsg->submess)
     {
       case RIGHT_BUTTON:
+        NextPL();
       break;
       case LEFT_BUTTON:
+        PrevPL();
       break;
       case UP_BUTTON:
         stop=0;
@@ -1653,15 +1679,26 @@ int main(char *exename, char *fname)
   load_skin(sfname);
   sprintf(sfname,"%s%s",PIC_DIR,"colour.cfg");
   load_skin(sfname);
+ // Log(0, " 001");
   SUBPROC((void*)LoadKeys);
+ // Log(0, " 002");
   SUBPROC((void*)lgpInitLangPack); //Загрузка языка - Vedan
- // SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
+ // Log(0, " 003");
+  SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
+ // Log(0, " 004");
+  extern short coord7;
+  extern unsigned short real[5];
+  real[0]=15;
+  real[1]=60;
+  real[2]=95;
+  real[3]=115;
+  real[4]=125;
+  coord7=coord[7];
   playmode = PlayMode;
   SoundVolume = soundvolume;
   ShowNamesNoConst=SHOW_NAMES;
   
   wl.wfilename=AllocWS(128);
- // Memory();
   // Если что-то передали в параметре - загружаем...
   if (fname)
   {

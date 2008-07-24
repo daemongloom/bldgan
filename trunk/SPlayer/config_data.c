@@ -33,11 +33,14 @@ __root const unsigned int SCROLL_MULT=10;
 __root const CFG_HDR cfghdr06 = {CFG_INT,LG_Speed_Rewind,0,316};
 __root const unsigned int SPEED_REW=20;
 
-__root const CFG_HDR cfghdr07={CFG_CBOX,LG_Show_Anim,0,2};
+__root const CFG_HDR cfghdr07 = {CFG_INT,LG_Speed_Moving_PL,0,316};
+__root const unsigned int SPEED_MOVE=10;
+
+__root const CFG_HDR cfghdr08={CFG_CBOX,LG_Show_Anim,0,2};
 __root const unsigned int GrafOn1 = 1;
 __root const CFG_CBOX_ITEM cfgcbox7[2]={LG_No,LG_Yes};
 
-__root const CFG_HDR cfghdr08={CFG_STR_UTF8,LG_Music_folder,3,127};
+__root const CFG_HDR cfghdr09={CFG_STR_UTF8,LG_Music_folder,3,127};
 __root const char MUSIC[128] = "0:\\Sounds\\";
 
 //Level 1
@@ -101,7 +104,7 @@ __root const CFG_HDR cfghdr24={CFG_STR_UTF8,LG_Path_To_SCE,3,127};
 __root const char EXENAME[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\SPlayer cfg editor.elf";
 
 __root const CFG_HDR cfghdr25={CFG_STR_UTF8,LG_Path_To_Lang,3,127};
-__root const char LANGFILE[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\*.txt"; //Путь к текстовому файлу - Vedan
+__root const char LANGFILE[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\RU.txt"; //Путь к текстовому файлу - Vedan
 
 __root const CFG_HDR cfghdr_m20={CFG_LEVEL,"",0,0};
 

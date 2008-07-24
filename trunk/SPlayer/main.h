@@ -154,6 +154,8 @@ static const char * const items1[TOTAL_ITEMS_1] = {
 #define CBOX_UNCHECKED 0xE10C
 #endif
 
+void Log(int dummy, char *txt);
+
 void load_skin(char const* fname);
 
 void PlayMP3File(WSHDR * fname);
@@ -181,6 +183,14 @@ void SavePL();
 void StartRewindToEnd();
 
 void StartRewindToBegin();
+
+void NextPL();
+
+void PrevPL();
+
+void CTDownSpeed(void);
+
+void CTUpSpeed(void);
 
 void DoKey(int key, int ka);
 
