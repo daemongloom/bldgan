@@ -48,11 +48,8 @@ void SetNextPlayed();
 // Воспроизведение поставленного в очередь   AAA
 void PlaySetTrack();
 
-// Слудующий пл   AAA
-void NextPL();
-
-// Предыдущий пл   AAA
-void PrevPL();
+// Переключаем пл   AAA
+void MovePL();
 
 // Потребовалось для исправления глюка AAA
 void CTtoFirst();
@@ -66,11 +63,8 @@ void CTDown();
 //Пробуем листание вверх AAA
 void CTUp();
 
-// Быстрое листание вниз AAA
-void CTDownSpeed(void);
-
-// Быстрое листание вверх AAA
-void CTUpSpeed(void);
+// Быстрое листание AAA
+void CTSpeed(void);
 
 //Листание шопестец вниз AAA
 void CTDownSix();

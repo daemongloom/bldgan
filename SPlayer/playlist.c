@@ -15,6 +15,7 @@ extern const int soundvolume;          // Громкость
 extern const unsigned int SizeOfFont;  // Шрифт AAA
 extern const unsigned int SCROLL_MULT; // Скорость листания   перенес в конфиг  AAA
 extern const unsigned int SPEED_REW;   // Скорость перемотки  AAA
+extern const unsigned int SPEED_MOVE;  // Скорость перелистывания пл  AAA
 
 // Мои переменные
 unsigned short SoundVolume;           // Громкость
@@ -69,6 +70,8 @@ unsigned short stop=1; // 1, если останавливаем листание   AAA
 extern unsigned short Stat_keypressed;
 unsigned short FM_o=0;
 short ModeRew;
+short ModeMove;
+short SpeedMove;
 // Всякие "мелкие" переменные
 
 extern unsigned int MAINGUI_ID;
@@ -79,6 +82,7 @@ extern unsigned int MAINGUI_ID;
 GBSTMR tmr_scroll;
 GBSTMR tmr_displacement;
 GBSTMR tmr_cursor_move;
+GBSTMR tmr_pl_move;
 GBSTMR tmr_rew;
 volatile int scroll_disp;
 volatile int max_scroll_disp;
@@ -426,37 +430,39 @@ void PlaySetTrack()
   NextPlayedTrack[1]=NULL;
 }
 
-// Слудующий пл   AAA
-void NextPL()
+short coord7;
+unsigned short imove=0;
+unsigned short real[5];
+void PL_mp(void)
 {
-  DisableScroll();
-  if(CurrentPL<TCPL-1)
+  if(imove<5&&GrafOn1)
   {
-  //  if(TC[CurrentPL+1]==0) {CurrentTrack[CurrentPL+1]=1;/*PlayedTrack[PlayedPL+1] = 0;*/}
-    CurrentPL++;
+    coord7=(132-real[imove]/*30*imove*/)*ModeMove;
+    imove++;
+    REDRAW();
+    GBS_StartTimerProc(&tmr_pl_move,SPEED_MOVE,PL_mp);
+  }else{
+    if(imove){
+    GBS_DelTimer(&tmr_cursor_move);
+    coord7=coord[7];
+    REDRAW();
+    imove=0;
+    }
   }
-  else
-  {
-  //  if(TC[0]==0) {CurrentTrack[0]=1;/*PlayedTrack[0] = 0;*/}
-    CurrentPL=0;
-  }
-  REDRAW();
 }
 
-// Предыдущий пл   AAA
-void PrevPL()
+void MovePL()
 {
   DisableScroll();
-  if(CurrentPL>0)
+  
+  if(0<=(CurrentPL+ModeMove)&&(CurrentPL+ModeMove)<TCPL)
   {
-  //  if(TC[CurrentPL-1]==0) {CurrentTrack[CurrentPL-1]=1;/*PlayedTrack[PlayedPL-1] = 0;*/}
-    CurrentPL--;
+    CurrentPL+=ModeMove;
+  }else{
+    if(ModeMove>0) {CurrentPL=0;}
+    else {CurrentPL=TCPL-1;}
   }
-  else
-  {
-  //  if(TC[4]==0) {CurrentTrack[4]=1;/*PlayedTrack[4] = 0;*/}
-    CurrentPL=TCPL-1;
-  }
+  PL_mp();
   REDRAW();
 }
 
@@ -495,7 +501,7 @@ void PL(void)
     GBS_StartTimerProc(&tmr_cursor_move,10,PL);
     
   }else{
-    
+    if(i){
     p1=0;
     p3=0;
     p=0;
@@ -504,6 +510,7 @@ void PL(void)
     d=0;
     n=0;
     i=0;
+    }
   }
 }
 
@@ -543,53 +550,29 @@ void CTUp()
   }
 }
 
-// Быстрое листание вниз AAA
-void CTDownSpeed(void)
+// Быстрое листание AAA
+void CTSpeed(void)
 {
   DisableScroll();
   if(stop==0)
   {
-    if (CurrentTrack[CurrentPL]<TC[CurrentPL])
+    if (CurrentTrack[CurrentPL]+SpeedMove>=1&&CurrentTrack[CurrentPL]+SpeedMove<=TC[CurrentPL])
     {
-      CurrentTrack[CurrentPL]++;
+      CurrentTrack[CurrentPL]+=SpeedMove;
     }
     else
     {
-      CurrentTrack[CurrentPL] = 1;
+      if(SpeedMove>0) {CurrentTrack[CurrentPL] = 1;}
+      else {CurrentTrack[CurrentPL] = TC[CurrentPL];}
     }
     REDRAW();
-    GBS_StartTimerProc(&tmr_displacement,10*SCROLL_MULT,CTDownSpeed); // фикс для sgold
+    GBS_StartTimerProc(&tmr_displacement,10*SCROLL_MULT,CTSpeed); // фикс для sgold
     
   }else{
     
     GBS_DelTimer(&tmr_displacement);
   }
 }
-
-
-// Быстрое листание вверх AAA
-void CTUpSpeed(void)
-{
-  DisableScroll();
-  if(stop==0)
-  {
-    if (CurrentTrack[CurrentPL]>1)
-    {
-      CurrentTrack[CurrentPL]--;
-    }
-    else
-    {
-      CurrentTrack[CurrentPL] = TC[CurrentPL];
-    }
-    REDRAW();
-    GBS_StartTimerProc(&tmr_displacement,10*SCROLL_MULT,CTUpSpeed); // фикс для sgold
-    
-  }else{
-    
-    GBS_DelTimer(&tmr_displacement);
-  }
-}
-
 
 //Листание шопестец вниз AAA
 void CTDownSix()
@@ -796,8 +779,11 @@ void SavePlaylist(char *fn)
 // Добавляем строку в пл   AAA
 void PastLine(WSHDR *p, unsigned short i) // Добавляем главно не с [0][0], а [0][1] почему-то... Работать должно тем не менее   AAA
 {
+ // Log(0, " 111");
   playlist_lines[CurrentPL][TC[CurrentPL]+1]=AllocWS(256);
+ // Log(0, " 112");
   wstrcpy(playlist_lines[CurrentPL][TC[CurrentPL]+1],p);
+ // Log(0, " 113");
   TC[CurrentPL]++;
   if(i) {CurrentTrack[CurrentPL]=TC[CurrentPL];}
 }
@@ -837,8 +823,11 @@ void DeleteLine()  // Стираем однако тоже до [0][1] и поэтому я считаю беспокоит
   {
     if(CurrentTrack[CurrentPL]>1) {CurrentTrack[CurrentPL]--;}   // Не хочу рыть весь код, подстрахуюсь так   AAA
   }
+ // Log(0, " 114");
   FreeWS(playlist_lines[CurrentPL][TC[CurrentPL]]);
+ // Log(0, " 115");
   playlist_lines[CurrentPL][TC[CurrentPL]]=NULL;
+ // Log(0, " 116");
   TC[CurrentPL]--;
   }
 }
@@ -1154,7 +1143,7 @@ char chanel[8],
     wsprintf(info_pf,"%t%t%t",format,chanel,freq); //Строка информации (фомат, канал, частота)
   }
   
-    my_x = coord[7];
+    my_x = coord7;
     my_y = coord[8];
 
     WSHDR * out_ws = AllocWS(128);
@@ -1381,8 +1370,11 @@ int LoadPlaylist(const char * fn)  // Переделал. Нет утечкам и глюкам!    AAA
         WSHDR* ppp=AllocWS(256);
         utf8_2ws(ppp,pp,strlen(pp));
         PastLine(ppp, 0);
+      //  Log(0, " 220");
         FreeWS(ppp);
+      //  Log(0, " 221");
         ppp=NULL;
+      //  Log(0, " 222");
         k++;
       }
       i++;
@@ -1393,6 +1385,7 @@ int LoadPlaylist(const char * fn)  // Переделал. Нет утечкам и глюкам!    AAA
   }
   mfree(p);
   mfree(pp);
+ // Log(0, " 223");
   return k;
 }
 
@@ -1481,5 +1474,6 @@ void MemoryFree()
   GBS_DelTimer(&tmr_scroll);
   GBS_DelTimer(&tmr_displacement);
   GBS_DelTimer(&tmr_cursor_move);
+  GBS_DelTimer(&tmr_pl_move);
   FreePlaylist();
 }
