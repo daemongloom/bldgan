@@ -288,6 +288,7 @@ static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//горячо любимый онкей
       if(strlen(nowpath))
       {
         GO();
+        OpenAnim();
         }else{
       FreeMemFM();
       return (1);
@@ -299,16 +300,29 @@ static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//горячо любимый онкей
       break;
     case ENTER_BUTTON:
       if(TCFM>0){
-      ws_2str(Files[CurFile], p, 256);
-      if(strlen(nowpath)){
-      if (isdir(p, &err)) // Проверка папка или нет AAA
-      {
-        NULLmass(MarkLines, TCFM);
-        LoadingDaemonList(p, 0, 0);
-      }else{
-        StopAllPlayback();
-        PlayMP3File(Files[CurFile]);
-      }}else{NULLmass(MarkLines, TCFM); LoadingDaemonList(p, 0, 0);}}
+        ws_2str(Files[CurFile], p, 256);
+        if(strlen(nowpath)){
+          if (isdir(p, &err)) // Проверка папка или нет AAA
+          {
+            NULLmass(MarkLines, TCFM);
+            LoadingDaemonList(p, 0, 0);
+            OpenAnim();
+          }else{
+            int a=p[strlen(p)-3];
+            int b=p[strlen(p)-2];
+            int c=p[strlen(p)-1];
+            if(!((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))&&
+               !((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U'))){
+                 StopAllPlayback();
+                 PlayMP3File(Files[CurFile]);
+               }
+          }
+        }else{
+          NULLmass(MarkLines, TCFM);
+          LoadingDaemonList(p, 0, 0);
+          OpenAnim();
+        }
+      }
       break;
     case UP_BUTTON:
       if(CurFile>1) {CurFile--;}

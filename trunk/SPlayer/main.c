@@ -495,8 +495,10 @@ int findmp3length(char *playy) {
 }
 
 int setdur=1;
+unsigned short corr=0;
 void SetDV()
 {
+  corr++;
   if(setdur){
   pha=GetPlayObjById(phandle);
   Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
@@ -508,6 +510,7 @@ void SetDV()
   GBS_DelTimer(&lvtm);
   setdur=1;
   }
+  if(corr<6&&!ln)SetDV();
 }
 
 // Играем MP3 файл
@@ -1686,14 +1689,6 @@ int main(char *exename, char *fname)
  // Log(0, " 003");
   SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
  // Log(0, " 004");
-  extern short coord7;
-  extern unsigned short real[5];
-  real[0]=15;
-  real[1]=60;
-  real[2]=95;
-  real[3]=115;
-  real[4]=125;
-  coord7=coord[7];
   playmode = PlayMode;
   SoundVolume = soundvolume;
   ShowNamesNoConst=SHOW_NAMES;

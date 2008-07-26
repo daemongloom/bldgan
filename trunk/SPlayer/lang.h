@@ -6,9 +6,9 @@
 #define _LANG_H_
 
 #ifdef X75
-#define LG_Version              "0.9.8.2"
+#define LG_Version              "0.9.8.4"
 #else
-#define LG_Version              "1.0.0.2"
+#define LG_Version              "1.0.0.4"
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -56,9 +56,11 @@
 #define LG_Music_folder          "Папка музыки"
 #define LG_Idle_coordinates      "Координаты иконки на Idle"
 #define LG_Auto_Exit_Min         "Время до автозакрытия"
+#define LG_Set_Speed             "Настройки скорости"
 #define LG_Speed_Moving          "Скорость листания"
 #define LG_Speed_Rewind          "Скорость перемотки"
 #define LG_Speed_Moving_PL       "Скорость перелистывания пл"
+#define LG_Speed_Open_Moving     "Скорость открытия пл"
 #define LG_Show_Anim             "Показывать анимацию"
 #define LG_Sets                  "Настройки"
 #define LG_Show_full_names       "Показ. полные имена"
@@ -150,9 +152,11 @@
 #define LG_Music_folder          "Папка пiсень"
 #define LG_Idle_coordinates      "Координати ярличка на Idle"
 #define LG_Auto_Exit_Min       ///////////////////////  "Время до автозакрытия"
+#define LG_Set_Speed           ///////////////////////  "Настройки скорости"
 #define LG_Speed_Moving        //////////////////////  "Скорость листания"
 #define LG_Speed_Rewind        /////////////////////  "Скорость перемотки"
 #define LG_Speed_Moving_PL     /////////////////////  "Скорость перелистывания пл"
+#define LG_Speed_Open_Moving   /////////////////////  "Скорость открытия пл"
 #define LG_Show_Anim           //////////////////////  "Показывать анимацию"
 #define LG_Sets                  "Установки"
 #define LG_Show_full_names       "Показ повного iменi"
@@ -245,9 +249,11 @@
 #define LG_Music_folder          "Music folder"
 #define LG_Idle_coordinates      "Idle coordinates"
 #define LG_Auto_Exit_Min         "Time before close"
+#define LG_Set_Speed             "Settings of speed"
 #define LG_Speed_Moving          "Speed of move cursor"
 #define LG_Speed_Rewind          "Speed of rewind"
 #define LG_Speed_Moving_PL       "Speed of move pl"
+#define LG_Speed_Open_Moving     //////////////////"Скорость открытия пл"
 #define LG_Show_Anim             "Show animation"
 #define LG_Sets                  "Sets"
 #define LG_Show_full_names       "Show full names"

@@ -119,11 +119,10 @@ void AboutDlg()
   CreateInputTextDialog(&info_desc,&info_about,eq,1,0);
   FreeWS(ews);
   */
-  ShowMSG(0,(int)"(r)\nIlya_ZX\n-Shadow-\nCaptain SISka\nVedan\nGanster and The_Zen");
+  ShowMSG(0,(int)"(r)\nIlya_ZX\n-Shadow-\nCaptain SISka\nVedan\nGanster and The_Zen\nDIEsel");
   char info[128];
   sprintf(info,"SPlayer v%s\n(c): \nAnderstand\nBlind007\nDemonGloom",LG_Version);
   ShowMSG(0,(int)info);
- /* ShowMSG(0,(int)"SPlayer v0.9.0.0\n(c): \nAnderstand\nBlind007\nDemonGloom");*/
   GeneralFuncF1(1);
 };
 /////////////////////////////////////////////Ξα ύλότε///////////////////////////////////////////////////

@@ -16,6 +16,7 @@ extern const unsigned int SizeOfFont;  // Шрифт AAA
 extern const unsigned int SCROLL_MULT; // Скорость листания   перенес в конфиг  AAA
 extern const unsigned int SPEED_REW;   // Скорость перемотки  AAA
 extern const unsigned int SPEED_MOVE;  // Скорость перелистывания пл  AAA
+extern const unsigned int SPEED_OPEN_MOVE;  // Скорость открытия пл  AAA
 
 // Мои переменные
 unsigned short SoundVolume;           // Громкость
@@ -84,6 +85,7 @@ GBSTMR tmr_displacement;
 GBSTMR tmr_cursor_move;
 GBSTMR tmr_pl_move;
 GBSTMR tmr_rew;
+GBSTMR tmr_opan;
 volatile int scroll_disp;
 volatile int max_scroll_disp;
 
@@ -430,21 +432,48 @@ void PlaySetTrack()
   NextPlayedTrack[1]=NULL;
 }
 
-short coord7;
+unsigned short s=0, op=0;
+// Сходим с ума по гламуру :)   AAA
+void OpenAnim(void)
+{
+  if(op<6&&GrafOn1)
+  {
+    s++;
+    op++;
+    REDRAW();
+    GBS_StartTimerProc(&tmr_opan,SPEED_OPEN_MOVE,OpenAnim);
+  }else{
+    if(op){
+    GBS_DelTimer(&tmr_opan);
+    s=0;
+    REDRAW();
+    op=0;
+    }
+  }
+}
+
 unsigned short imove=0;
-unsigned short real[5];
+short PL_move_L[6];
 void PL_mp(void)
 {
-  if(imove<5&&GrafOn1)
+  if(imove<8&&GrafOn1)
   {
-    coord7=(132-real[imove]/*30*imove*/)*ModeMove;
+    for(unsigned short i=0; i<6; i++)
+    {
+      PL_move_L[i]=(3*(8-imove)*(8-imove)-15*(5-i))*ModeMove;
+      if((ModeMove>=0&&PL_move_L[i]<=coord[7])||(ModeMove<=0&&PL_move_L[i]>=coord[7])||imove==7) {PL_move_L[i]=0;}
+    }
+  //  coord7=(132-real[imove]/*30*imove*/)*ModeMove;
     imove++;
     REDRAW();
     GBS_StartTimerProc(&tmr_pl_move,SPEED_MOVE,PL_mp);
   }else{
     if(imove){
     GBS_DelTimer(&tmr_cursor_move);
-    coord7=coord[7];
+   /* for(unsigned short i=0; i<6; i++)
+    {
+      PL_move_L[i]=0;
+    }*/
     REDRAW();
     imove=0;
     }
@@ -619,6 +648,7 @@ void PlayTrackUnderC()
     char p[256];
     ws_2str(GetCurrentTrack(CurrentTrack[CurrentPL]),p,256);
     LoadingPlaylist(p);
+    OpenAnim();
   }
 }
 
@@ -1143,7 +1173,7 @@ char chanel[8],
     wsprintf(info_pf,"%t%t%t",format,chanel,freq); //Строка информации (фомат, канал, частота)
   }
   
-    my_x = coord7;
+    my_x = coord[7];
     my_y = coord[8];
 
     WSHDR * out_ws = AllocWS(128);
@@ -1233,10 +1263,10 @@ char chanel[8],
     // Делаем другой цвет для не текущего трека...
     if (MarkLine[CurList]==i||MarkLines[i]==1)
     {
-      DrawScrollString(out_ws,my_x,my_y+c+(p2-p3*v)*v3,w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
+      DrawScrollString(out_ws,my_x+PL_move_L[l],my_y+c+(p2-p3*v)*v3,/*my_x+125*/w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
                    1,SizeOfFont,0,COLOR[5],0);
     }else{
-      DrawScrollString(out_ws,my_x,my_y+c+(p2-p3*v)*v3,w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
+      DrawScrollString(out_ws,my_x+PL_move_L[l],my_y+c+(p2-p3*v)*v3,/*my_x+125*/w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
                    1,SizeOfFont,0,COLOR[4],0);
     }
     p2=0;
@@ -1247,9 +1277,9 @@ char chanel[8],
 #ifndef NO_PNG
       char sfname[256];
       sprintf(sfname,p_3s,PIC_DIR,items1[12],PNGEXT);
-      DrawImg(my_x-1,my_y+c-3+p*v*v4,(int)sfname);
+      DrawImg(my_x-1+PL_move_L[l],my_y+c-3+p*v*v4,(int)sfname);
 #else
-      DrawRoundedFrame(my_x-1,my_y+c-3+p*v*v4,w-5,my_y+coord[6]*2+c-3+p*v*v4,4,4,0,GetPaletteAdrByColorIndex(1),COLOR[2]);
+      DrawRoundedFrame(my_x-1+PL_move_L[l],my_y+c-3+p*v*v4,my_x+127,my_y+coord[6]*2+c-3+p*v*v4,4,4,0,GetPaletteAdrByColorIndex(1),COLOR[2]);
 #endif
       p2=-p1*v1;
       
@@ -1270,12 +1300,12 @@ char chanel[8],
 	    max_scroll_disp=i;
 	  }
       }
-      DrawScrollString(out_ws,my_x,my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
+      DrawScrollString(out_ws,my_x+PL_move_L[l],my_y+c-(p1*v2+p3*v1)*v3*v,/*my_x+125*/w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
                    scroll_disp+1,SizeOfFont,0,COLOR[5],0);
       if(InfoOn&&MarkLine)
      {
         
-        DrawString(info_pf,my_x,GetFontYSIZE(SizeOfFont)+2+my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+2*GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v+2,SizeOfFont,0,COLOR[5],0);
+        DrawString(info_pf,my_x+PL_move_L[l],GetFontYSIZE(SizeOfFont)+2+my_y+c-(p1*v2+p3*v1)*v3*v,/*my_x+125*/w-7,my_y+2*GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v+2,SizeOfFont,0,COLOR[5],0);
      }
       
       
@@ -1295,12 +1325,22 @@ char chanel[8],
 	    max_scroll_disp=i;
 	  }
         }
-      DrawScrollString(out_ws,my_x,my_y+c-(p1*v2+p3*v1)*v3*v,w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
+      DrawScrollString(out_ws,my_x+PL_move_L[l],my_y+c-(p1*v2+p3*v1)*v3*v,/*my_x+125*/w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
                    scroll_disp+1,SizeOfFont,0,COLOR[0],0);
     }
-    c+=coord[6];
+      if(s){
+        if(s>1) {c+=coord[6];}
+        else {c+=coord[6]/5;}
+      }else{
+        c+=coord[6];
+      }
     }
-    c+=coord[6];
+      if(s){
+        if(c/coord[6]>l&&s>l+2&&s>2) {c+=coord[6];}
+        else {c+=coord[6]/5;}
+      }else{
+        c+=coord[6];
+      }
     }
     }
     if(n==0) {n=coord[6];}
@@ -1475,5 +1515,6 @@ void MemoryFree()
   GBS_DelTimer(&tmr_displacement);
   GBS_DelTimer(&tmr_cursor_move);
   GBS_DelTimer(&tmr_pl_move);
+  GBS_DelTimer(&tmr_opan);
   FreePlaylist();
 }
