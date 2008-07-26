@@ -338,6 +338,7 @@ static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//гор€чо любимый онкей
     case '1':
       NULLchar(nowpath, 128);
       GO();
+      OpenAnim();
       break;
     case '2':
       if(CurFile-6>0) {CurFile-=6;}
@@ -430,6 +431,6 @@ static const RECT Canvas={0,0,0,0};
   FM_o=1;
   NULLchar(nowpath, 128);
   NULLmass(MarkLines, TCFM);
-  if(strlen(MUSIC)) {LoadingDaemonList(MUSIC, 0, 0);}
-  else {GO();}
+  if(strlen(MUSIC)) {LoadingDaemonList(MUSIC, 0, 0); OpenAnim();}
+  else {GO(); OpenAnim();}
 }
