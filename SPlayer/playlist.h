@@ -48,6 +48,9 @@ void SetNextPlayed();
 // Воспроизведение поставленного в очередь   AAA
 void PlaySetTrack();
 
+// Сходим с ума по гламуру :)   AAA
+void OpenAnim(void);
+
 // Переключаем пл   AAA
 void MovePL();
 
