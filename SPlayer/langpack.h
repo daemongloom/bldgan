@@ -83,7 +83,9 @@ enum LGP_ID
   LGP_Error_2,
   LGP_Spkeys_er,
   LGP_PNG_er,
-  LGP_LangCode,
+  
+  LGP_LangCode, // Пусть всегда будет в конце
+  
   LGP_DATA_NUM
 };
 

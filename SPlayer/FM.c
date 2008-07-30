@@ -192,7 +192,7 @@ void LoadingDaemonList(const char* path, unsigned int re, unsigned int toPL)
   LoadDaemonList(path, re, toPL);
 }
 
-void NULLmass(int* mass, unsigned int end) {for(unsigned int i=0; i<end+1; i++) {mass[i]=0;}}   // Обнуляем массив-маркер   AAA
+//void NULLmass(int* mass, unsigned int end) {for(unsigned int i=0; i<end+1; i++) {mass[i]=0;}}   // Обнуляем массив-маркер   AAA
 
 void CopyFName(WSHDR** mlines, int* mark, unsigned int imax)   // Копируем пути к файлам в пл   AAA
 {
@@ -219,14 +219,14 @@ void CopyFName(WSHDR** mlines, int* mark, unsigned int imax)   // Копируем пути 
       }
     }
   }
-  NULLmass(mark, imax);
+  zeromem(mark, sizeof(mark));
 }
 
 void GO()
 {
   char pn[128];
   WSHDR* ws=AllocWS(256);
-  NULLmass(MarkLines, TCFM);
+  zeromem(MarkLines, sizeof(MarkLines));
 if(strlen(nowpath)>3)
 {
   nowpath[strlen(nowpath)-1]=0;
@@ -235,7 +235,7 @@ if(strlen(nowpath)>3)
   pn[p-nowpath]='\0';
   LoadingDaemonList(pn, 0, 0);
 }else{
-  NULLchar(nowpath, 128);
+  zeromem(nowpath,128);
   DeleteFiles();
   for(unsigned short i=0; i<5; i++)
   {
@@ -304,7 +304,7 @@ static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//горячо любимый онкей
         if(strlen(nowpath)){
           if (isdir(p, &err)) // Проверка папка или нет AAA
           {
-            NULLmass(MarkLines, TCFM);
+            zeromem(MarkLines, sizeof(MarkLines));
             LoadingDaemonList(p, 0, 0);
             OpenAnim();
           }else{
@@ -318,7 +318,7 @@ static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//горячо любимый онкей
                }
           }
         }else{
-          NULLmass(MarkLines, TCFM);
+          zeromem(MarkLines, sizeof(MarkLines));
           LoadingDaemonList(p, 0, 0);
           OpenAnim();
         }
@@ -336,7 +336,7 @@ static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//горячо любимый онкей
       
       break;
     case '1':
-      NULLchar(nowpath, 128);
+      zeromem(nowpath,128);
       GO();
       OpenAnim();
       break;
@@ -368,7 +368,7 @@ void FreeMemFM()
   DeleteFiles();
   CurFile=1;
   FM_o=0;
-  NULLmass(MarkLines, TCFM);
+  zeromem(MarkLines, sizeof(MarkLines));
   ShowNamesNoConst=SHOW_NAMES;
 }
 
@@ -429,8 +429,8 @@ static const RECT Canvas={0,0,0,0};
   CreateGUI(main_gui);
   
   FM_o=1;
-  NULLchar(nowpath, 128);
-  NULLmass(MarkLines, TCFM);
+  zeromem(nowpath,128);
+  zeromem(MarkLines, sizeof(MarkLines));
   if(strlen(MUSIC)) {LoadingDaemonList(MUSIC, 0, 0); OpenAnim();}
   else {GO(); OpenAnim();}
 }

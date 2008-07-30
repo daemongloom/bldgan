@@ -9,13 +9,15 @@ WSHDR *playlist_lines[TCPL][512];  // Массив указателей на имена файлов в пл   M
 // Из конфига
 extern const int SHOW_NAMES;
 extern const char PLAYLISTS[];
-extern const char PIC_DIR[];           // Для курсора AAA
-extern const int EXT;                  // Расширение по умолчанию
-extern const int soundvolume;          // Громкость
-extern const unsigned int SizeOfFont;  // Шрифт AAA
-extern const unsigned int SCROLL_MULT; // Скорость листания   перенес в конфиг  AAA
-extern const unsigned int SPEED_REW;   // Скорость перемотки  AAA
-extern const unsigned int SPEED_MOVE;  // Скорость перелистывания пл  AAA
+extern const char PIC_DIR[];                // Для курсора AAA
+extern const int EXT;                       // Расширение по умолчанию
+extern const int soundvolume;               // Громкость
+extern const unsigned int SizeOfFont;       // Шрифт AAA
+extern const unsigned int SCROLL_MULT;      // Скорость листания   перенес в конфиг  AAA
+extern const unsigned int STEP_SCROLL_MULT; // Шаг быстрого листания   AAA
+extern const unsigned int SPEED_REW;        // Скорость перемотки  AAA
+extern const unsigned int STEP_REW;         // Шаг перемотки   AAA
+extern const unsigned int SPEED_MOVE;       // Скорость перелистывания пл  AAA
 extern const unsigned int SPEED_OPEN_MOVE;  // Скорость открытия пл  AAA
 
 // Мои переменные
@@ -24,6 +26,7 @@ unsigned short SVforToggle = 0;       // Прежняя громкость
 unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 - играем)   // Было char стало unsigned short! :D   AAA
 short phandle = -1;                   // Что играем
 extern void* pha;
+//extern HObj gObj;
 
 int CurrentTrack[TCPL];                 // Текущий трек
 int PlayedTrack[TCPL];                  // Проигрываемый трек   AAA
@@ -64,9 +67,11 @@ unsigned short BRC_w;  //=2;
 // Всякие "мелкие" переменные
 extern unsigned int playmode;
 extern unsigned short copy;
-extern const unsigned int GrafOn; // 1,если включены эффекты типа скролла   AAA
-extern const unsigned int GrafOn1; // 1,если включена анимация   AAA
-extern const unsigned int InfoOn; // 1,если включен показ информации   Vedan
+extern const unsigned int GrafOn;     // 1,если включены эффекты типа скролла   AAA
+extern const unsigned int GrafOn1;    // 1,если включена анимация   AAA
+extern const unsigned int InfoOn;     // 1,если включен показ информации   Vedan
+extern const unsigned int SHOW_POPUP; // 1,если включены попапы   AAA
+extern const unsigned int ALLTRACK;   // 1,если включено отображение всех треков    AAA
 unsigned short stop=1; // 1, если останавливаем листание   AAA
 extern unsigned short Stat_keypressed;
 unsigned short FM_o=0;
@@ -89,6 +94,13 @@ GBSTMR tmr_opan;
 volatile int scroll_disp;
 volatile int max_scroll_disp;
 
+void DisableScroll(void)
+{
+  GBS_DelTimer(&tmr_scroll);
+  max_scroll_disp=0;
+  scroll_disp=0;
+}
+
 void scroll_timer_proc(void)
 {
   int i=max_scroll_disp;
@@ -110,13 +122,6 @@ void scroll_timer_proc(void)
   {
     DisableScroll();
   }
-}
-
-void DisableScroll(void)
-{
-  GBS_DelTimer(&tmr_scroll);
-  max_scroll_disp=0;
-  scroll_disp=0;
 }
 
 // --- Скроллинг ---
@@ -164,9 +169,11 @@ void VolumeUp()
 #ifdef NEWSGOLD
   if(SoundVolume<15)SoundVolume++;
   if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
+  //Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #else
   if(SoundVolume<14)SoundVolume++;
   if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
+ // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #endif
   REDRAW();
 }
@@ -177,8 +184,10 @@ void VolumeDown()
   if(SoundVolume>0)SoundVolume--;
 #ifdef NEWSGOLD
   if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
+ // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #else
   if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
+ // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #endif
   REDRAW();
 }
@@ -192,8 +201,10 @@ void ToggleVolume()
     SVforToggle = 0;
 #ifdef NEWSGOLD
     if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
+   // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #else
     if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
+   // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #endif
   } else 
   {
@@ -201,8 +212,10 @@ void ToggleVolume()
     SoundVolume = 0;
 #ifdef NEWSGOLD
     if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
+   // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #else
     if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
+   // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #endif
   }
   REDRAW();
@@ -224,6 +237,7 @@ void RandTrack()
   if(ready[PlayedPL])
   {
    if(phandle!=-1)PlayMelody_StopPlayback(phandle);
+  // Obs_Stop (gObj);
    if(NextPlayedTrack[1]){PlaySetTrack();}
    else{int prevtrack=PlayedTrack[PlayedPL];
    while (PlayedTrack[PlayedPL]==prevtrack) 
@@ -248,6 +262,7 @@ void RepeatTrack()
 {
   if(ready[PlayedPL]){
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
+ // Obs_Stop (gObj);
   if(NextPlayedTrack[1]){PlaySetTrack();}
   PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));}
 }
@@ -257,6 +272,7 @@ void NextTrackX()
 {
   if(ready[PlayedPL]){
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
+ // Obs_Stop (gObj);
   
   if(PlayedTrack[PlayedPL]<TC[PlayedPL]||NextPlayedTrack[1])
   {
@@ -267,6 +283,7 @@ void NextTrackX()
   else
   {
     StopTMR(1);
+    PlayingStatus=0;
     PlayedTrack[PlayedPL]=1;
   }
   }
@@ -277,6 +294,7 @@ void NextTrack()
 {
   if(ready[PlayedPL]){
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
+ // Obs_Stop (gObj);
 //  if (CurrentTrack==(PlayedTrack-1)){// Перенос курсора на следующую песню  // И зачем? То пытаемся не повторять ошибок
 //    CurrentTrack=PlayedTrack;        // встроенного плеера, а тут... И Где логика если у следующей функции нет аналогичного свойства??  AAA
 //    if(PlayedTrack>TC) CurrentTrack=1;
@@ -294,6 +312,7 @@ void PreviousTrack()
 {
   if(ready[PlayedPL]){
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
+ // Obs_Stop (gObj);
   if(PlayedTrack[PlayedPL]>1) {PlayedTrack[PlayedPL]--;}
   else {PlayedTrack[PlayedPL]=TC[PlayedPL];}
   PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));}
@@ -312,6 +331,7 @@ void StopRewind()       // Остановка перемотки :)
   {
     StopCount = 0;
     PlayMelody_SetPosition(phandle, mlsc);
+   // Obs_SetPosition (gObj, mlsc);
     PlayingStatus = 2;
     EXT_REDRAW();
     IsRewind = 0;
@@ -324,7 +344,7 @@ void DoRewinded()
   DisableScroll();
     if(!StopCount)
     {
-      mlsc=tm*1000+1000*ModeRew;
+      mlsc=tm*1000+1000*ModeRew*STEP_REW;
       tm=mlsc/1000;      
     }
     if(tm<=0)
@@ -360,6 +380,7 @@ void StartRewind()
     {
       IsRewind=1;
       PlayMelody_PausePlayback(phandle);
+     // Obs_Pause (gObj);
       StopTMR(0);
       PlayingStatus = 1;
       DoRewinded();
@@ -385,6 +406,7 @@ void TogglePlayback()
     if (phandle!=-1)
     {
       PlayMelody_ResumePlayBack(phandle);
+     // Obs_Resume (gObj);
       EXT_REDRAW();
       PlayingStatus = 2;
     }
@@ -394,6 +416,7 @@ void TogglePlayback()
     if (phandle!=-1)
     {
       PlayMelody_PausePlayback(phandle);
+     // Obs_Pause (gObj);
       StopTMR(0);
       PlayingStatus = 1;
     }
@@ -410,6 +433,7 @@ void StopAllPlayback()
   if(PlayingStatus==0)return;
   if (phandle!=-1){
     PlayMelody_StopPlayback(phandle);
+   // Obs_Stop (gObj);
     PlayingStatus = 0;
   }
 }
@@ -434,6 +458,14 @@ void PlaySetTrack()
 
 unsigned short s=0, op=0;
 // Сходим с ума по гламуру :)   AAA
+void Disable_OpenAnim(void)
+{
+  GBS_DelTimer(&tmr_opan);
+  s=0;
+  REDRAW();
+  op=0;
+}
+
 void OpenAnim(void)
 {
   if(op<6&&GrafOn1)
@@ -443,17 +475,24 @@ void OpenAnim(void)
     REDRAW();
     GBS_StartTimerProc(&tmr_opan,SPEED_OPEN_MOVE,OpenAnim);
   }else{
-    if(op){
-    GBS_DelTimer(&tmr_opan);
-    s=0;
-    REDRAW();
-    op=0;
-    }
+    if(op)Disable_OpenAnim();
   }
 }
 
 unsigned short imove=0;
 short PL_move_L[6];
+
+void Disable_PL_mp(void)
+{
+  GBS_DelTimer(&tmr_cursor_move);
+   /* for(unsigned short i=0; i<6; i++)
+    {
+      PL_move_L[i]=0;
+    }*/
+  REDRAW();
+  imove=0;
+}
+
 void PL_mp(void)
 {
   if(imove<8&&GrafOn1)
@@ -468,15 +507,7 @@ void PL_mp(void)
     REDRAW();
     GBS_StartTimerProc(&tmr_pl_move,SPEED_MOVE,PL_mp);
   }else{
-    if(imove){
-    GBS_DelTimer(&tmr_cursor_move);
-   /* for(unsigned short i=0; i<6; i++)
-    {
-      PL_move_L[i]=0;
-    }*/
-    REDRAW();
-    imove=0;
-    }
+    if(imove)Disable_PL_mp();
   }
 }
 
@@ -512,6 +543,18 @@ void PTtoFirst()
 short p, p1, p3;
 short n, d, v, v1, v2;
 unsigned short i;
+void Disable_PL(void)
+{
+    p1=0;
+    p3=0;
+    p=0;
+    REDRAW();
+    GBS_DelTimer(&tmr_cursor_move);
+    d=0;
+    n=0;
+    i=0;
+}
+
 void PL(void)
 {
  // unsigned short i=0;
@@ -530,16 +573,7 @@ void PL(void)
     GBS_StartTimerProc(&tmr_cursor_move,10,PL);
     
   }else{
-    if(i){
-    p1=0;
-    p3=0;
-    p=0;
-    REDRAW();
-    GBS_DelTimer(&tmr_cursor_move);
-    d=0;
-    n=0;
-    i=0;
-    }
+    if(i)Disable_PL();
   }
 }
 
@@ -579,15 +613,21 @@ void CTUp()
   }
 }
 
+void Disable_CTSpeed(void)
+{
+  stop=1;
+  GBS_DelTimer(&tmr_displacement);
+}
+
 // Быстрое листание AAA
 void CTSpeed(void)
 {
   DisableScroll();
   if(stop==0)
   {
-    if (CurrentTrack[CurrentPL]+SpeedMove>=1&&CurrentTrack[CurrentPL]+SpeedMove<=TC[CurrentPL])
+    if (CurrentTrack[CurrentPL]+SpeedMove*STEP_SCROLL_MULT>=1&&CurrentTrack[CurrentPL]+SpeedMove*STEP_SCROLL_MULT<=TC[CurrentPL])
     {
-      CurrentTrack[CurrentPL]+=SpeedMove;
+      CurrentTrack[CurrentPL]+=SpeedMove*STEP_SCROLL_MULT;
     }
     else
     {
@@ -595,11 +635,7 @@ void CTSpeed(void)
       else {CurrentTrack[CurrentPL] = TC[CurrentPL];}
     }
     REDRAW();
-    GBS_StartTimerProc(&tmr_displacement,10*SCROLL_MULT,CTSpeed); // фикс для sgold
-    
-  }else{
-    
-    GBS_DelTimer(&tmr_displacement);
+    GBS_StartTimerProc(&tmr_displacement,10*SCROLL_MULT,CTSpeed);
   }
 }
 
@@ -637,6 +673,7 @@ void PlayTrackUnderC()
   if(ready[CurrentPL]){
   Stat_keypressed = 1;
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
+ // Obs_Stop (gObj);
   if(PlayedPL!=CurrentPL)
   {
     PlayedTrack[PlayedPL] = 0;
@@ -802,18 +839,15 @@ void SavePlaylist(char *fn)
     mfree(p);
   }
   fclose(f,&err);
-  ShowMSG(1,(int)lgpData[LGP_PL_Saved]);
+  if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_PL_Saved]);
 }
 
 /////////////////////////////////////////////////////<<<РЕДАКТИРОВАНИЕ ПЛ>>>/////////////////////////////////////////////////////////
 // Добавляем строку в пл   AAA
 void PastLine(WSHDR *p, unsigned short i) // Добавляем главно не с [0][0], а [0][1] почему-то... Работать должно тем не менее   AAA
 {
- // Log(0, " 111");
   playlist_lines[CurrentPL][TC[CurrentPL]+1]=AllocWS(256);
- // Log(0, " 112");
   wstrcpy(playlist_lines[CurrentPL][TC[CurrentPL]+1],p);
- // Log(0, " 113");
   TC[CurrentPL]++;
   if(i) {CurrentTrack[CurrentPL]=TC[CurrentPL];}
 }
@@ -853,11 +887,8 @@ void DeleteLine()  // Стираем однако тоже до [0][1] и поэтому я считаю беспокоит
   {
     if(CurrentTrack[CurrentPL]>1) {CurrentTrack[CurrentPL]--;}   // Не хочу рыть весь код, подстрахуюсь так   AAA
   }
- // Log(0, " 114");
   FreeWS(playlist_lines[CurrentPL][TC[CurrentPL]]);
- // Log(0, " 115");
   playlist_lines[CurrentPL][TC[CurrentPL]]=NULL;
- // Log(0, " 116");
   TC[CurrentPL]--;
   }
 }
@@ -1016,93 +1047,6 @@ void fix(char* p)  // Убираем странный символ (всвязи с переходом на WSHDR)   AA
   mfree(p1);
 }
 
-// From SieJC
-// Строковый вариант
-char* convUTF8_to_ANSI_STR(char *UTF8_str)
-{
-  // Рассматривая строку UTF8 как обычную, определяем её длину
-  if(!UTF8_str)return NULL;
-  int st_len = strlen(UTF8_str);
-
-  // Выделяем память - на всякий случай дохера
-  int lastchar = 0;
-  int dummy;
-  char* tmp_out = malloc(st_len+1);
-  zeromem(tmp_out,st_len+1);
-  char chr, chr2, chr3;
-  for(int i=0;i<st_len;i++)
-  {
-  chr = (*(UTF8_str+i));
-
-	if (chr<0x80)
-        {
-          *(tmp_out+lastchar)=chr;
-          lastchar++;
-          goto L_END_CYCLE;
-        }
-	if (chr<0xc0)
-        {
-          ShowMSG(1,(int)"Bad UTF-8 Encoding encountered (chr<0xC0)");
-          mfree(tmp_out);
-          return NULL;
-        }
-	
-        chr2 = *(UTF8_str+i+1);
-
-        if (chr2<0x80)
-        {
-          ShowMSG(1,(int)"Bad UTF-8 Encoding encountered (chr2<0x80)");
-          mfree(tmp_out);
-          return NULL;
-        }
-	
-	if (chr<0xe0) {
-	    // cx, dx
-                  if ((chr == 0xD0)&&(chr2 == 0x81)){*(tmp_out+lastchar) = 0xA8;}//Ё
-             else if ((chr == 0xD0)&&(chr2 == 0x86)){*(tmp_out+lastchar) = 0xB2;}//І
-             else if ((chr == 0xD0)&&(chr2 == 0x87)){*(tmp_out+lastchar) = 0xAF;}//Ї
-             else if ((chr == 0xD0)&&(chr2 == 0x84)){*(tmp_out+lastchar) = 0xAA;}//Є
-             else if ((chr == 0xD1)&&(chr2 == 0x91)){*(tmp_out+lastchar) = 0xB8;}//ё
-             else if ((chr == 0xD1)&&(chr2 == 0x96)){*(tmp_out+lastchar) = 0xB3;}//і
-             else if ((chr == 0xD1)&&(chr2 == 0x97)){*(tmp_out+lastchar) = 0xBF;}//ї
-             else if ((chr == 0xD1)&&(chr2 == 0x94)){*(tmp_out+lastchar) = 0xBA;}//є
-             else if ((chr == 0xD2)&&(chr2 == 0x91)){*(tmp_out+lastchar) = 0xE3;}//ґ->г
-             else if ((chr == 0xD2)&&(chr2 == 0x90)){*(tmp_out+lastchar) = 0xC3;}//Ґ->Г
-             else
-          {
-	    char test1 = (chr & 0x1f)<<6;
-            char test2 = chr2 & 0x3f;
-            *(tmp_out+lastchar)= test1 | test2 + 127 + 0x31;
-          }
-            i++;
-            lastchar++;
-            goto L_END_CYCLE;
-	}
-	if (chr<0xf0) {
-	    // cx, dx
-	    chr3= *(UTF8_str+i+2);
-
-	    if (chr3<0x80)
-            {
-              ShowMSG(1,(int)"Bad UTF-8 Encoding encountered");
-              mfree(tmp_out);
-              return NULL;
-            }
-	    else
-            {
-              *(tmp_out+lastchar) =  ((chr & 0x0f)<<12) | ((chr2 &0x3f) <<6) | (chr3 &0x3f);
-              i=i+2;
-            }
-	}
-
-  L_END_CYCLE:
-    dummy++;
-  }
-  st_len = strlen(tmp_out);
-  tmp_out = realloc(tmp_out,st_len+1);
-  return tmp_out;
-}
-
 // Возвращется трек по номеру в пл
 WSHDR * GetCurrentTrack()
 {
@@ -1148,7 +1092,7 @@ char chanel[8],
      format[8];
 //Определение Канала 
     if(*RamChannel()==0)strcpy(chanel," mono"); else strcpy(chanel," stereo");   
-//Определени формата 
+//Определение формата 
     switch (*RamFormatTrack())
     {
     case 0xA: strcpy(format,"MP3 ::"); break;
@@ -1175,6 +1119,7 @@ char chanel[8],
   
     my_x = coord[7];
     my_y = coord[8];
+    if(!ALLTRACK) {coord[6]=0;}
 
     WSHDR * out_ws = AllocWS(128);
 /*
@@ -1263,11 +1208,11 @@ char chanel[8],
     // Делаем другой цвет для не текущего трека...
     if (MarkLine[CurList]==i||MarkLines[i]==1)
     {
-      DrawScrollString(out_ws,my_x+PL_move_L[l],my_y+c+(p2-p3*v)*v3,/*my_x+125*/w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
-                   1,SizeOfFont,0,COLOR[5],0);
+      if(ALLTRACK) {DrawScrollString(out_ws,my_x+PL_move_L[l],my_y+c+(p2-p3*v)*v3,/*my_x+125*/w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
+                                     1,SizeOfFont,0,COLOR[5],0);}
     }else{
-      DrawScrollString(out_ws,my_x+PL_move_L[l],my_y+c+(p2-p3*v)*v3,/*my_x+125*/w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
-                   1,SizeOfFont,0,COLOR[4],0);
+      if(ALLTRACK) {DrawScrollString(out_ws,my_x+PL_move_L[l],my_y+c+(p2-p3*v)*v3,/*my_x+125*/w-7,my_y+GetFontYSIZE(SizeOfFont)+c+(p2-p3*v)*v3,
+                                     1,SizeOfFont,0,COLOR[4],0);}
     }
     p2=0;
     }else{
@@ -1302,9 +1247,8 @@ char chanel[8],
       }
       DrawScrollString(out_ws,my_x+PL_move_L[l],my_y+c-(p1*v2+p3*v1)*v3*v,/*my_x+125*/w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
                    scroll_disp+1,SizeOfFont,0,COLOR[5],0);
-      if(InfoOn&&MarkLine)
+      if(InfoOn&&MarkLine&&p==0)
      {
-        
         DrawString(info_pf,my_x+PL_move_L[l],GetFontYSIZE(SizeOfFont)+2+my_y+c-(p1*v2+p3*v1)*v3*v,/*my_x+125*/w-7,my_y+2*GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v+2,SizeOfFont,0,COLOR[5],0);
      }
       
@@ -1330,14 +1274,14 @@ char chanel[8],
     }
       if(s){
         if(s>1) {c+=coord[6];}
-        else {c+=coord[6]/5;}
+        else {c+=coord[6]/4;}
       }else{
         c+=coord[6];
       }
     }
       if(s){
         if(c/coord[6]>l&&s>l+2&&s>2) {c+=coord[6];}
-        else {c+=coord[6]/5;}
+        else {c+=coord[6]/4;}
       }else{
         c+=coord[6];
       }
@@ -1356,10 +1300,10 @@ char chanel[8],
   wsprintf(pl_c,"%i/%i/%i;%i/%i",CurLine[CurList],AllLines[CurList],CurList+1,MarkLine[MarkList],MarkList+1);
   }else{
   unsigned int nLines=0;
-  for(unsigned int i=0; i<AllLines[CurList]+1; i++) {if(MarkLines[i]==1) {nLines++;}}
+  for(unsigned int i=1; i<AllLines[CurList]+1; i++) {if(MarkLines[i]==1) {nLines++;}}
   wsprintf(pl_c,"%i/%i;%i(%i)",CurLine[CurList],AllLines[CurList],nLines,TC[CurrentPL]);
   }
-  DrawString(pl_c,coord[13],coord[14],w,coord[14]+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR[0],0);
+  DrawString(pl_c,coord[13],coord[14],w,coord[14]+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR[1],0);
   FreeWS(pl_c);
   BandRoll(CurLine[CurList], AllLines[CurList]);
 }
@@ -1376,20 +1320,16 @@ void BandRoll(int CurLine, int AllLines)
 }
 
 // Чистим массив   AAA
-void NULLchar(char* p, unsigned int imax) {for(unsigned int i=0; i<imax+1; i++) {p[i]=0;}}  //{unsigned int i=0; while(p[i]!='\0') {p[i]=0; i++;} p[i]=0;}
+//void NULLchar(char* p, unsigned int imax) {for(unsigned int i=0; i<imax+1; i++) {p[i]=0;}}  //{unsigned int i=0; while(p[i]!='\0') {p[i]=0; i++;} p[i]=0;}
 
 // Загружаем пл!
 int LoadPlaylist(const char * fn)  // Переделал. Нет утечкам и глюкам!    AAA
 {
   FSTATS stat;
-  int f;
-  unsigned int ul;
-  unsigned int i=0;
-  unsigned int j=0;
-  unsigned int k=0;
-  int fsize;
+  unsigned int ul, i=0, j=0 ,k=0;
+  int f, fsize;
   char *pp=malloc(256);
-  NULLchar(pp, 256);
+  zeromem(pp,256);
   char *p;
 
   if (GetFileStats(fn,&stat,&ul)==-1) return 0;
@@ -1410,22 +1350,18 @@ int LoadPlaylist(const char * fn)  // Переделал. Нет утечкам и глюкам!    AAA
         WSHDR* ppp=AllocWS(256);
         utf8_2ws(ppp,pp,strlen(pp));
         PastLine(ppp, 0);
-      //  Log(0, " 220");
         FreeWS(ppp);
-      //  Log(0, " 221");
         ppp=NULL;
-      //  Log(0, " 222");
         k++;
       }
       i++;
       j=0;
-      NULLchar(pp, 256);
+      zeromem(pp,256);
     }
     i++;
   }
-  mfree(p);
-  mfree(pp);
- // Log(0, " 223");
+  /*if(p)*/mfree(p);
+  /*if(pp)*/mfree(pp);
   return k;
 }
 
@@ -1506,6 +1442,18 @@ void LoadPlaylists(const char* path) // Для еще одной фичи   AAA
   FindClose(&de,&err);
   if(TC[CurrentPL]>0) {CTtoFirst(); PTtoFirst();}
   ready[CurrentPL]=0;
+}
+
+// Эта зверюга замочит что угодно!   AAA
+void Disable_An(unsigned short i1, unsigned short i2, unsigned short i3, unsigned short i4, unsigned short i5, unsigned short i6/*, unsigned short i7*/)
+{
+  if(i1)DisableScroll();
+  if(i2)StopRewind();
+  if(i3)Disable_OpenAnim();
+  if(i4)Disable_PL_mp();
+  if(i5)Disable_PL();
+  if(i6)Disable_CTSpeed();
+  /*if(i7)StopAllPlayback();*/    // Че т шикарно через чур :D но если сильно потребуется...
 }
 
 // Утечка памяти в самом деле достала...   AAA
