@@ -29,10 +29,10 @@ void NextTrack();
 
 // Предыдущий трек пл  AAA
 void PreviousTrack();
-
+/*
 // Остановить перемотку :) - Vedan
 void StopRewind();
-
+*/
 // Перемотка - Vedan   // Оптимизировал   AAA
 void StartRewind();
 
@@ -126,9 +126,6 @@ void FullpathToFilename(WSHDR * fnamews, WSHDR * wsFName);
 // Убираем странный символ (всвязи с переходом на WSHDR)   AAA
 void fix(char* p);
 
-// From SieJC
-char* convUTF8_to_ANSI_STR(char *UTF8_str);
-
 // Возвращется трек по номеру в пл
 WSHDR * GetCurrentTrack();
 
@@ -136,7 +133,7 @@ WSHDR * GetCurrentTrack();
 WSHDR * GetPlayedTrack();
 
 // Чистим массив   AAA
-void NULLchar(char* p, unsigned int imax);
+//void NULLchar(char* p, unsigned int imax);
 
 // Перерисовка
 void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsigned int* AllLines, int CurList, int MarkList);
@@ -155,6 +152,9 @@ void LoadPlaylists(const char* path);
 
 // Чистим пл   AAA
 void CleanPlaylist();
+
+// Эта зверюга замочит что угодно!   AAA
+void Disable_An(unsigned short i1, unsigned short i2, unsigned short i3, unsigned short i4, unsigned short i5, unsigned short i6/*, unsigned short i7*/);
 
 // Утечка памяти в самом деле достала...   AAA
 void MemoryFree();

@@ -5,11 +5,7 @@
 #ifndef _LANG_H_
 #define _LANG_H_
 
-#ifdef X75
-#define LG_Version              "0.9.8.4"
-#else
-#define LG_Version              "1.0.0.4"
-#endif
+#define LG_Version              "1.0.1.1"
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -57,8 +53,10 @@
 #define LG_Idle_coordinates      "Координаты иконки на Idle"
 #define LG_Auto_Exit_Min         "Время до автозакрытия"
 #define LG_Set_Speed             "Настройки скорости"
-#define LG_Speed_Moving          "Скорость листания"
+#define LG_Speed_Moving          "Скорость быстрого листания"
+#define LG_Step_Moving           "Шаг быстрого листания"
 #define LG_Speed_Rewind          "Скорость перемотки"
+#define LG_Step_Rewind           "Шаг перемотки"
 #define LG_Speed_Moving_PL       "Скорость перелистывания пл"
 #define LG_Speed_Open_Moving     "Скорость открытия пл"
 #define LG_Show_Anim             "Показывать анимацию"
@@ -73,6 +71,8 @@
 
 #define LG_Show_effects          "Показывать эффекты"
 #define LG_Show_info             "Показывать информацию"
+#define LG_Show_Popup            "Показывать попапы"
+#define LG_Show_One_Track        "Показывать 1 трек"
 #define LG_Playmode              "Режим воспр."
 #define LG_Play_all              "Воспр. все"
 #define LG_Repeat_all            "Повторить все"
@@ -154,7 +154,9 @@
 #define LG_Auto_Exit_Min       ///////////////////////  "Время до автозакрытия"
 #define LG_Set_Speed           ///////////////////////  "Настройки скорости"
 #define LG_Speed_Moving        //////////////////////  "Скорость листания"
+#define LG_Step_Moving         /////////////////////  "Шаг быстрого листания"
 #define LG_Speed_Rewind        /////////////////////  "Скорость перемотки"
+#define LG_Step_Rewind         ////////////////////  "Шаг перемотки"
 #define LG_Speed_Moving_PL     /////////////////////  "Скорость перелистывания пл"
 #define LG_Speed_Open_Moving   /////////////////////  "Скорость открытия пл"
 #define LG_Show_Anim           //////////////////////  "Показывать анимацию"
@@ -169,6 +171,8 @@
 
 #define LG_Show_effects          "Показ ефектiв"
 #define LG_Show_info           //////////////////////  "Show info"
+#define LG_Show_Popup           //////////////////////  "Показывать попапы"
+#define LG_Show_One_Track       ////////////////////// "Показывать 1 трек"
 #define LG_Playmode              "Режим відтворення"
 #define LG_Play_all              "Відтворити все"
 #define LG_Repeat_all            "Повторювати усе"
@@ -251,7 +255,9 @@
 #define LG_Auto_Exit_Min         "Time before close"
 #define LG_Set_Speed             "Settings of speed"
 #define LG_Speed_Moving          "Speed of move cursor"
+#define LG_Step_Moving          /////////////////// "Шаг быстрого листания"
 #define LG_Speed_Rewind          "Speed of rewind"
+#define LG_Step_Rewind          /////////////////// "Шаг перемотки"
 #define LG_Speed_Moving_PL       "Speed of move pl"
 #define LG_Speed_Open_Moving     //////////////////"Скорость открытия пл"
 #define LG_Show_Anim             "Show animation"
@@ -266,6 +272,8 @@
 
 #define LG_Show_effects          "Show effects"
 #define LG_Show_info             "Show info"
+#define LG_Show_Popup            "Show popups"
+#define LG_Show_One_Track        "Show 1 track"
 #define LG_Playmode              "Playmode"
 #define LG_Play_all              "Play all"
 #define LG_Repeat_all            "Repeat all"

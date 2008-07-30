@@ -4,7 +4,7 @@
 // Грузим файлы из папки. Респект
 void LoadingDaemonList(const char* path, unsigned int re, unsigned int toPL);
 
-void NULLmass(int* mass, unsigned int end);
+//void NULLmass(int* mass, unsigned int end);
 
 void ShowFM();
 

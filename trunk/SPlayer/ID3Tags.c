@@ -45,7 +45,7 @@ int ReadID3v1(WSHDR* fnamews, ID3TAGDATA *tag) // Чтение ID3 v1
     tag->genre = tagtext[124];
     mfree(tagtext); // Освобождаем память
   }
-  else {tag->present=0; ShowMSG(1,(int)lgpData[LGP_No_Tags]);} // Если проверку не прошли, значит тегов нет
+  else {tag->present=0; extern const unsigned int SHOW_POPUP; if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_No_Tags]);} // Если проверку не прошли, значит тегов нет
   fclose(f,&err); // Закрываем файл
   mfree(fname);
   REDRAW(); // Перерисовываем экран

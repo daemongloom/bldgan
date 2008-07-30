@@ -150,6 +150,7 @@ extern const int soundvolume;
 extern const unsigned int SizeOfFont;  // Шрифт   AAA
 extern const unsigned int FnameIPC;    // Отправлять или нет   AAA
 extern const unsigned int AUTO_EXIT_MIN;  // Время до автозакрытия   AAA
+extern const unsigned int SHOW_POPUP;
 //--- настройки из конфига ---
 
 //--- Переменные ---
@@ -191,99 +192,7 @@ int ln=0;  // Длительность
 
 //--- Переменные ---
 
-void load_skin();       // Из skin.cfg AAA
 void UpdateCSMname(WSHDR * tname);
-
-void TimeRedraw();
-
-// Избавляемся от тормозов   AAA
-void LoadPng()
-{
-#ifndef NO_PNG
-  unsigned int err;
-  FSTATS fstat;
-  unsigned int i;
-  unsigned int l=0;
-  sprintf(sfname,p_3s,PIC_DIR,items1[0],PNGEXT);
-  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-  else{DrawImg(0,0,(int)sfname);}
-  Npng++;
-  sprintf(sfname,p_3s,PIC_DIR,items1[12],PNGEXT);
-  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-  else{DrawImg(0,0,(int)sfname);}
-  Npng++;
-  sprintf(sfname,p_3s,PIC_DIR,items1[1],PNGEXT);
-  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-  else{DrawImg(0,0,(int)sfname);}
-  Npng++;REDRAW();
-  sprintf(sfname,"%s%s1%s",PIC_DIR,items1[1],PNGEXT);
-  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-  else{DrawImg(0,0,(int)sfname);}
-  Npng++;
-  
-  for(i=0; i<TOTAL_ITEMS; i++)
-  {
-    sprintf(sfname,p_3s,PIC_DIR,items[i],PNGEXT);
-    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    else{DrawImg(0,0,(int)sfname);}
-    Npng++;REDRAW();
-  }
-  for(i=0; i<TOTAL_ITEMS_2; i++)
-  {
-    sprintf(sfname,p_3s,PIC_DIR,items2[i],PNGEXT);
-    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    else{DrawImg(0,0,(int)sfname);}
-    Npng++;REDRAW();
-  }
-  for(i=2; i<5; i++)
-  {
-    sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
-    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    else{DrawImg(0,0,(int)sfname);}
-    Npng++;
-    sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
-    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    else{DrawImg(0,0,(int)sfname);}
-    Npng++;
-    sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[14],PNGEXT);
-    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    else{DrawImg(0,0,(int)sfname);}
-    Npng++;REDRAW();
-  }
-  for(i=5; i<9; i++)
-  {
-    sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
-    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    else{DrawImg(0,0,(int)sfname);}
-    Npng++;
-    sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
-    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    else{DrawImg(0,0,(int)sfname);}
-    Npng++;REDRAW();
-  }
-  for(i=9;i<11;i++)
-  {
-    sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
-    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    else{DrawImg(0,0,(int)sfname);}
-    Npng++;
-    sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
-    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-    else{DrawImg(0,0,(int)sfname);}
-    Npng++;REDRAW();
-  }
-  sprintf(sfname,p_3s,PIC_DIR,items1[11],PNGEXT);
-  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
-  else{DrawImg(0,0,(int)sfname);}
-  Npng++;
-  pngloadcomp=1;
-  REDRAW();
- // Log(0, " 330");
-  if(l){
-  sprintf(sfname,"%d%s",l,lgpData[LGP_PNG_er]);
-  ShowMSG(1,(int)sfname);}
-#endif
-}
 
 //--- Инициализация ленгпака --- Vedan
 char *lgpData[LGP_DATA_NUM];
@@ -305,9 +214,13 @@ void InitLangPack()
 void lgpInitLangPack(void)
 {
   extern const char LANGFILE[128];
-  unsigned int err;
+  unsigned int err=NULL;
   int f;
+  
+  for (int i = 0; i < LGP_DATA_NUM; i ++)
+    lgpData[i] = NULL;
   lgpLoaded=0;
+  
   char * buf;
   FSTATS fstat;
   if (GetFileStats(LANGFILE, &fstat, &err)!=-1)
@@ -316,13 +229,13 @@ void lgpInitLangPack(void)
     {
       if (buf =(char *)malloc(fstat.size+1))
       {
-        buf[fread(f, buf, fstat.size, &err)]=0;
+        buf[fread(f, buf, fstat.size, &err)]=NULL;
         fclose(f, &err);
         char line[128];
-        int lineSize=0;
-        int lp_id=0;
-        int buf_pos = 0;
-        while(buf[buf_pos]!=0 && buf_pos < fstat.size && lp_id < LGP_DATA_NUM)
+        int lineSize=NULL;
+        int lp_id=NULL;
+        int buf_pos = NULL;
+        while(buf[buf_pos] && buf_pos < fstat.size && lp_id < LGP_DATA_NUM)
         {
           if (buf[buf_pos]=='\n' || buf[buf_pos]=='\r')
           {
@@ -330,9 +243,9 @@ void lgpInitLangPack(void)
             {
               lgpData[lp_id] = (char *)malloc(lineSize+1);
               memcpy(lgpData[lp_id], line, lineSize);
-              lgpData[lp_id][lineSize]=0;
+              lgpData[lp_id][lineSize]=NULL;
               lp_id++;
-              lineSize=0;
+              lineSize=NULL;
             }
           }
           else
@@ -343,9 +256,9 @@ void lgpInitLangPack(void)
         {
           lgpData[lp_id] = (char *)malloc(lineSize+1);
           memcpy(lgpData[lp_id], line, lineSize);
-          lgpData[lp_id][lineSize]=0;
+          lgpData[lp_id][lineSize]=NULL;
           lp_id++;
-          lineSize=0;
+          lineSize=NULL;
         }
         mfree(buf);
         InitLangPack();
@@ -355,8 +268,16 @@ void lgpInitLangPack(void)
         if (strlen(lgpData[LGP_LangCode])>2)
         {
           mfree(lgpData[LGP_LangCode]);
-          lgpData[LGP_LangCode]=malloc(3);
+          lgpData[LGP_LangCode]=(char *)malloc(3);
           strcpy(lgpData[LGP_LangCode],"ru");
+        }
+        for (int i = 0; i < LGP_DATA_NUM; i ++)
+        {
+          if (!lgpData[i])
+          {
+            lgpData[i] = (char *)malloc(32);
+            strcpy(lgpData[i], "Error! Update lang.txt!");
+          }
         }
         return;
       }
@@ -451,7 +372,7 @@ void lgpFreeLangPack(void)
   if (!lgpLoaded) return;
   for (int i=0;i<LGP_DATA_NUM;i++)
   {
-    if (lgpData[i]!=NULL)
+    if (lgpData[i])
       mfree(lgpData[i]);
   }
 }
@@ -462,6 +383,96 @@ void InitLanguage()
   lgpInitLangPack();
 }
 //---------------------------------------------
+
+// Избавляемся от тормозов   AAA
+void LoadPng()
+{
+#ifndef NO_PNG
+  unsigned int err;
+  FSTATS fstat;
+  unsigned int i;
+  unsigned int l=0;
+  sprintf(sfname,p_3s,PIC_DIR,items1[0],PNGEXT);
+  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+  else{DrawImg(0,0,(int)sfname);}
+  Npng++;
+  sprintf(sfname,p_3s,PIC_DIR,items1[12],PNGEXT);
+  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+  else{DrawImg(0,0,(int)sfname);}
+  Npng++;
+  sprintf(sfname,p_3s,PIC_DIR,items1[1],PNGEXT);
+  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+  else{DrawImg(0,0,(int)sfname);}
+  Npng++;REDRAW();
+  sprintf(sfname,"%s%s1%s",PIC_DIR,items1[1],PNGEXT);
+  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+  else{DrawImg(0,0,(int)sfname);}
+  Npng++;
+  
+  for(i=0; i<TOTAL_ITEMS; i++)
+  {
+    sprintf(sfname,p_3s,PIC_DIR,items[i],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+    else{DrawImg(0,0,(int)sfname);}
+    Npng++;REDRAW();
+  }
+  for(i=0; i<TOTAL_ITEMS_2; i++)
+  {
+    sprintf(sfname,p_3s,PIC_DIR,items2[i],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+    else{DrawImg(0,0,(int)sfname);}
+    Npng++;REDRAW();
+  }
+  for(i=2; i<5; i++)
+  {
+    sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+    else{DrawImg(0,0,(int)sfname);}
+    Npng++;
+    sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+    else{DrawImg(0,0,(int)sfname);}
+    Npng++;
+    sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[14],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+    else{DrawImg(0,0,(int)sfname);}
+    Npng++;REDRAW();
+  }
+  for(i=5; i<9; i++)
+  {
+    sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+    else{DrawImg(0,0,(int)sfname);}
+    Npng++;
+    sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+    else{DrawImg(0,0,(int)sfname);}
+    Npng++;REDRAW();
+  }
+  for(i=9;i<11;i++)
+  {
+    sprintf(sfname,p_4s,PIC_DIR,items1[i],items1[13],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+    else{DrawImg(0,0,(int)sfname);}
+    Npng++;
+    sprintf(sfname,p_3s,PIC_DIR,items1[i],PNGEXT);
+    if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+    else{DrawImg(0,0,(int)sfname);}
+    Npng++;REDRAW();
+  }
+  sprintf(sfname,p_3s,PIC_DIR,items1[11],PNGEXT);
+  if (GetFileStats(sfname, &fstat, &err)==-1) {l++;}
+  else{DrawImg(0,0,(int)sfname);}
+  Npng++;
+  pngloadcomp=1;
+  REDRAW();
+  if(l){
+  sprintf(sfname,"%d%s",l,lgpData[LGP_PNG_er]);
+  if(SHOW_POPUP) ShowMSG(1,(int)sfname);}
+#endif
+}
+
+
 // Отсчет времени. Теперь по-моему и вроде без глюков+приведено к общему виду для удобства использования   AAA
 unsigned short sttmr=0;  // Почему-то неверно начинал счет   AAA
 void EXT_REDRAW()
@@ -493,26 +504,39 @@ int findmp3length(char *playy) {
   return (wl.length/1000);
   #endif 
 }
-
-int setdur=1;
-unsigned short corr=0;
+/*
+unsigned short setdur=0, time_refr=40;
 void SetDV()
 {
-  corr++;
-  if(setdur){
-  pha=GetPlayObjById(phandle);
-  Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
-  setdur=0;
-  GBS_StartTimerProc(&lvtm,70,SetDV);
-  }else{
-  GetPlayObjDuration((( int**)pha)[0x3d0/4], &ln);
-  ln/=1000;
-  GBS_DelTimer(&lvtm);
-  setdur=1;
+  switch(setdur){
+  case 0:
+    setdur=1;
+    pha=GetPlayObjById(phandle);
+    GBS_StartTimerProc(&lvtm,time_refr,SetDV);
+    break;
+  case 1:
+    setdur=2;
+    GetPlayObjDuration((( int**)pha)[0x3d0/4], &ln);
+    ln/=1000;
+    GBS_StartTimerProc(&lvtm,time_refr,SetDV);
+    break;
+  case 2:
+    setdur=0;
+    Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
+    time_refr+=30;
+    if(time_refr<200&&!ln)GBS_StartTimerProc(&lvtm,time_refr,SetDV);
+    else GBS_DelTimer(&lvtm);
+    break;
   }
-  if(corr<6&&!ln)SetDV();
-}
-
+}*/
+/*
+#define MSG_Report  0xB034
+HObj gObj=NULL;
+void KillObj(){
+ if (!gObj) return;
+  Obs_DestroyObject(gObj);
+  gObj=NULL;
+}*/
 // Играем MP3 файл
 void PlayMP3File(WSHDR * fname)
 {
@@ -529,7 +553,49 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
     {
       StopTMR(1);
      // EXT_REDRAW();
+      /*
+      WSHDR* sndFName=AllocWS(128);
+      const char *p=strrchr(fnamech,'\\')+1;
+      str_2ws(sndFName,p,128);
       
+      unsigned int err=0;
+      KillObj();
+      WSHDR *ext;
+
+      int uid;
+      short pos;
+      int len;
+      if (!fname)goto exit0;
+      len=wstrlen(fname); 
+      pos=wstrrchr(fname,len,'.'); 
+      if (!pos)goto exit0;
+
+      ext=AllocWS(len-pos);
+      wstrcpybypos(ext,fname,pos+1,len-pos);
+      uid=GetExtUid_ws(ext); 
+      FreeWS(ext);
+ // Log(0,"адын");
+      gObj=Obs_CreateObject(uid,0x34,2,MSG_Report,1,0,&err);
+ // Log(0,"дыва");
+      err=Obs_SetInput_File(gObj,0,fname);
+      if (err)  goto exit1;  
+    //  Obs_Prepare(gObj);
+      Obs_Start(gObj);
+ // Log(0,"тыри");
+      EXT_REDRAW();
+      //  pha=GetPlayObjById(phandle);
+      Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#ifdef NEWSGOLD
+      GetPlayObjDuration((void*)gObj, &ln);
+      ln/=1000;
+#endif
+  goto exit0;
+ 
+exit1:
+  Obs_DestroyObject(gObj);
+  gObj=NULL;
+exit0:
+      */
       PLAYFILE_OPT pfopt;
       WSHDR* sndPath=AllocWS(128);
       WSHDR* sndFName=AllocWS(128);
@@ -552,19 +618,16 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       pfopt.unk7=1;
       pfopt.unk9=2;
       SetPHandle(PlayFile(0xC, sndPath, sndFName, GBS_GetCurCepid(), MSG_PLAYFILE_REPORT, &pfopt)); // Вместо 0xC было 0x10 ... Пробуйте так!!
-      SetPlayingStatus(2);
-      GBS_StartTimerProc(&lvtm,70,SetDV);
 #else 
       pfopt.unk4=0x80000000;
       pfopt.unk5=1;
       SetPHandle(PlayFile(0xC, sndPath, sndFName, 0,GBS_GetCurCepid(), MSG_PLAYFILE_REPORT, &pfopt));
-      SetPlayingStatus(2);
-      if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
       char *pp=strrchr(fnamech,':')-1;
       ln=findmp3length(pp);
 #endif
-      EXT_REDRAW();
       
+      
+      SetPlayingStatus(2);
       UpdateCSMname(sndFName); // Покажем что играем XTask Blind007
       // Покажем что играем тем кому нужно :)))   AAA
       if(FnameIPC)
@@ -579,7 +642,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
           if(strlen(StatTag->artist)&&strlen(StatTag->title)) {sprintf(trackname,"%s - %s",StatTag->artist,StatTag->title);}
           mfree(StatTag);
           
-          ShowMSG(1,(int)trackname);
+          //ShowMSG(1,(int));
           
           WSHDR *ws1 = AllocWS(strlen(trackname) + 1);
           wsprintf(ws1, "%t", trackname);
@@ -587,17 +650,13 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
           char *name = malloc(wstrlen(ws1) * 2 + 1);
           int len;
           ws_2utf8(ws1, name, &len, wstrlen(ws1) * 2 + 1);
-          
-          char *p=malloc(256);
-          strcpy(p,name);
-          
+          name[strlen(name)]='\0';
           
           gipc.name_to=ipc_grantee_name;
           gipc.name_from=ipc_my_name;
-          gipc.data=(void*)p;
+          gipc.data=(void*)name;
           GBS_SendMessage(MMI_CEPID,MSG_IPC,0,&gipc);
           
-          mfree(p);
           mfree(name);
           FreeWS(ws1);
           mfree(trackname);
@@ -608,29 +667,25 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
           char *name = malloc(wstrlen(ws1) * 2 + 1);
           int len;
           ws_2utf8(ws1, name, &len, wstrlen(ws1) * 2 + 1);
-          
-          char *p=malloc(256);
-          strcpy(p,name);
-          
-          ShowMSG(1,(int)convUTF8_to_ANSI_STR(name));
+          name[strlen(name)]='\0';
+        //  ShowMSG(1,(int));
           
           gipc.name_to=ipc_grantee_name;
           gipc.name_from=ipc_my_name;
-          gipc.data=(void*)p;
+          gipc.data=(void*)name;
           GBS_SendMessage(MMI_CEPID,MSG_IPC,0,&gipc);
           
-          mfree(p);
           FreeWS(ws1);
           mfree(name);
         }
       }
 //      BeginTime = SetBeginTime(); // Время начала играния файла Blind007
-      FreeWS(sndPath);
+     // FreeWS(sndPath);
       FreeWS(sndFName);
     } else {
       // Если нет такого файла!
       if(IsUnlocked()){
-      ShowMSG(1,(int)lgpData[LGP_Can_not_find_file]);
+      if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Can_not_find_file]);
       ToDevelop();}
       NextTrackX();
     }
@@ -639,7 +694,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
 }
 else
 {
-  ShowMSG(1,(int)lgpData[LGP_Load_a_playlist]);
+  if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Load_a_playlist]);
 }
 }
 
@@ -699,7 +754,7 @@ void load_skin(char const * fname)              // Извращенец... Такое создать..
   }
   else
   {
-    ShowMSG(1,(int)"Can't find file!");
+    if(SHOW_POPUP) ShowMSG(1,(int)"Can't find file!");
   }
 }
 
@@ -838,11 +893,16 @@ void ToDevelop()   // Развернуть   AAA
 
 void CheckDoubleRun(void)   // При открытии копии   AAA
 {
-  if ((int)(gipc.data)>1)
+  int csm_id;
+  if ((csm_id=(int)(gipc.data))!=-1)
   {
+    gipc.name_to=ipc_xtask_name;
+    gipc.name_from=ipc_my_name;
+    gipc.data=(void *)csm_id;
+    GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_XTASK_SHOW_CSM,&gipc);  
     LockSched();
     CloseCSM(MAINCSM_ID);
-    ShowMSG(1,(int)lgpData[LGP_Already_Started]);
+    if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Already_Started]);
     UnlockSched();
   }
   else
@@ -1028,10 +1088,10 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   
     WSHDR * time_disp = AllocWS(32);
     wsprintf(time_disp,"%02i:%02i",tm/60,tm%60);
-    DrawString(time_disp,coord[23],coord[24],coord[23]+Get_WS_width(time_disp,FONT_SMALL),coord[24]+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR[0],0);
+    DrawString(time_disp,coord[23],coord[24],coord[23]+Get_WS_width(time_disp,FONT_SMALL),coord[24]+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR[1],0);
     
     wsprintf(time_disp,"%02i:%02i",ln/60,ln%60);
-    DrawString(time_disp,coord[25],coord[26],coord[25]+Get_WS_width(time_disp,FONT_SMALL),coord[26]+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR[0],0);
+    DrawString(time_disp,coord[25],coord[26],coord[25]+Get_WS_width(time_disp,FONT_SMALL),coord[26]+GetFontYSIZE(FONT_SMALL),FONT_SMALL,0,COLOR[1],0);
     FreeWS(time_disp);
   
     PL_Redraw(playlist_lines[CurrentPL],CurrentTrack,PlayedTrack,0,TC,CurrentPL,PlayedPL);
@@ -1086,7 +1146,7 @@ void QuitCallbackProc(int decision)
 
 /* Блок функций. Неоходимо для конфига клавиш. */
 void DoErrKey() {
-  ShowMSG(1, (int)lgpData[LGP_Error_2]);
+  if(SHOW_POPUP) ShowMSG(1, (int)lgpData[LGP_Error_2]);
 }
 
 void DoExit() {
@@ -1147,12 +1207,14 @@ void NextPL()
 
 void CTDownSpeed(void)
 {
+  stop=0;
   SpeedMove=1;
   CTSpeed();
 }
 
 void CTUpSpeed(void)
 {
+  stop=0;
   SpeedMove=-1;
   CTSpeed();
 }
@@ -1171,7 +1233,7 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
     if ((msg->gbsmsg->msg==LONG_PRESS)&&(msg->gbsmsg->submess=='#')){
      KbdUnlock();
      KeyLock=(KeyLock+1)%2;
-     ShowMSG(1,(int)lgpData[LGP_Keypad_Unlock]);
+     if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Keypad_Unlock]);
      REDRAW();}
      return 0;
      }
@@ -1179,12 +1241,11 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
 if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
 {
   if (msg->gbsmsg->msg==KEY_UP) {
-     stop=1;              //  Mr. Anderstand: а это??
+     Disable_An(0,1,0,0,0,1);
      Stat_keypressed = 0;
      P_keypressed = 0;
      N_keypressed = 0;
      Mode_keypressed = 0;
-     StopRewind();
      REDRAW();
   }
   if (msg->gbsmsg->msg==KEY_DOWN)
@@ -1203,11 +1264,9 @@ if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
         PrevPL();
       break;
       case UP_BUTTON:
-        stop=0;
         CTUpSpeed();
       break;
       case DOWN_BUTTON:
-        stop=0;
         CTDownSpeed();
       break;
       case '2':
@@ -1225,7 +1284,7 @@ if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
        if (KeyLock==0){
           KbdLock();
           Mode_keypressed = 0;
-          ShowMSG(1,(int)lgpData[LGP_Keypad_Lock]);
+          if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Keypad_Lock]);
           KeyLock=1;
        }
        if (playmode>0) {playmode-=1;}
@@ -1246,10 +1305,10 @@ if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
     switch(msg->gbsmsg->submess)
     {
     case UP_BUTTON:
-      if(move==0) {stop=1;}
+      if(move==0) {Disable_An(0,0,0,0,0,1);}
       break;
     case DOWN_BUTTON:
-      if(move==0) {stop=1;}
+      if(move==0) {Disable_An(0,0,0,0,0,1);}
       break;
     }
     REDRAW();
@@ -1315,11 +1374,11 @@ if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
     switch(msg->gbsmsg->submess)
     {
       case UP_BUTTON:
-        if(move==0) {stop=0; CTUpSpeed();}
+        if(move==0) {CTUpSpeed();}
         else {MoveLineUp();}
       break;
       case DOWN_BUTTON:
-        if(move==0) {stop=0; CTDownSpeed();}
+        if(move==0) {CTDownSpeed();}
         else {MoveLineDown();}
       break;
       case '2':
@@ -1449,7 +1508,7 @@ void maincsm_oncreate(CSM_RAM *data)
   
   gipc.name_to=ipc_my_name;
   gipc.name_from=ipc_my_name;
-  gipc.data=0;
+  gipc.data=(void *)-1;
   GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_CHECK_DOUBLERUN,&gipc);
 }
 
@@ -1459,6 +1518,7 @@ void maincsm_onclose(CSM_RAM *csm)
   GBS_DelTimer(&offtm);
   GBS_DelTimer(&mytmr);
   StopAllPlayback();
+ // KillObj();
   MemoryFree();
   lgpFreeLangPack();                                   //Очисть память, выделенную под язык - Vedan
   RemoveKeybMsgHook((void *)my_keyhook);               //НАДО!!  AAA . Надо :) DemonGloom
@@ -1481,14 +1541,9 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
           switch (msg->submess)
           {
           case IPC_CHECK_DOUBLERUN:
-            ipc->data=(void *)((int)(ipc->data)+1);
-	    //Если приняли свое собственное сообщение, значит запускаем чекер
+            //Если приняли свое собственное сообщение, значит запускаем чекер
 	    if (ipc->name_from==ipc_my_name) SUBPROC((void *)CheckDoubleRun);
-            /*
-            gipc.name_to=ipc_xtask_name;
-            gipc.name_from=ipc_my_name;
-            gipc.data=(void *)MAINCSM_ID;
-            GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_XTASK_SHOW_CSM,&gipc);*/
+            else ipc->data=(void *)MAINCSM_ID;
             break;
           case IPC_PLAY_PAUSE:
             ipc->data=(void *)((int)(ipc->data)+1);
@@ -1570,13 +1625,17 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
     if (strcmp(successed_config_filename,(char *)msg->data0)==0)
     {
       InitConfig();
-    //  InitLanguage();
+      sprintf(sfname,"%s%s",PIC_DIR,"skin.cfg");
+      load_skin(sfname);
+      sprintf(sfname,"%s%s",PIC_DIR,"colour.cfg");
+      load_skin(sfname);
+      InitLanguage();
       ShowNamesNoConst=SHOW_NAMES;
       
       if(!IsTimerProc(&offtm)) {AutoExit();}
       ResetAutoExit();
       
-      ShowMSG(1,(int)lgpData[LGP_Config_Updated]);
+      if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Config_Updated]);
     }
   }
 #ifdef NEWSGOLD
@@ -1618,6 +1677,20 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
             break;
         }
         REDRAW();
+      }
+      if (pmsg->cmd==M_SAE_PLAYBACK_STARTED)
+      {
+        EXT_REDRAW();
+#ifdef NEWSGOLD
+        pha=GetPlayObjById(phandle);
+        if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
+       // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+        GetPlayObjDuration((( int**)pha)[0x3d0/4], &ln);
+        ln/=1000;
+#else
+        if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
+       // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#endif
       }
 //      if (pmsg->cmd==M_SAE_HANDSFREE_UPDATED)
 //      {
@@ -1662,14 +1735,11 @@ const struct
 // Покажем в XTask'e что играем! Blind007
 void UpdateCSMname(WSHDR * tname)
 {
-  WSHDR * xtaskname = AllocWS(128);
   if (tname) {
-    wsprintf(xtaskname,"%s - %w","SPlayer",tname);
-    wsprintf((WSHDR *)(&MAINCSM.maincsm_name),"%w",xtaskname);
+    wsprintf((WSHDR *)(&MAINCSM.maincsm_name),"%s - %w","SPlayer",tname);
   } else {
     wsprintf((WSHDR *)(&MAINCSM.maincsm_name),"SPlayer");
   }
-  FreeWS(xtaskname);
 }
 
 
@@ -1682,13 +1752,9 @@ int main(char *exename, char *fname)
   load_skin(sfname);
   sprintf(sfname,"%s%s",PIC_DIR,"colour.cfg");
   load_skin(sfname);
- // Log(0, " 001");
   SUBPROC((void*)LoadKeys);
- // Log(0, " 002");
   SUBPROC((void*)lgpInitLangPack); //Загрузка языка - Vedan
- // Log(0, " 003");
   SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
- // Log(0, " 004");
   playmode = PlayMode;
   SoundVolume = soundvolume;
   ShowNamesNoConst=SHOW_NAMES;
