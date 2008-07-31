@@ -1,5 +1,5 @@
 #include "include.h"
-#include "../../inc/playsound.h"
+#include "../inc/playsound.h"
 #include "conf_loader.h"
 #include "main.h"
 #include "mainmenu.h"
@@ -9,7 +9,7 @@
 #include "langpack.h"
 #include "SPlayer_ipc.h"
 #include "mylib.h" 
-#include "../../inc/xtask_ipc.h"
+#include "../inc/xtask_ipc.h"
 
 /*
 typedef struct {
