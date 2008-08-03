@@ -44,8 +44,8 @@ void Log(int dummy, char *txt)
   if (f!=-1)
   {
     fwrite(f,txt,strlen(txt),&ul);
-    fclose(f,&ul);
   }
+  fclose(f,&ul);
 }
 
 const int minus11=-11; // стремная константа =)
@@ -1250,52 +1250,12 @@ if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
   }
   if (msg->gbsmsg->msg==KEY_DOWN)
   {
-    DoKey(msg->gbsmsg->submess,1);
+    DoKey(msg->gbsmsg->submess);
     REDRAW();
   }
   if (msg->gbsmsg->msg==LONG_PRESS)
   {
-    switch(msg->gbsmsg->submess)
-    {
-      case RIGHT_BUTTON:
-        NextPL();
-      break;
-      case LEFT_BUTTON:
-        PrevPL();
-      break;
-      case UP_BUTTON:
-        CTUpSpeed();
-      break;
-      case DOWN_BUTTON:
-        CTDownSpeed();
-      break;
-      case '2':
-        CTUpSix();
-      break;
-      case '3':
-      break;
-      case '8':
-        CTDownSix();
-      break;
-      case '9':
-       // PlayPopup(10, 10, 120, 120, );
-      break;
-      case '#':
-       if (KeyLock==0){
-          KbdLock();
-          Mode_keypressed = 0;
-          if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Keypad_Lock]);
-          KeyLock=1;
-       }
-       if (playmode>0) {playmode-=1;}
-       else {playmode=3;}
-  
-      break;
-      case '*':
-        EditPL=1;
-        ToggleVolume();
-      break;
-    }
+    DoKey(msg->gbsmsg->submess+LONG_PRESS_DIFF);
     REDRAW();
   }
 }else{

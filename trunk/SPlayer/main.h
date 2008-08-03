@@ -9,6 +9,8 @@
 
 #define MAX_INIBUF 256  // Размер буфера ини-файла
 
+#define LONG_PRESS_DIFF 0x40 // Для реализации длинного нажатия через конфиг клавиш
+
 typedef void (*INIPROC) (char *name, char *value); // Процедура обработки ини-файла
 
 // Общие функции модуля MAIN.C
@@ -192,7 +194,7 @@ void CTDownSpeed(void);
 
 void CTUpSpeed(void);
 
-void DoKey(int key, int ka);
+void DoKey(int key);
 
 char *strtolower(char *src, char *dst, int sz);
 
