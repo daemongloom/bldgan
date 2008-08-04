@@ -29,10 +29,10 @@ void NextTrack();
 
 // Предыдущий трек пл  AAA
 void PreviousTrack();
-/*
+
 // Остановить перемотку :) - Vedan
 void StopRewind();
-*/
+
 // Перемотка - Vedan   // Оптимизировал   AAA
 void StartRewind();
 

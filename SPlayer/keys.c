@@ -134,15 +134,18 @@ KEY_PROC procmap[] = {
 void DoKey(int key)
 {
   int startkn;
+  int finishkn;
   if (key>LONG_PRESS_DIFF) {
     // Длинное нажатие
     startkn = MAX_KEY_DOWN_NUM+1;
+    finishkn = KEYS_COUNT;
     key -= LONG_PRESS_DIFF;
   } else {
     // Короткое нажатие
     startkn = 0;
+    finishkn = MAX_KEY_DOWN_NUM;
   }
-  for(int cc=startkn;cc<KEYS_COUNT;cc++)
+  for(int cc=startkn;cc<finishkn;cc++)
     if(keynames[cc].key==key) {
       if(procmap[cc])procmap[cc]();
       return;

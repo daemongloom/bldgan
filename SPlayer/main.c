@@ -292,7 +292,7 @@ void lgpInitLangPack(void)
   lgpData[LGP_Settings]=             "Settings";
   lgpData[LGP_AboutDlg]=             "AboutDlg";
   lgpData[LGP_Exit_SPlayer]=         "Exit";
-  lgpData[LGP_SELECT]=               "Selest";
+  lgpData[LGP_SELECT]=               "Select";
   lgpData[LGP_BACK]=                 "Back";
   ///////////Menu 1///////////
   lgpData[LGP_Sets_Menu]=            "Instruments";
