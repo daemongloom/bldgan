@@ -75,7 +75,7 @@ extern const unsigned int ALLTRACK;   // 1,если включено отображение всех треков
 unsigned short stop=1; // 1, если останавливаем листание   AAA
 extern unsigned short Stat_keypressed;
 unsigned short FM_o=0;
-short ModeRew;
+short ModeRew;  // Режим перемотки (-1 - назад, +1 - вперед)
 short ModeMove;
 short SpeedMove;
 // Всякие "мелкие" переменные
@@ -339,26 +339,26 @@ void StopRewind()       // Остановка перемотки :)
   }
 }
 
+// Слегка подправил
 void DoRewinded()
 {
   DisableScroll();
-    if(!StopCount)
-    {
-      mlsc=tm*1000+1000*ModeRew*STEP_REW;
-      tm=mlsc/1000;      
-    }
-    if(tm<=0)
-    {
+  if(!StopCount) {
+    mlsc=tm*1000+1000*ModeRew*STEP_REW;
+    tm=mlsc/1000;      
+    if(tm<=0) {
       tm=mlsc=0;
       StopCount=1;
     }
-    if(tm>=ln)
-    {
+    if(tm>=ln) {
       tm=ln;
       StopCount=1;
     }
     REDRAW();
     GBS_StartTimerProc(&tmr_rew,SPEED_REW,DoRewinded);
+  } else {
+    StopRewind();
+  }
 }
 
 // Перемотка   // Оптимизировал   AAA
