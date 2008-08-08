@@ -245,12 +245,9 @@ void Colours()
   FreeWS(ws);
 }
 
-void Refresh()
+void Refresh1()
 {
-  sprintf(cfgxname,"%s%s",PIC_DIR,"skin.cfg");
-  load_skin(cfgxname);
-  sprintf(cfgxname,"%s%s",PIC_DIR,"colour.cfg");
-  load_skin(cfgxname);
+  Refresh();
   GeneralFuncF1(1);
 }
 
@@ -281,7 +278,7 @@ void *sets_menuprocs[MAX_ITEMS]={
                           (void *)Set_Edit_PL,
                           (void *)Coordinates,
                           (void *)Colours,
-                          (void *)Refresh
+                          (void *)Refresh1
                          };
 
 SOFTKEY_DESC sets_menu_sk[]=

@@ -59,6 +59,7 @@ const char ipc_my_name[32]=IPC_SPLAYER_NAME;
 const char ipc_xtask_name[]=IPC_XTASK_NAME;
 const char ipc_grantee_name[]=IPC_GRANTEE_NAME;
 const char ipc_control_name[]=IPC_CONTROL_NAME;
+const char ipc_editor_name[]=IPC_EDITOR_NAME;
 IPC_REQ gipc;
 
 extern short ModeRew;
@@ -887,6 +888,14 @@ void CheckDoubleRun(void)   // При открытии копии   AAA
   }
 }
 
+void Refresh()
+{
+  char cfgname[256];
+  sprintf(cfgname,"%s%s",PIC_DIR,"skin.cfg");
+  load_skin(cfgname);
+  sprintf(cfgname,"%s%s",PIC_DIR,"colour.cfg");
+  load_skin(cfgname);
+}
 //////////////Автовыход   AAA//////////////
 int AutoExitCounter;
 
@@ -1173,7 +1182,8 @@ void SavePL()
 
 void StartRewindToBegin()
 {
-  if(PlayingStatus==0)return;
+  extern unsigned int IsRewind;
+  if(PlayingStatus==0||IsRewind)return;
   ModeRew=-1;
   P_keypressed = 2;
   StartRewind();
@@ -1181,7 +1191,8 @@ void StartRewindToBegin()
 
 void StartRewindToEnd()
 {
-  if(PlayingStatus==0)return;
+  extern unsigned int IsRewind;
+  if(PlayingStatus==0||IsRewind)return;
   ModeRew=1;
   N_keypressed = 2;
   StartRewind();
@@ -1201,6 +1212,7 @@ void NextPL()
 
 void CTDownSpeed(void)
 {
+  if(stop==0)return;
   stop=0;
   SpeedMove=1;
   CTSpeed();
@@ -1208,6 +1220,7 @@ void CTDownSpeed(void)
 
 void CTUpSpeed(void)
 {
+  if(stop==0)return;
   stop=0;
   SpeedMove=-1;
   CTSpeed();
@@ -1501,20 +1514,23 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
 	    if (ipc->name_from==ipc_my_name) SUBPROC((void *)CheckDoubleRun);
             else ipc->data=(void *)MAINCSM_ID;
             break;
+          case IPC_REFRESH:
+	    if (ipc->name_from==ipc_editor_name) {Refresh();}
+            break;
           case IPC_PLAY_PAUSE:
-            ipc->data=(void *)((int)(ipc->data)+1);
+          //  ipc->data=(void *)((int)(ipc->data)+1);
 	    if (ipc->name_from==ipc_control_name) {TogglePlayback();}
             break;
           case IPC_STOP:
-            ipc->data=(void *)((int)(ipc->data)+1);
+          //  ipc->data=(void *)((int)(ipc->data)+1);
 	    if (ipc->name_from==ipc_control_name) {StopAllPlayback();}
             break;
           case IPC_NEXT_TRACK:
-            ipc->data=(void *)((int)(ipc->data)+1);
+          //  ipc->data=(void *)((int)(ipc->data)+1);
 	    if (ipc->name_from==ipc_control_name) {NextTrack();}
             break;
           case IPC_PREV_TRACK:
-            ipc->data=(void *)((int)(ipc->data)+1);
+          //  ipc->data=(void *)((int)(ipc->data)+1);
 	    if (ipc->name_from==ipc_control_name) {PreviousTrack();}
             break;
           }
@@ -1581,10 +1597,7 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
     if (strcmp(successed_config_filename,(char *)msg->data0)==0)
     {
       InitConfig();
-      sprintf(sfname,"%s%s",PIC_DIR,"skin.cfg");
-      load_skin(sfname);
-      sprintf(sfname,"%s%s",PIC_DIR,"colour.cfg");
-      load_skin(sfname);
+      Refresh();
       LoadKeys();
       InitLanguage();
       ShowNamesNoConst=SHOW_NAMES;
@@ -1704,10 +1717,7 @@ int main(char *exename, char *fname)
 {
   char dummy[sizeof(MAIN_CSM)];
   InitConfig();
-  sprintf(sfname,"%s%s",PIC_DIR,"skin.cfg");
-  load_skin(sfname);
-  sprintf(sfname,"%s%s",PIC_DIR,"colour.cfg");
-  load_skin(sfname);
+  Refresh();
   lgpInitLangPack(); //Загрузка языка - Vedan
   SUBPROC((void*)LoadKeys);
  // SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
