@@ -144,18 +144,12 @@ void LoadDaemonList(const char* path, unsigned short re, unsigned short toPL) //
         int a=de.file_name[strlen(de.file_name)-3];
         int b=de.file_name[strlen(de.file_name)-2];
         int c=de.file_name[strlen(de.file_name)-1];
-        char tmp[3];
-        strcpy(tmp,(char const*)de.file_name[strlen(de.file_name)-3]);
-        // Немного переделаем перерывание форматов Blind
-        if ((tmp=="mp3")||(tmp=="wav")||(tmp=="aac")||(tmp=="mid")||(tmp=="spl")||(tmp=="m3u"))
-/*
         if(((a=='m'||a=='M')&&(b=='p'||b=='P')&&c=='3')||
            ((a=='w'||a=='W')&&(b=='a'||b=='A')&&(c=='v'||c=='V'))||
             ((a=='a'||a=='A')&&(b=='a'||b=='A')&&(c=='c'||c=='C'))||
              ((a=='m'||a=='M')&&(b=='i'||b=='I')&&(c=='d'||c=='D'))||
               ((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))||
                ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U')))   // Перерываем форматы   AAA
-*/
         {
           
           strcpy(p1,name);
@@ -163,13 +157,8 @@ void LoadDaemonList(const char* path, unsigned short re, unsigned short toPL) //
           utf8_2ws(p,p1,256);
           if(toPL==0) {PastFile(p, 0);}
           else {
-            // Переделаем перерывание форматов Blind
-            if ((tmp=="spl")||(tmp=="m3u"))
-/*
             if(((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))||
-               ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U')))
-*/
-               {   // Перерываем форматы   AAA
+               ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U'))){   // Перерываем форматы   AAA
                  LoadPlaylist(name);
                }else{
                  PastLine(p, 0);
