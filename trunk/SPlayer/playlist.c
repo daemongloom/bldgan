@@ -26,7 +26,9 @@ unsigned short SVforToggle = 0;       // Прежняя громкость
 unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 - играем)   // Было char стало unsigned short! :D   AAA
 short phandle = -1;                   // Что играем
 extern void* pha;
-//extern HObj gObj;
+#ifdef OBS
+extern HObj gObj;
+#endif
 
 int CurrentTrack[TCPL];                 // Текущий трек
 int PlayedTrack[TCPL];                  // Проигрываемый трек   AAA
