@@ -1401,7 +1401,9 @@ static void ElfKiller(void)      //Добавил static не знаю зачем, главное - работ
   GBS_DelTimer(&offtm);
   GBS_DelTimer(&mytmr);
   StopAllPlayback();
- // KillObj();
+#ifdef OBS
+  KillObj();
+#endif
   MemoryFree();
   lgpFreeLangPack();                                   //Очисть память, выделенную под язык - Vedan
   RemoveKeybMsgHook((void *)my_keyhook);               //НАДО!!  AAA . Надо :) DemonGloom
