@@ -15,7 +15,7 @@ int ReadID3v1(WSHDR* fnamews, ID3TAGDATA *tag) // Чтение ID3 v1
 {
   char* fname=malloc(256);
   ws_2str(fnamews,fname,256);
- // wstrcpy(tag->full_name,fnamews);
+ // ws_2str(fnamews,tag->full_name,256);
   unsigned int err;
   int f;
   FSTATS stat;
