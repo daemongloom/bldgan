@@ -169,6 +169,8 @@ void SendNULL();    // Послать по окончании воспр.   AAA
 
 void ToDevelop();   // Развернуть   AAA
 
+void Refresh();     // Загрузить конфиги скина   AAA
+
 void QuitCallbackProc(int decision);
 
 void DoErrKey();

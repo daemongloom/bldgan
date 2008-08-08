@@ -183,7 +183,9 @@ const PROC_MAP keyprocs[] = {
   {"cleanpl", CleanPlaylist},
   {"rewindtoend", StartRewindToEnd},
   {"rewindtobegin", StartRewindToBegin},
-  {"savepl", SavePL}
+  {"savepl", SavePL},
+  {"goupspeed", CTUpSpeed},
+  {"godownspeed", CTDownSpeed}
 };
 
 void KeysProc(char *name, char *value)
