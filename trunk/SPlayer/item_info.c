@@ -93,7 +93,7 @@ void Disp_Info(ID3TAGDATA *tag)
   ConstructEditControl(&ec,ECT_HEADER,ECF_APPEND_EOL,ws_info,30);
   AddEditControlToEditQend(eq,&ec,ma);
   
-  wsprintf(ws_info,"%w",tag->full_name);
+  wsprintf(ws_info,"%t",tag->full_name);
   ConstructEditControl(&ec,ECT_NORMAL_TEXT,ECF_APPEND_EOL,ws_info,256);
   AddEditControlToEditQend(eq,&ec,ma);
   // Size

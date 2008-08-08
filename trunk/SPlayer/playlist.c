@@ -168,12 +168,18 @@ void VolumeUp()
 {
 #ifdef NEWSGOLD
   if(SoundVolume<15)SoundVolume++;
+#ifndef OBS
   if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
-  //Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#else
+  Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#endif
 #else
   if(SoundVolume<14)SoundVolume++;
+#ifndef OBS
   if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
- // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#else
+  Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#endif
 #endif
   REDRAW();
 }
@@ -183,11 +189,17 @@ void VolumeDown()
 {
   if(SoundVolume>0)SoundVolume--;
 #ifdef NEWSGOLD
+#ifndef OBS
   if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
- // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #else
+  Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#endif
+#else
+#ifndef OBS
   if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
- // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#else
+  Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#endif
 #endif
   REDRAW();
 }
@@ -200,22 +212,34 @@ void ToggleVolume()
     SoundVolume = SVforToggle;
     SVforToggle = 0;
 #ifdef NEWSGOLD
+#ifndef OBS
     if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
-   // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #else
+    Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#endif
+#else
+#ifndef OBS
     if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
-   // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#else
+    Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#endif
 #endif
   } else 
   {
     SVforToggle = SoundVolume;
     SoundVolume = 0;
 #ifdef NEWSGOLD
+#ifndef OBS
     if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
-   // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #else
+    Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#endif
+#else
+#ifndef OBS
     if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
-   // Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#else
+    Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+#endif
 #endif
   }
   REDRAW();
@@ -236,8 +260,11 @@ void RandTrack()
 {
   if(ready[PlayedPL])
   {
+#ifndef OBS
    if(phandle!=-1)PlayMelody_StopPlayback(phandle);
-  // Obs_Stop (gObj);
+#else
+   Obs_Stop (gObj);
+#endif
    if(NextPlayedTrack[1]){PlaySetTrack();}
    else{int prevtrack=PlayedTrack[PlayedPL];
    while (PlayedTrack[PlayedPL]==prevtrack) 
@@ -261,8 +288,11 @@ void RandTrack()
 void RepeatTrack()
 {
   if(ready[PlayedPL]){
+#ifndef OBS
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
- // Obs_Stop (gObj);
+#else
+  Obs_Stop (gObj);
+#endif
   if(NextPlayedTrack[1]){PlaySetTrack();}
   PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));}
 }
@@ -271,8 +301,11 @@ void RepeatTrack()
 void NextTrackX()
 {
   if(ready[PlayedPL]){
+#ifndef OBS
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
- // Obs_Stop (gObj);
+#else
+  Obs_Stop (gObj);
+#endif
   
   if(PlayedTrack[PlayedPL]<TC[PlayedPL]||NextPlayedTrack[1])
   {
@@ -293,8 +326,11 @@ void NextTrackX()
 void NextTrack()
 {
   if(ready[PlayedPL]){
+#ifndef OBS
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
- // Obs_Stop (gObj);
+#else
+  Obs_Stop (gObj);
+#endif
 //  if (CurrentTrack==(PlayedTrack-1)){// Перенос курсора на следующую песню  // И зачем? То пытаемся не повторять ошибок
 //    CurrentTrack=PlayedTrack;        // встроенного плеера, а тут... И Где логика если у следующей функции нет аналогичного свойства??  AAA
 //    if(PlayedTrack>TC) CurrentTrack=1;
@@ -311,8 +347,11 @@ void NextTrack()
 void PreviousTrack()
 {
   if(ready[PlayedPL]){
+#ifndef OBS
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
- // Obs_Stop (gObj);
+#else
+  Obs_Stop (gObj);
+#endif
   if(PlayedTrack[PlayedPL]>1) {PlayedTrack[PlayedPL]--;}
   else {PlayedTrack[PlayedPL]=TC[PlayedPL];}
   PlayMP3File(GetPlayedTrack(PlayedTrack[PlayedPL]));}
@@ -330,8 +369,11 @@ void StopRewind()       // Остановка перемотки :)
   if(IsRewind)
   {
     StopCount = 0;
+#ifndef OBS
     PlayMelody_SetPosition(phandle, mlsc);
-   // Obs_SetPosition (gObj, mlsc);
+#else
+    Obs_SetPosition (gObj, mlsc);
+#endif
     PlayingStatus = 2;
     EXT_REDRAW();
     IsRewind = 0;
@@ -379,10 +421,13 @@ void StartRewind()
     if (phandle!=-1)
     {
       IsRewind=1;
+#ifndef OBS
       PlayMelody_PausePlayback(phandle);
-     // Obs_Pause (gObj);
+#else
+      Obs_Pause (gObj);
+#endif
       StopTMR(0);
-      PlayingStatus = 1;
+     // PlayingStatus = 1;
       DoRewinded();
     }
     break;
@@ -405,8 +450,11 @@ void TogglePlayback()
     // Если пауза - продолжаем воспроизведение...
     if (phandle!=-1)
     {
+#ifndef OBS
       PlayMelody_ResumePlayBack(phandle);
-     // Obs_Resume (gObj);
+#else
+      Obs_Resume (gObj);
+#endif
       EXT_REDRAW();
       PlayingStatus = 2;
     }
@@ -415,8 +463,11 @@ void TogglePlayback()
     // Если играет - ставим паузу...
     if (phandle!=-1)
     {
+#ifndef OBS
       PlayMelody_PausePlayback(phandle);
-     // Obs_Pause (gObj);
+#else
+      Obs_Pause (gObj);
+#endif
       StopTMR(0);
       PlayingStatus = 1;
     }
@@ -432,8 +483,11 @@ void StopAllPlayback()
   Stat_keypressed = 1;
   if(PlayingStatus==0)return;
   if (phandle!=-1){
+#ifndef OBS
     PlayMelody_StopPlayback(phandle);
-   // Obs_Stop (gObj);
+#else
+    Obs_Stop (gObj);
+#endif
     PlayingStatus = 0;
   }
 }
@@ -672,8 +726,11 @@ void PlayTrackUnderC()
 {
   if(ready[CurrentPL]){
   Stat_keypressed = 1;
+#ifndef OBS
   if(phandle!=-1)PlayMelody_StopPlayback(phandle);
- // Obs_Stop (gObj);
+#else
+  Obs_Stop (gObj);
+#endif
   if(PlayedPL!=CurrentPL)
   {
     PlayedTrack[PlayedPL] = 0;
@@ -1071,6 +1128,7 @@ void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsign
   unsigned short my_x;
   unsigned short my_y;
   unsigned short k;
+  unsigned short interval;
   short p2=0;
   short v3=1;
   unsigned short c = 0;  // Координаты  AAA
@@ -1119,7 +1177,8 @@ char chanel[8],
   
     my_x = coord[7];
     my_y = coord[8];
-    if(!ALLTRACK) {coord[6]=0;}
+    if(ALLTRACK) {interval=coord[6];}
+    else {interval=0;}
 
     WSHDR * out_ws = AllocWS(128);
 /*
@@ -1147,17 +1206,51 @@ char chanel[8],
 */
     if (AllLines[CurList]>5)
     {
-    if(CurLine[CurList]==1) {k=0; v3=0;}
+      switch(CurLine[CurList])
+      {
+      case 1:
+        k=0;
+        v3=0;
+        break;
+      case 2:
+        k=1;
+        v3=0;
+        break;
+      default:
+        if(CurLine[CurList]==AllLines[CurList]-2) {k=3; v3=0;}
+        else{ if(CurLine[CurList]==AllLines[CurList]-1) {k=4; v3=0;}
+        else{ if(CurLine[CurList]==AllLines[CurList]) {k=5; v3=0;} else {k=2;}}}
+        break;
+      }
+   /* if(CurLine[CurList]==1) {k=0; v3=0;}
     else{ if(CurLine[CurList]==2) {k=1; v3=0;}
     else{ if(CurLine[CurList]==AllLines[CurList]-2) {k=3; v3=0;}
     else{ if(CurLine[CurList]==AllLines[CurList]-1) {k=4; v3=0;}
-    else{ if(CurLine[CurList]==AllLines[CurList]) {k=5; v3=0;} else {k=2;}}}}}
+    else{ if(CurLine[CurList]==AllLines[CurList]) {k=5; v3=0;} else {k=2;}}}}}*/
     }else{
-    if(CurLine[CurList]==1) {k=0; v3=0;}
-    else{ if(CurLine[CurList]==2) {k=1; v3=0;}
-    else{ if(CurLine[CurList]==3) {k=2; v3=0;}
-    else{ if(CurLine[CurList]==4) {k=3; v3=0;}
-    else{ if(CurLine[CurList]==5) {k=4; v3=0;}}}}}
+      switch(CurLine[CurList])
+      {
+      case 1:
+        k=0;
+        v3=0;
+        break;
+      case 2:
+        k=1;
+        v3=0;
+        break;
+      case 3:
+        k=2;
+        v3=0;
+        break;
+      case 4:
+        k=3;
+        v3=0;
+        break;
+      case 5:
+        k=4;
+        v3=0;
+        break;
+      }
     }
     
     for(int l=0;l<6;l++)
@@ -1249,7 +1342,7 @@ char chanel[8],
                    scroll_disp+1,SizeOfFont,0,COLOR[5],0);
       if(InfoOn&&MarkLine&&p==0)
      {
-        DrawString(info_pf,my_x+PL_move_L[l],GetFontYSIZE(SizeOfFont)+2+my_y+c-(p1*v2+p3*v1)*v3*v,/*my_x+125*/w-7,my_y+2*GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v+2,SizeOfFont,0,COLOR[5],0);
+        DrawString(info_pf,my_x+PL_move_L[l],my_y+c-(p1*v2+p3*v1)*v3*v+coord[6],/*my_x+125*/w-7,my_y+c-(p1*v2+p3*v1)*v3*v+coord[6]*2,SizeOfFont,0,COLOR[5],0);
      }
       
       
@@ -1273,22 +1366,22 @@ char chanel[8],
                    scroll_disp+1,SizeOfFont,0,COLOR[0],0);
     }
       if(s){
-        if(s>1) {c+=coord[6];}
-        else {c+=coord[6]/4;}
+        if(s>1) {c+=interval;}
+        else {c+=interval/4;}
       }else{
-        c+=coord[6];
+        c+=interval;
       }
     }
       if(s){
-        if(c/coord[6]>l&&s>l+2&&s>2) {c+=coord[6];}
-        else {c+=coord[6]/4;}
+        if(c/interval>l&&s>l+2&&s>2) {c+=interval;}
+        else {c+=interval/4;}
       }else{
-        c+=coord[6];
+        c+=interval;
       }
     }
     }
-    if(n==0) {n=coord[6];}
-    if(d==0) {d=2*coord[6];}
+    if(n==0) {n=interval;}
+    if(d==0) {d=2*interval;}
     FreeWS(out_ws);
     FreeWS(info_pf);
   }else{

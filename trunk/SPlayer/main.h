@@ -51,7 +51,7 @@ typedef struct
 
 typedef struct
 {
-  WSHDR* full_name; // Путь к файлу   AAA
+ // char full_name[256]; // Путь к файлу   AAA
   char istagg[3]; // Слово "TAG"
   char title[30]; // Название
   char artist[30]; // Исполнитель
@@ -68,8 +68,8 @@ int ReadID3v1(WSHDR* fnamews, ID3TAGDATA *tag); // Чтение ID3 v1
 
 #ifndef NO_PNG  /////////////////////////////////////////
 
-#define TOTAL_ITEMS_1 15
-#define ALLPNG 36
+#define TOTAL_ITEMS_1 18
+#define ALLPNG 39
 
 // Лепота... Но за один запуск жрет много   AAA
 static const char * const items1[TOTAL_ITEMS_1] = {
@@ -88,6 +88,9 @@ static const char * const items1[TOTAL_ITEMS_1] = {
 /* 12*/ "cursor",
 /* 13*/ "_down",
 /* 14*/ "_idle",
+/* 15*/ "splash",
+/* 16*/ "rewtb",
+/* 17*/ "rewte",
 };
 #define PNGEXT ".png"
 
