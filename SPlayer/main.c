@@ -504,14 +504,16 @@ void SetDV()
     break;
   }
 }*/
-/*
+#ifdef OBS
 #define MSG_Report  0xB034
 HObj gObj=NULL;
 void KillObj(){
  if (!gObj) return;
   Obs_DestroyObject(gObj);
   gObj=NULL;
-}*/
+}
+#endif
+
 // Èדנאול MP3 פאיכ
 void PlayMP3File(WSHDR * fname)
 {
