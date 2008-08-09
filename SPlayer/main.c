@@ -557,6 +557,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
  // Log(0,"дыва");
       err=Obs_SetInput_File(gObj,0,fname);
       if (err)  goto exit1;  
+  //    Obs_Mam_SetPurpose(gObj,0x16);
       Obs_Prepare(gObj);
       Obs_Start(gObj);
  // Log(0,"тыри");
