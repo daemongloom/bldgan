@@ -412,16 +412,22 @@ void StartRewind()
   {
   case 1:
     // Если пауза - перематываем :) ...
+#ifndef OBS
     if (phandle!=-1)
     {
+#endif
       IsRewind=1;
       DoRewinded();
+#ifndef OBS
     }
+#endif
     break;
   case 2:
     // Если играет, ставим паузу и перематываем !! :)
+#ifndef OBS
     if (phandle!=-1)
     {
+#endif
       IsRewind=1;
 #ifndef OBS
       PlayMelody_PausePlayback(phandle);
@@ -431,7 +437,9 @@ void StartRewind()
       StopTMR(0);
      // PlayingStatus = 1;
       DoRewinded();
+#ifndef OBS
     }
+#endif
     break;
   }
 }
@@ -450,29 +458,33 @@ void TogglePlayback()
     break;
   case 1:
     // Если пауза - продолжаем воспроизведение...
+#ifndef OBS
     if (phandle!=-1)
     {
-#ifndef OBS
       PlayMelody_ResumePlayBack(phandle);
 #else
       Obs_Resume (gObj);
 #endif
       EXT_REDRAW();
       PlayingStatus = 2;
+#ifndef OBS
     }
+#endif
     break;
   case 2:
     // Если играет - ставим паузу...
+#ifndef OBS
     if (phandle!=-1)
     {
-#ifndef OBS
       PlayMelody_PausePlayback(phandle);
 #else
       Obs_Pause (gObj);
 #endif
       StopTMR(0);
       PlayingStatus = 1;
+#ifndef OBS
     }
+#endif
     break;
   }
 }
@@ -484,14 +496,16 @@ void StopAllPlayback()
   StopTMR(1);
   Stat_keypressed = 1;
   if(PlayingStatus==0)return;
-  if (phandle!=-1){
 #ifndef OBS
+  if (phandle!=-1){
     PlayMelody_StopPlayback(phandle);
 #else
     Obs_Stop (gObj);
 #endif
     PlayingStatus = 0;
+#ifndef OBS
   }
+#endif
 }
 
 // Постановка в очередь   AAA
