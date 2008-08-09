@@ -1516,23 +1516,23 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
             else ipc->data=(void *)MAINCSM_ID;
             break;
           case IPC_REFRESH:
-	    if (ipc->name_from==ipc_editor_name) {Refresh();}
+            if (strcmp(ipc->name_from,ipc_editor_name)==0) {Refresh();}
             break;
           case IPC_PLAY_PAUSE:
           //  ipc->data=(void *)((int)(ipc->data)+1);
-	    if (ipc->name_from==ipc_control_name) {TogglePlayback();}
+	    if (strcmp(ipc->name_from,ipc_control_name)==0) {TogglePlayback();}
             break;
           case IPC_STOP:
           //  ipc->data=(void *)((int)(ipc->data)+1);
-	    if (ipc->name_from==ipc_control_name) {StopAllPlayback();}
+	    if (strcmp(ipc->name_from,ipc_control_name)==0) {StopAllPlayback();}
             break;
           case IPC_NEXT_TRACK:
           //  ipc->data=(void *)((int)(ipc->data)+1);
-	    if (ipc->name_from==ipc_control_name) {NextTrack();}
+	    if (strcmp(ipc->name_from,ipc_control_name)==0) {NextTrack();}
             break;
           case IPC_PREV_TRACK:
           //  ipc->data=(void *)((int)(ipc->data)+1);
-	    if (ipc->name_from==ipc_control_name) {PreviousTrack();}
+	    if (strcmp(ipc->name_from,ipc_control_name)==0) {PreviousTrack();}
             break;
           }
         }
