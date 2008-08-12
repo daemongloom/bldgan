@@ -4,7 +4,8 @@
 #include "mylib.h" 
 #include "langpack.h"
 
-WSHDR *playlist_lines[TCPL][512];  // Массив указателей на имена файлов в пл   Mr. Anderstand: Воплотим мечту в жизнь!
+WSHDR *playlist_lines[TCPL][TClines];  // Массив указателей на имена файлов в пл   Mr. Anderstand: Воплотим мечту в жизнь!
+extern char *Playlists[TCPL];
 
 // Из конфига
 extern const int SHOW_NAMES;
@@ -919,6 +920,7 @@ void SavePlaylist(char *fn)
 // Добавляем строку в пл   AAA
 void PastLine(WSHDR *p, unsigned short i) // Добавляем главно не с [0][0], а [0][1] почему-то... Работать должно тем не менее   AAA
 {
+  if(TC[CurrentPL]==TClines-1) {ShowMSG(1,(int)lgpData[LGP_eoPL]); return;}
   playlist_lines[CurrentPL][TC[CurrentPL]+1]=AllocWS(256);
   wstrcpy(playlist_lines[CurrentPL][TC[CurrentPL]+1],p);
   TC[CurrentPL]++;
@@ -1496,6 +1498,8 @@ void LoadingPlaylist(const char * fn)
   PTtoFirst();
   CleanPlaylist();
   LoadPlaylist(fn);
+  extern const unsigned int SAVE_SETS;
+  if(SAVE_SETS)strcpy(Playlists[CurrentPL],fn);
   ready[CurrentPL]=1;
 }
 
@@ -1550,6 +1554,7 @@ void LoadPlaylists(const char* path) // Для еще одной фичи   AAA
   }
   FindClose(&de,&err);
   if(TC[CurrentPL]>0) {CTtoFirst(); PTtoFirst();}
+  zeromem(Playlists[CurrentPL],256);
   ready[CurrentPL]=0;
 }
 

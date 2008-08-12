@@ -1,7 +1,7 @@
 #include "../inc/swilib.h"
 #include "main.h"
 #include "FM.h"
-#include "lang.h"
+#include "langpack.h"
 #include "playlist.h"
 
 
@@ -26,12 +26,12 @@ void patch_rect(RECT*rc,int x,int y, int x2, int y2)
   rc->y2=y2;
 }
 //////////////////////////Переменные//////////////////////////////
-WSHDR* Files[256];   // Массив путей к файлам/папкам   AAA
+WSHDR* Files[TCFMlines];   // Массив путей к файлам/папкам   AAA
 extern const char PIC_DIR[];
 extern const char MUSIC[];
 //extern char COLOR_BG[4];
 extern const int SHOW_NAMES;
-int MarkLines[256];  // Массив-маркер для выделения файлов   AAA
+int MarkLines[TCFMlines];  // Массив-маркер для выделения файлов   AAA
 int CurFile=1;       // Текущий элемент   AAA
 unsigned int TCFM=0; // Количество элементов   AAA
 char nowpath[128];
@@ -43,6 +43,7 @@ extern char COLOR[ncolor][4];
 
 void PastFile(WSHDR *p, unsigned short i)
 {
+  if(CurFile==TCFMlines-1) {ShowMSG(1,(int)lgpData[LGP_eoPL]); return;}
   Files[TCFM+1]=AllocWS(256);
   wstrcpy(Files[TCFM+1],p);
   TCFM++;

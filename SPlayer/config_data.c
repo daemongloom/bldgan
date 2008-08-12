@@ -50,9 +50,17 @@ __root const CFG_HDR cfghdr16={CFG_CBOX,LG_Show_Popup,0,2};  //Показывать попапы
 __root const unsigned int SHOW_POPUP = 1;
 __root const CFG_CBOX_ITEM cfgcbox2_1[2]={LG_No,LG_Yes};
 
-__root const CFG_HDR cfghdr16_0={CFG_CBOX,LG_Show_One_Track,0,2};  // Показывать все/один трек. Сделано хитрожописто,
+__root const CFG_HDR cfghdr16_0={CFG_CBOX,LG_Save_Sets,0,2};  //Сохранять настройки   AAA
+__root const unsigned int SAVE_SETS = 1;
+__root const CFG_CBOX_ITEM cfgcbox2_3[2]={LG_No,LG_Yes};
+
+__root const CFG_HDR cfghdr16_1={CFG_CBOX,LG_Show_One_Track,0,2};  // Показывать все/один трек. Сделано хитрожописто,
 __root const unsigned int ALLTRACK=1;                              // кто будет менять - подумайте!   AAA
 __root const CFG_CBOX_ITEM cfgcbox2_2[2]={LG_Yes,LG_No};
+
+__root const CFG_HDR cfghdr16_2={CFG_CBOX,LG_LoadKeys,0,2};
+__root const unsigned int LOAD_KEYS = 1;
+__root const CFG_CBOX_ITEM cfgcbox6[2]={LG_No,LG_Yes};
 
 __root const CFG_HDR cfghdr17={CFG_CBOX,LG_Playmode,0,4};  // Временно убрал варинг Blind007
 __root const int PlayMode = 0;
@@ -95,10 +103,23 @@ __root const CFG_HDR cfghdr25={CFG_STR_UTF8,LG_Path_To_SCE,3,127};
 __root const char EXENAME[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\SPlayer cfg editor.elf";
 
 __root const CFG_HDR cfghdr26={CFG_STR_UTF8,LG_Path_To_Lang,3,127};
-__root const char LANGFILE[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\RU.txt"; //Путь к текстовому файлу - Vedan
+__root const char LANGFILE[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\Files\\RU.txt"; //Путь к текстовому файлу - Vedan
 
+__root const CFG_HDR cfghdr27={CFG_STR_UTF8,LG_Sets_Path,3,127};
+__root const char SETS_PATH[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\Files\\";
+
+/*
+__root const CFG_HDR cfghdr27={CFG_STR_UTF8,LG_KeySet_Path,3,127};
+__root const char KEYCFG_PATH[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\Files\\spkeys.cfg";
+
+__root const CFG_HDR cfghdr28={CFG_STR_UTF8,LG_Sets_File,3,127};
+__root const char SETS[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\Files\\sets.cfg";
+
+__root const CFG_HDR cfghdr29={CFG_STR_UTF8,LG_Sets_File,3,127};
+__root const char PLS[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\Files\\pls.cfg";
+*/
 __root const CFG_HDR cfghdr_m20={CFG_LEVEL,"",0,0};
-
+/*
 // Level 3
 __root const CFG_HDR cfghdr_m31={CFG_LEVEL,LG_Key_Settings,1,0};
 
@@ -107,33 +128,33 @@ __root const unsigned int LOAD_KEYS = 1;
 __root const CFG_CBOX_ITEM cfgcbox6[2]={LG_No,LG_Yes};
 
 __root const CFG_HDR cfghdr33={CFG_STR_UTF8,LG_KeySet_Path,3,127};
-__root const char KEYCFG_PATH[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\spkeys.cfg";
+__root const char KEYCFG_PATH[128] = DEFAULT_DISK ":\\ZBin\\SPlayer\\Files\\spkeys.cfg";
 
 __root const CFG_HDR cfghdr_m30={CFG_LEVEL,"",0,0};
+*/
+// Level 3
+__root const CFG_HDR cfghdr_m31={CFG_LEVEL,LG_Set_Speed,1,0};
 
-// Level 4
-__root const CFG_HDR cfghdr_m41={CFG_LEVEL,LG_Set_Speed,1,0};
-
-__root const CFG_HDR cfghdr42 = {CFG_INT,LG_Speed_Moving,0,30};
+__root const CFG_HDR cfghdr32 = {CFG_INT,LG_Speed_Moving,0,30};
 #ifdef NEWSGOLD
 __root const unsigned int SCROLL_MULT=2;
 #else
 __root const unsigned int SCROLL_MULT=10;
 #endif
 
-__root const CFG_HDR cfghdr43 = {CFG_INT,LG_Step_Moving,0,30};
+__root const CFG_HDR cfghdr33 = {CFG_INT,LG_Step_Moving,0,30};
 __root const unsigned int STEP_SCROLL_MULT=1;
 
-__root const CFG_HDR cfghdr44 = {CFG_INT,LG_Speed_Rewind,0,60};
+__root const CFG_HDR cfghdr34 = {CFG_INT,LG_Speed_Rewind,0,60};
 __root const unsigned int SPEED_REW=20;
 
-__root const CFG_HDR cfghdr45 = {CFG_INT,LG_Step_Rewind,0,60};
+__root const CFG_HDR cfghdr35 = {CFG_INT,LG_Step_Rewind,0,60};
 __root const unsigned int STEP_REW=1;
 
-__root const CFG_HDR cfghdr46 = {CFG_INT,LG_Speed_Moving_PL,0,40};
+__root const CFG_HDR cfghdr36 = {CFG_INT,LG_Speed_Moving_PL,0,40};
 __root const unsigned int SPEED_MOVE=10;
 
-__root const CFG_HDR cfghdr47 = {CFG_INT,LG_Speed_Open_Moving,0,40};
+__root const CFG_HDR cfghdr37 = {CFG_INT,LG_Speed_Open_Moving,0,40};
 __root const unsigned int SPEED_OPEN_MOVE=10;
 
-__root const CFG_HDR cfghdr_m40={CFG_LEVEL,"",0,0};
+__root const CFG_HDR cfghdr_m30={CFG_LEVEL,"",0,0};

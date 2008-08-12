@@ -11,7 +11,8 @@
  */
 
 extern const unsigned int LOAD_KEYS; // Грузить ли из файла
-extern const char KEYCFG_PATH[];      // Откуда грузятся настройки
+//extern const char KEYCFG_PATH[];      // Откуда грузятся настройки
+extern const char SETS_PATH[];      // Откуда грузятся настройки
 
 typedef void (*KEY_PROC) ();
 
@@ -216,6 +217,8 @@ void KeysProc(char *name, char *value)
 
 void LoadKeys()
 {
+  char fname[256];
+  sprintf(fname,"%s%s",SETS_PATH,"spkeys.cfg");
   if(LOAD_KEYS)
-  EnumIni(1,(char*)&KEYCFG_PATH,KeysProc);
+  EnumIni(1,(char*)&fname,KeysProc);
 }
