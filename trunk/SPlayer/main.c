@@ -75,6 +75,7 @@ unsigned short Stat_keypressed = 0; // нажата ли клавиша изменения статуса?
 unsigned short Mode_keypressed = 0; // нажата ли клавиша изменения режима проигрывания?
 unsigned short N_keypressed = 0;
 unsigned short P_keypressed = 0;
+unsigned short IPC_COPY=0;          // Открыли копию или нет?    AAA
 
 ///////////////////////////////////////////////////////////////////////////////
 unsigned short coord[ncoord];
@@ -958,10 +959,11 @@ void CheckDoubleRun(void)   // При открытии копии   AAA
   int csm_id;
   if ((csm_id=(int)(gipc.data))!=-1)
   {
+    IPC_COPY=1;
     gipc.name_to=ipc_xtask_name;
     gipc.name_from=ipc_my_name;
     gipc.data=(void *)csm_id;
-    GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_XTASK_SHOW_CSM,&gipc);  
+    GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_XTASK_SHOW_CSM,&gipc);
     LockSched();
     CloseCSM(MAINCSM_ID);
     if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Already_Started]);
@@ -969,6 +971,11 @@ void CheckDoubleRun(void)   // При открытии копии   AAA
   }
   else
   {
+    gipc.name_to=ipc_grantee_name;
+    gipc.name_from=ipc_my_name;
+    gipc.data=NULL;
+    GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_SPLAYER_STARTED,&gipc);   // Это чтобы всех послать :) , при открытии копии не посылает   AAA
+    
     SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
     ToDevelop();             // Чтобы не вызывался в фон при установленном патче на вызов SPlayer'a по горячей клавише   AAA
   }
@@ -1517,6 +1524,13 @@ static void ElfKiller(void)      //Добавил static не знаю зачем, главное - работ
   lgpFreeLangPack();                                   //Очисть память, выделенную под язык - Vedan
   RemoveKeybMsgHook((void *)my_keyhook);               //НАДО!!  AAA . Надо :) DemonGloom
   FreeWS(wl.wfilename);
+  
+  if(!IPC_COPY){
+  gipc.name_to=ipc_grantee_name;                       // Это чтобы всех послать :)   AAA
+  gipc.name_from=ipc_my_name;
+  gipc.data=NULL;
+  GBS_SendMessage(MMI_CEPID,MSG_IPC,IPC_SPLAYER_CLOSED,&gipc);}
+  
   extern void *ELF_BEGIN;
   kill_data(&ELF_BEGIN,(void (*)(void *))mfree_adr());
 }
