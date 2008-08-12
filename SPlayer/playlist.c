@@ -75,6 +75,7 @@ extern const unsigned int GrafOn1;    // 1,если включена анимация   AAA
 extern const unsigned int InfoOn;     // 1,если включен показ информации   Vedan
 extern const unsigned int SHOW_POPUP; // 1,если включены попапы   AAA
 extern const unsigned int ALLTRACK;   // 1,если включено отображение всех треков    AAA
+extern const unsigned int SAVE_SETS;  // 1,если включено сохранение настроек   AAA
 unsigned short stop=1; // 1, если останавливаем листание   AAA
 extern unsigned short Stat_keypressed;
 unsigned short FM_o=0;
@@ -1498,7 +1499,6 @@ void LoadingPlaylist(const char * fn)
   PTtoFirst();
   CleanPlaylist();
   LoadPlaylist(fn);
-  extern const unsigned int SAVE_SETS;
   if(SAVE_SETS)strcpy(Playlists[CurrentPL],fn);
   ready[CurrentPL]=1;
 }
@@ -1554,7 +1554,7 @@ void LoadPlaylists(const char* path) // Для еще одной фичи   AAA
   }
   FindClose(&de,&err);
   if(TC[CurrentPL]>0) {CTtoFirst(); PTtoFirst();}
-  zeromem(Playlists[CurrentPL],256);
+  if(SAVE_SETS)zeromem(Playlists[CurrentPL],256);
   ready[CurrentPL]=0;
 }
 
