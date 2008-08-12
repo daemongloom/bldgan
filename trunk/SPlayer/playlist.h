@@ -1,6 +1,7 @@
 #ifndef _PLAYLIST_H_
   #define _PLAYLIST_H_
 
+#define TClines 512
 #define TCPL 5             // Количество пл   AAA
 
 // Оказалось его перед закрытием еще и останавливать надо... А то такое начинается! :D  AAA

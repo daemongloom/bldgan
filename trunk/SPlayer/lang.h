@@ -62,9 +62,9 @@
 #define LG_Show_Anim             "Показывать анимацию"
 #define LG_Sets                  "Настройки"
 #define LG_Show_full_names       "Показ. полные имена"
-#define LG_Key_Settings          "Настройки конфига клавиш"
-#define LG_LoadKeys              "Загружать из файла?"
-#define LG_KeySet_Path           "Файл настроек клавиш"
+//#define LG_Key_Settings          "Настройки конфига клавиш"
+#define LG_LoadKeys              "Загружать конфиг клавиш?"
+//#define LG_KeySet_Path           "Файл настроек клавиш"
 
 #define LG_No                    "Нет"
 #define LG_Yes                   "Да"
@@ -72,6 +72,7 @@
 #define LG_Show_effects          "Показывать эффекты"
 #define LG_Show_info             "Показывать информацию"
 #define LG_Show_Popup            "Показывать попапы"
+#define LG_Save_Sets             "Сохранять настройки"
 #define LG_Show_One_Track        "Показывать 1 трек"
 #define LG_Playmode              "Режим воспр."
 #define LG_Play_all              "Воспр. все"
@@ -90,6 +91,8 @@
 #define LG_Playlist_folder       "Папка для плейлистов"
 #define LG_Path_To_SCE           "SPlayer cfg editor"
 #define LG_Path_To_Lang          "Файл ленгпака"
+#define LG_Sets_Path             "Папка доп. файлов"
+//#define LG_Sets_File             "Файл настроек"
 
 ///////////ShowMSG/MsgBoxError///////////
 /*#define LG_Can_not_find_file     "Файл не найден!"
@@ -172,6 +175,7 @@
 #define LG_Show_effects          "Показ ефектiв"
 #define LG_Show_info           //////////////////////  "Show info"
 #define LG_Show_Popup           //////////////////////  "Показывать попапы"
+#define LG_Save_Sets            ///////////////////// "Сохранять настройки"
 #define LG_Show_One_Track       ////////////////////// "Показывать 1 трек"
 #define LG_Playmode              "Режим відтворення"
 #define LG_Play_all              "Відтворити все"
@@ -190,6 +194,7 @@
 #define LG_Playlist_folder       "Папка для плейлистів"
 #define LG_Path_To_SCE           "SPlayer cfg editor"
 #define LG_Path_To_Lang        ///////////////////  "Language file"
+#define LG_Path_To_Files         ////////////////////////// "Папка с доп. файлами"
 /*
 ///////////ShowMSG/MsgBoxError///////////
 #define LG_Can_not_find_file    "файл не знайдено!"
@@ -263,9 +268,9 @@
 #define LG_Show_Anim             "Show animation"
 #define LG_Sets                  "Sets"
 #define LG_Show_full_names       "Show full names"
-#define LG_Key_Settings          "Key-config settings"
+//#define LG_Key_Settings          "Key-config settings"
 #define LG_LoadKeys              "Load key-config from file"
-#define LG_KeySet_Path           "File key-config"
+//#define LG_KeySet_Path           "File key-config"
 
 #define LG_No                    "No"
 #define LG_Yes                   "Yes"
@@ -273,6 +278,7 @@
 #define LG_Show_effects          "Show effects"
 #define LG_Show_info             "Show info"
 #define LG_Show_Popup            "Show popups"
+#define LG_Save_Sets             "Save settings"
 #define LG_Show_One_Track        "Show 1 track"
 #define LG_Playmode              "Playmode"
 #define LG_Play_all              "Play all"
@@ -290,7 +296,8 @@
 #define LG_Picture_folder        "Picture folder"
 #define LG_Playlist_folder       "Playlist folder"
 #define LG_Path_To_SCE           "SPlayer cfg editor"
-#define LG_Path_To_Lang          "Language file"
+//#define LG_Path_To_Lang          "Language file"
+#define LG_Path_To_Files         ////////////////////////// "Папка с доп. файлами"
 /*
 ///////////ShowMSG/MsgBoxError///////////
 #define LG_Can_not_find_file     "Can't find file!"

@@ -140,6 +140,7 @@ char COLOR_PROG_MAIN_FRAME[4];             // Ободок
 //--- настройки из конфига ---
 extern const char PIC_DIR[];
 extern const char PLAYLISTS[];
+extern const char SETS_PATH[];
 extern const char DEFAULT_PLAYLIST[];
 extern const char DEFAULT_PLAYLIST1[];
 extern const char DEFAULT_PLAYLIST2[];
@@ -152,10 +153,12 @@ extern const unsigned int SizeOfFont;  // Шрифт   AAA
 extern const unsigned int FnameIPC;    // Отправлять или нет   AAA
 extern const unsigned int AUTO_EXIT_MIN;  // Время до автозакрытия   AAA
 extern const unsigned int SHOW_POPUP;
+extern const unsigned int SAVE_SETS;
 //--- настройки из конфига ---
 
 //--- Переменные ---
 extern WSHDR *playlist_lines[TCPL][512];
+char *Playlists[TCPL];
 extern short phandle;  // Для определения конца воспр.  AAA
 void* pha;               // Для Obs   AAA
 extern unsigned short PlayingStatus;
@@ -328,6 +331,9 @@ void lgpInitLangPack(void)
   lgpData[LGP_Error_2]=              "Error_2!";
   lgpData[LGP_Spkeys_er]=            "Spkeys error!";
   lgpData[LGP_PNG_er]=               " png-files are absent. It can reduce speed of work";
+  lgpData[LGP_eoPL]=                 "Playlist is overflown!";
+  lgpData[LGP_Error_cfg_file]=       "Error of cfg-file!";
+  lgpData[LGP_No_cfg_file]=          "No cfg-file!";
   lgpData[LGP_LangCode]=             "en";
   InitLangPack();
 }
@@ -679,23 +685,24 @@ else
 // Грузим координаты из skin.cfg AAA
 void load_skin(char const * fname)              // Извращенец... Такое создать... DG
 {
-  unsigned short i=0;
-  unsigned short j=0;
-  char *data; 
+  unsigned short i=0, j=0, k=0, num=3;
+  char *data, *pp; 
   unsigned int err;
-  int handle;
+  int handle, fsize;
   FSTATS fstats;
   if (GetFileStats(fname,&fstats,&err)!=-1) // Проверка файла на существование
   {
+    fsize=fstats.size;
     handle=fopen(fname, A_ReadOnly, P_READ,&err); // x65-75 for read MMC instead P_READ - 0
     if(handle!=-1)
     {
-      data=malloc(0xFF);
+      data=malloc(fsize);
       if(data)
       {
-        fread(handle,data,0xFF,&err); // Экономим память! :)  Пошли вы куда подальше... Сами же забываете добавлять!!! DG
-        if(data[2]==0x01)
+        fread(handle,data,fsize,&err); // Экономим память! :)  Пошли вы куда подальше... Сами же забываете добавлять!!! DG
+        switch(data[2])
         {
+        case 0x01:
           coord[0]=data[3];
           coord[1]=data[4]+data[5];
           coord[2]=data[6]+data[7];
@@ -713,10 +720,8 @@ void load_skin(char const * fname)              // Извращенец... Такое создать..
             j+=2;
             if(i==ncoord)break;
           }
-        }
-        else
-        {
-          unsigned short num=3;
+          break;
+        case 0x02:
           for(i=0;i<ncolor;i++)
           {
             for(j=0;j<4;j++)
@@ -724,6 +729,41 @@ void load_skin(char const * fname)              // Извращенец... Такое создать..
               COLOR[i][j]=data[num++];
             }
           }
+          break;
+        case 0x03:
+          CurrentPL=data[3];
+          CurrentTrack[CurrentPL]=data[4]*100+data[5];
+          PlayedPL=data[6];
+          PlayedTrack[PlayedPL]=data[7]*100+data[8];
+         // tm=data[9]*60+data[10];
+          SoundVolume=data[11];
+          playmode=data[12];
+          break;
+        case 0x04:
+          pp=malloc(256);
+          zeromem(pp,256);
+          i=3;
+          while(i<fsize)
+          {
+            if(data[i]!=0x0D&&data[i+1]!=0x0A) {pp[j++]=data[i];}
+            else
+            {
+             // fix(pp);
+              if(strlen(pp)>2)strcpy(Playlists[k],pp);
+              else zeromem(Playlists[k],256);
+              k++;
+              i++;
+              j=0;
+              zeromem(pp,256);
+            }
+            if(k==5)break;
+            i++;
+          }
+          mfree(pp);
+          break;
+        default:
+          if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Error_cfg_file]);
+          break;
         }
       }
       mfree(data);
@@ -732,7 +772,7 @@ void load_skin(char const * fname)              // Извращенец... Такое создать..
   }
   else
   {
-    if(SHOW_POPUP) ShowMSG(1,(int)"Can't find file!");
+    if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_No_cfg_file]);
   }
 }
 
@@ -847,6 +887,50 @@ void load_skin(char const* cfgname)              // Извращенец... Такое создать.
   }
 }
 */
+
+// Сохраняем координаты в skin.cfg AAA
+void save_sets(char const * fname, unsigned short rd)
+{
+  char *data;
+  unsigned int err;
+  int handle;
+  handle=fopen(fname,A_ReadWrite+A_Create+A_BIN,P_READ+P_WRITE,&err);  //+A_Create создать если нет||+A_BIN в двойчном коде||+A_Append дописать в конец||+A_Truncate хз
+  if(handle!=-1)
+  {
+    if(rd)
+    {
+      data=malloc(13);
+      if(data)
+      {
+        data[2]=0x03;
+        data[3]=CurrentPL;
+        data[4]=CurrentTrack[CurrentPL]/100;
+        data[5]=CurrentTrack[CurrentPL]%100;
+        data[6]=PlayedPL;
+        data[7]=PlayedTrack[PlayedPL]/100;
+        data[8]=PlayedTrack[PlayedPL]%100;
+        data[9]=tm/60;
+        data[10]=tm%60;
+        data[11]=SoundVolume;
+        data[12]=playmode;
+        
+        fwrite(handle,data,13,&err);
+      }
+      mfree(data);
+    }else{
+      char s[]={0x0D,0x0A};
+      char p[]={0x00,0x00,0x04};
+      fwrite(handle,p,3,&err);
+      for (unsigned int i=0;i<TCPL;i++)
+      {
+        if(Playlists[i])fwrite(handle,Playlists[i],strlen(Playlists[i]),&err);
+        fwrite(handle,s,2,&err);
+      }
+    }
+  }
+  fclose(handle,&err);
+}
+
 void SendNULL()   // Послать по окончании воспр.   AAA
 {
     if(FnameIPC)
@@ -886,6 +970,7 @@ void CheckDoubleRun(void)   // При открытии копии   AAA
   else
   {
     SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
+    ToDevelop();             // Чтобы не вызывался в фон при установленном патче на вызов SPlayer'a по горячей клавише   AAA
   }
 }
 
@@ -1414,6 +1499,14 @@ extern void kill_data(void *p, void (*func_p)(void *));
 // Всё ясно из названия ;) оставить как есть
 static void ElfKiller(void)      //Добавил static не знаю зачем, главное - работает! :)  AAA
 {
+  if(SAVE_SETS)
+  {
+    sprintf(sfname,"%s%s",SETS_PATH,"pls.cfg");
+    save_sets(sfname,0);
+    sprintf(sfname,"%s%s",SETS_PATH,"sets.cfg");
+    save_sets(sfname,1);
+    for(unsigned int i=0;i<TCPL;i++) mfree(Playlists[i]);
+  }
   GBS_DelTimer(&offtm);
   GBS_DelTimer(&mytmr);
   StopAllPlayback();
@@ -1722,8 +1815,6 @@ int main(char *exename, char *fname)
   lgpInitLangPack(); //Загрузка языка - Vedan
   SUBPROC((void*)LoadKeys);
  // SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
-  playmode = PlayMode;
-  SoundVolume = soundvolume;
   ShowNamesNoConst=SHOW_NAMES;
   
   wl.wfilename=AllocWS(128);
@@ -1732,7 +1823,24 @@ int main(char *exename, char *fname)
   {
     LoadingPlaylist(fname);
   }
-  
+  if(SAVE_SETS)
+  {
+    for(unsigned int i=0;i<TCPL;i++) Playlists[i]=malloc(256);
+    sprintf(sfname,"%s%s",SETS_PATH,"pls.cfg");
+    load_skin(sfname);
+    for(unsigned int i=0;i<TCPL;i++)
+    {
+      CurrentPL=i;
+      if(Playlists[i])LoadingPlaylist(Playlists[i]);
+    }
+    CurrentPL=0;
+    sprintf(sfname,"%s%s",SETS_PATH,"sets.cfg");
+    load_skin(sfname);
+    
+  }else{
+    
+  playmode = PlayMode;
+  SoundVolume = soundvolume;
   if(TC[CurrentPL]==0){ // если плейлист из параметра пустой или нет параметров-> грузим стандарт
     if (DEFAULT_PLAYLIST!="")
     {
@@ -1743,6 +1851,7 @@ int main(char *exename, char *fname)
       LoadingPlaylist(DEFAULT_PLAYLIST2);
       CurrentPL=0;
     }
+  }
   }
   UpdateCSMname(NULL);
   LockSched();

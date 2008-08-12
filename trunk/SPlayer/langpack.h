@@ -47,6 +47,9 @@ enum LGP_ID
   LGP_Error_2,
   LGP_Spkeys_er,
   LGP_PNG_er,
+  LGP_eoPL,
+  LGP_Error_cfg_file,
+  LGP_No_cfg_file,
   
   LGP_LangCode, // Пусть всегда будет в конце
   
