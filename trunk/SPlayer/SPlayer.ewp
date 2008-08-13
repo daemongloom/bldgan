@@ -138,6 +138,7 @@
         <option>
           <name>CCDefines</name>
           <state>NEWSGOLD</state>
+          <state>OBS</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
