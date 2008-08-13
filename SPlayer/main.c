@@ -559,24 +559,21 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       wstrcpybypos(ext,fname,pos+1,len-pos);
       uid=GetExtUid_ws(ext); 
       FreeWS(ext);
- // Log(0,"адын");
       gObj=Obs_CreateObject(uid,0x34,2,MSG_Report,1,0,&err);
- // Log(0,"дыва");
       err=Obs_SetInput_File(gObj,0,fname);
-      if (err)  goto exit1;  
-  //    Obs_Mam_SetPurpose(gObj,0x16);
-      Obs_Prepare(gObj);
-      Obs_Start(gObj);
- // Log(0,"тыри");
-      EXT_REDRAW();
-      Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
-#ifdef NEWSGOLD
-      GetPlayObjDuration((void*)gObj, &ln);
-      ln/=1000;
+      if (err)  goto exit1;
+#ifdef ELKA
+      Obs_Mam_SetPurpose(gObj,0x16);
+#else
+      Obs_SetPurpose(gObj,0x16);
 #endif
+      Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
+      Obs_Prepare(gObj);
+      
   goto exit0;
  
 exit1:
+  ShowMSG(1,(int)"ЫЫЫЫ");
   Obs_DestroyObject(gObj);
   gObj=NULL;
 exit0:
@@ -1603,6 +1600,66 @@ void maincsm_onclose(CSM_RAM *csm)
   SUBPROC((void *)ElfKiller);
 }
 
+#ifdef OBS
+int obError(HObj hobj,int error){
+  Obs_DestroyObject(hobj);
+  return 0;
+};
+
+int obPrep(HObj hobj,int error){
+  Obs_Start(hobj);
+  EXT_REDRAW();
+#ifdef NEWSGOLD
+  GetPlayObjDuration((void*)hobj, &ln);
+  ln/=1000;
+#endif
+    /*
+int   err=Obs_GetInfo(hobj,0);    
+    */
+  return 0;
+};
+
+/*
+int obInfo(HObj hobj,int error){
+
+  return 0;
+};
+*/
+/*
+int obResumeCon(HObj hobj,int error){
+  return 0;
+};*/
+/*
+int obParam (HObj hobj,int pl, int error){
+      if (pl==2)obFrameUpd(hobj);
+      if (pl==1)Obs_Resume(hobj);
+  return 0;
+};
+*/
+/*
+int pint=0;
+int obPause (HObj hobj,int pl, int error){
+      if (pint==1){
+        int r;
+          GetPlayObjPosition((void*)gObj,&r);
+          Obs_SetPosition(gObj,r);
+          pint--;
+      }
+  return 0;
+};*/
+
+OBSevent ObsEventsHandlers[]={
+ // OBS_EV_FrameUpdate,(void*)obFrameUpd,
+  OBS_EV_Error,(void*)obError,
+  //OBS_EV_GetInfoCon,(void*)obInfo,
+ // OBS_EV_PauseCon,(void*)obPause,
+ // OBS_EV_ParamChanged, (void*)obParam,
+//  OBS_EV_ResumeCon,(void*)obResumeCon,
+  OBS_EV_PrepareCon,(void*)obPrep,
+  OBS_EV_EndList,NULL
+};
+#endif
+
 // Обработчик событий главного CSM
 int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
 {
@@ -1773,6 +1830,16 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
 //        GetAccessoryType();
 //      }
     }
+  }
+#else
+  if (msg->msg==MSG_Report)
+  {
+//    void *msg_internal;
+//    GBS_MsgConv ((int)&msg_internal,msg);
+//    Obs_TranslateMessage((int)&msg_internal,ObsEventsHandlers);
+//    GBS_ConvKill((int)&msg_internal);
+    Obs_TranslateMessageGBS(msg,ObsEventsHandlers);
+   // return 0;
   }
 #endif
   return(1);
