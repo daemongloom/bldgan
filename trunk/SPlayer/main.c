@@ -1,5 +1,8 @@
-#include "include.h"
+#include "../inc/swilib.h"
+#include "../inc/cfg_items.h"
+#include "../inc/stdbool.h"
 #include "../inc/playsound.h"
+#include "../inc/obs.h"
 #include "conf_loader.h"
 #include "main.h"
 #include "mainmenu.h"
@@ -162,6 +165,9 @@ extern WSHDR *playlist_lines[TCPL][512];
 char *Playlists[TCPL];
 extern short phandle;  // Для определения конца воспр.  AAA
 void* pha;               // Для Obs   AAA
+#ifdef OBS
+HObj gObj=NULL;
+#endif
 extern unsigned short PlayingStatus;
 extern int CurrentPL;
 extern int PlayedPL;
@@ -192,8 +198,9 @@ GBSTMR lvtm;      // Длительность/громкость правим   AAA         удаляется после
 TWavLen wl;
 GBSTMR mytmr;
 // Сделал иначе   AAA
-int tm=0;  // Время
-int ln=0;  // Длительность
+int tm=0;    // Время
+int ln=0;    // Длительность
+bool tm_er=0;// Случился посторонний звук или нет
 
 //--- Переменные ---
 
@@ -461,8 +468,8 @@ unsigned short sttmr=0;  // Почему-то неверно начинал счет   AAA
 void EXT_REDRAW()
 {
   if(IsGuiOnTop(MAINGUI_ID)) REDRAW();
- /* GetPlayObjPosition((( int**)pha)[0x3d0/4], &tm);   // Лагает   AAA
-  tm/=1000;*/
+ // GetPlayObjPosition((void*)gObj,&tm);   // Лагает   AAA
+ // tm/=1000;
   if(tm||sttmr) {tm++;}
   else {sttmr=1;}
   GBS_StartTimerProc(&mytmr,216,EXT_REDRAW);
@@ -514,7 +521,6 @@ void SetDV()
 }*/
 #ifdef OBS
 #define MSG_Report  0xB034
-HObj gObj=NULL;
 void KillObj(){
  if (!gObj) return;
   Obs_DestroyObject(gObj);
@@ -562,18 +568,24 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       gObj=Obs_CreateObject(uid,0x34,2,MSG_Report,1,0,&err);
       err=Obs_SetInput_File(gObj,0,fname);
       if (err)  goto exit1;
-#ifdef ELKA
-      Obs_Mam_SetPurpose(gObj,0x16);
-#else
+#ifdef NEWSGOLD
+#ifndef ELKA
       Obs_SetPurpose(gObj,0x16);
+#else
+      Obs_Mam_SetPurpose(gObj,0x16);
+#endif
+#else
+      Obs_Mam_SetPurpose(gObj,0x16);
 #endif
       Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
       Obs_Prepare(gObj);
+     // Obs_Start(gObj);
+     // EXT_REDRAW();
       
   goto exit0;
  
 exit1:
-  ShowMSG(1,(int)"ЫЫЫЫ");
+ // ShowMSG(1,(int)"ЫЫЫЫ");
   Obs_DestroyObject(gObj);
   gObj=NULL;
 exit0:
@@ -1601,6 +1613,11 @@ void maincsm_onclose(CSM_RAM *csm)
 }
 
 #ifdef OBS
+int obFrameUpd(HObj hobj,int error){
+  
+  return 0;
+}
+
 int obError(HObj hobj,int error){
   Obs_DestroyObject(hobj);
   return 0;
@@ -1609,15 +1626,19 @@ int obError(HObj hobj,int error){
 int obPrep(HObj hobj,int error){
   Obs_Start(hobj);
   EXT_REDRAW();
-#ifdef NEWSGOLD
   GetPlayObjDuration((void*)hobj, &ln);
   ln/=1000;
-#endif
-    /*
-int   err=Obs_GetInfo(hobj,0);    
-    */
+ //Obs_GetInfo(hobj,0);    
   return 0;
 };
+
+int obDestroy(HObj hobj,int err)
+{
+  
+ // if (flag_nextsong)CallSomeToPlayNextSong();
+ // else ; //nothing when stop
+  return 0;
+}
 
 /*
 int obInfo(HObj hobj,int error){
@@ -1625,37 +1646,89 @@ int obInfo(HObj hobj,int error){
   return 0;
 };
 */
-/*
+
 int obResumeCon(HObj hobj,int error){
   return 0;
-};*/
-/*
+};
+
 int obParam (HObj hobj,int pl, int error){
-      if (pl==2)obFrameUpd(hobj);
-      if (pl==1)Obs_Resume(hobj);
+    //  if (pl==2)obFrameUpd(hobj);
+    //  if (pl==1)Obs_Resume(hobj);
   return 0;
 };
-*/
-/*
-int pint=0;
+
+int obSetPause(HObj hobj,int err)
+{
+  // Имитируем паузу
+  StopTMR(0);
+  PlayingStatus = 1;
+  // Ловим время
+  GetPlayObjPosition((void*)hobj,&tm);
+  tm/=1000;
+  tm_er=1;
+  return 0;
+}
+
+int obSetStop(HObj hobj,int err)
+{
+  return 0;
+}
+
+int obNext(HObj hobj,int err)
+{
+  switch(playmode)
+        {
+          case 0:
+            NextTrackX();         //Тупо, не спорю, если придумаете лучше...  AAA
+            break;
+          case 1:
+            NextTrack();
+            break;
+          case 2:
+            RandTrack();
+            break;
+          case 3:
+            RepeatTrack();
+            break;
+        }
+        REDRAW();
+  return 0;
+}
+
+//int pint=0;
 int obPause (HObj hobj,int pl, int error){
-      if (pint==1){
+  
+    /*  if (pint==1){
         int r;
           GetPlayObjPosition((void*)gObj,&r);
           Obs_SetPosition(gObj,r);
           pint--;
-      }
+      }*/
   return 0;
+};
+/*
+OBSevent ObsEventsHandlers[]={
+  OBS_EV_FrameUpdate,(void*)obFrameUpd,
+  OBS_EV_Error,(void*)obError,
+  OBS_EV_PauseCon,(void*)obPause,
+  OBS_EV_ParamChanged,(void*)obParam,
+  OBS_EV_PrepareCon,(void*)obPrep,
+  OBS_EV_destroy,(void*)obDestroy,
+  OBS_EV_EndList,NULL
 };*/
 
 OBSevent ObsEventsHandlers[]={
- // OBS_EV_FrameUpdate,(void*)obFrameUpd,
+  OBS_EV_FrameUpdate,(void*)obFrameUpd,
   OBS_EV_Error,(void*)obError,
   //OBS_EV_GetInfoCon,(void*)obInfo,
- // OBS_EV_PauseCon,(void*)obPause,
- // OBS_EV_ParamChanged, (void*)obParam,
-//  OBS_EV_ResumeCon,(void*)obResumeCon,
+  OBS_EV_PauseCon,(void*)obPause,
+  OBS_EV_ParamChanged,(void*)obParam,
+  OBS_EV_ResumeCon,(void*)obResumeCon,
+  OBS_EV_PauseInd,(void*)obSetPause,
+  OBS_EV_StopInd,(void*)obSetStop,
+  OBS_EV_LoopUpdate,(void*)obNext,
   OBS_EV_PrepareCon,(void*)obPrep,
+  OBS_EV_ConvDestroyed,(void*)obDestroy,
   OBS_EV_EndList,NULL
 };
 #endif
@@ -1728,7 +1801,7 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
 	  void *canvasdata=((void **)idata)[DISPLACE_OF_IDLECANVAS/4];
 #endif
 
-#ifndef NO_PNG          
+#ifndef NO_PNG     
         switch(GetPlayingStatus())
 	{
         case 0:
@@ -1834,13 +1907,19 @@ int maincsm_onmessage(CSM_RAM *data, GBS_MSG *msg)
 #else
   if (msg->msg==MSG_Report)
   {
+   // char *s=(char*)malloc(100);
+   // sprintf(s,"myrep %08X %08X %08X\r\n",msg->submess,msg->data0,msg->data1);
+   // SUBPROC((void *)Log,0,s);
 //    void *msg_internal;
 //    GBS_MsgConv ((int)&msg_internal,msg);
 //    Obs_TranslateMessage((int)&msg_internal,ObsEventsHandlers);
 //    GBS_ConvKill((int)&msg_internal);
     Obs_TranslateMessageGBS(msg,ObsEventsHandlers);
-   // return 0;
+    //очень важно чтоб далее шел выход из функции, по краине мере не было обращений к msg так как оно очищается
+    return 0;
   }
+  //if (key==stop){obs_destroyobj() flag_nextsong=false}
+  //if (key==next){obs_destroyobj(); flag_nextsong=true}
 #endif
   return(1);
 }

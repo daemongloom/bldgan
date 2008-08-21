@@ -1,4 +1,6 @@
-#include "include.h"
+#include "../inc/swilib.h"
+#include "../inc/cfg_items.h"
+#include "../inc/stdbool.h"
 #include "main.h"
 #include "playlist.h"
 #include "mylib.h" 
@@ -76,9 +78,10 @@ extern const unsigned int InfoOn;     // 1,если включен показ информации   Vedan
 extern const unsigned int SHOW_POPUP; // 1,если включены попапы   AAA
 extern const unsigned int ALLTRACK;   // 1,если включено отображение всех треков    AAA
 extern const unsigned int SAVE_SETS;  // 1,если включено сохранение настроек   AAA
-unsigned short stop=1; // 1, если останавливаем листание   AAA
+unsigned short stop=1;                // 1, если останавливаем листание   AAA
 extern unsigned short Stat_keypressed;
 unsigned short FM_o=0;
+extern bool tm_er;                    // Случился посторонний звук или нет   AAA
 short ModeRew;  // Режим перемотки (-1 - назад, +1 - вперед)
 short ModeMove;
 short SpeedMove;
@@ -171,19 +174,24 @@ void ToggleVolume()
 void VolumeUp()
 {
 #ifdef NEWSGOLD
+
   if(SoundVolume<15)SoundVolume++;
 #ifndef OBS
   if(phandle!=-1)Obs_Sound_SetVolumeEx((( int*)pha)[0x3d0/4], SoundVolume, 1);
 #else
   Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #endif
+
 #else
-  if(SoundVolume<14)SoundVolume++;
+
 #ifndef OBS
+  if(SoundVolume<14)SoundVolume++;
   if(phandle!=-1)PlayMelody_ChangeVolume(phandle,SoundVolume);
 #else
+  if(SoundVolume<15)SoundVolume++;
   Obs_Sound_SetVolumeEx(gObj, SoundVolume, 1);
 #endif
+
 #endif
   REDRAW();
 }
@@ -377,6 +385,7 @@ void StopRewind()       // Остановка перемотки :)
     PlayMelody_SetPosition(phandle, mlsc);
 #else
     Obs_SetPosition (gObj, mlsc);
+    Obs_Resume (gObj);
 #endif
     PlayingStatus = 2;
     EXT_REDRAW();
@@ -385,7 +394,7 @@ void StopRewind()       // Остановка перемотки :)
   }
 }
 
-// Слегка подправил
+// Слегка подправил   AAA
 void DoRewinded()
 {
   DisableScroll();
@@ -415,20 +424,15 @@ void StartRewind()
   case 1:
     // Если пауза - перематываем :) ...
 #ifndef OBS
-    if (phandle!=-1)
-    {
+    if (phandle!=-1)return;
 #endif
       IsRewind=1;
       DoRewinded();
-#ifndef OBS
-    }
-#endif
     break;
   case 2:
     // Если играет, ставим паузу и перематываем !! :)
 #ifndef OBS
-    if (phandle!=-1)
-    {
+    if (phandle!=-1)return;
 #endif
       IsRewind=1;
 #ifndef OBS
@@ -439,9 +443,6 @@ void StartRewind()
       StopTMR(0);
      // PlayingStatus = 1;
       DoRewinded();
-#ifndef OBS
-    }
-#endif
     break;
   }
 }
@@ -460,33 +461,36 @@ void TogglePlayback()
     break;
   case 1:
     // Если пауза - продолжаем воспроизведение...
-#ifndef OBS
-    if (phandle!=-1)
+    if(tm_er)
     {
+      tm_er=0;
+      /*Obs_Stop(gObj);
+      Obs_Start(gObj);
+      Obs_Pause(gObj);*/
+#ifdef OBS
+      Obs_SetPosition (gObj, tm);
+#endif
+     // Obs_Resume (gObj);
+    }
+#ifndef OBS
+      if (phandle==-1)return;
       PlayMelody_ResumePlayBack(phandle);
 #else
       Obs_Resume (gObj);
 #endif
       EXT_REDRAW();
       PlayingStatus = 2;
-#ifndef OBS
-    }
-#endif
     break;
   case 2:
     // Если играет - ставим паузу...
 #ifndef OBS
-    if (phandle!=-1)
-    {
+    if (phandle==-1)return;
       PlayMelody_PausePlayback(phandle);
 #else
       Obs_Pause (gObj);
 #endif
       StopTMR(0);
       PlayingStatus = 1;
-#ifndef OBS
-    }
-#endif
     break;
   }
 }
@@ -499,15 +503,12 @@ void StopAllPlayback()
   Stat_keypressed = 1;
   if(PlayingStatus==0)return;
 #ifndef OBS
-  if (phandle!=-1){
+  if (phandle!=-1)return;
     PlayMelody_StopPlayback(phandle);
 #else
     Obs_Stop (gObj);
 #endif
     PlayingStatus = 0;
-#ifndef OBS
-  }
-#endif
 }
 
 // Постановка в очередь   AAA
@@ -1498,7 +1499,11 @@ void LoadingPlaylist(const char * fn)
   CTtoFirst();
   PTtoFirst();
   CleanPlaylist();
-  LoadPlaylist(fn);
+  
+  unsigned int err;
+  if(isdir(fn,&err)) {void LoadDaemonList(const char* path, unsigned short re, unsigned short toPL); LoadDaemonList(fn, 1, 1);}
+  else LoadPlaylist(fn);
+  
   if(SAVE_SETS)strcpy(Playlists[CurrentPL],fn);
   ready[CurrentPL]=1;
 }

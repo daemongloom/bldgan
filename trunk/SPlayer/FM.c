@@ -175,7 +175,7 @@ void LoadDaemonList(const char* path, unsigned short re, unsigned short toPL) //
           strcat(p1,"\\");
           fix(p1);
           utf8_2ws(p,p1,256);
-          PastFile(p, 0);
+          if(toPL==0)PastFile(p, 0);
         }
       }
       FreeWS(p);
