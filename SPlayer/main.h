@@ -49,29 +49,6 @@ typedef struct
   void *next;
 }PLIST;
 
-#ifdef OBS
-#ifdef NEWSGOLD
-#define OBS_EV_NO_MSG 0x00
-#define OBS_EV_GetInfoCon 0x01
-#define OBS_EV_ConvDestroyed 0x05
-#define OBS_EV_ParamChanged 0x06
-#define OBS_EV_StatusChanged 0x08
-#define OBS_EV_StatusUpdated 0x09
-#define OBS_EV_FrameUpdate 0x0A
-#define OBS_EV_LoopUpdate 0x0B
-#define OBS_EV_Error 0x0C
-#define OBS_EV_StopInd 0x13
-#define OBS_EV_PauseInd 0x14
-#define OBS_EV_ResumeInd 0x15
-#define OBS_EV_StopCon 0x16
-#define OBS_EV_PauseCon 0x17
-#define OBS_EV_ResumeCon 0x18
-#define OBS_EV_PrepareCon 0x35
-#define OBS_EV_GetCapabilityCon 0x37
-#define OBS_EV_EndList 0x66
-#endif 
-#endif
-
 typedef struct
 {
  // char full_name[256]; // ѕуть к файлу   AAA

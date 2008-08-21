@@ -963,6 +963,7 @@
           <name>CCDefines</name>
           <state>NEWSGOLD</state>
           <state>ELKA</state>
+          <state>OBS</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -1786,6 +1787,7 @@
         <option>
           <name>CCDefines</name>
           <state>X75</state>
+          <state>OBS</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -6318,9 +6320,6 @@
   </file>
   <file>
     <name>$PROJ_DIR$\ID3Tags.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\include.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\item_info.c</name>
