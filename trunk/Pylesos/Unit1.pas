@@ -106,6 +106,7 @@ type
     SpeedButton8: TSpeedButton;
     SpeedButton10: TSpeedButton;
     Button2: TButton;
+    N38: TMenuItem;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -161,6 +162,7 @@ type
     procedure RadioButton2Click(Sender: TObject);
     procedure AutoModeClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure N38Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -1600,6 +1602,11 @@ begin
       for j:=1 to fsize_h do
          if (field[i,j].ElemT-Offset)>=0 then Inc(DCount);
    Button2.Caption := IntToStr(DCount);      
+end;
+
+procedure TForm1.N38Click(Sender: TObject);
+begin
+   ShellExecute(0,nil,'license.txt',nil,nil,0);
 end;
 
 end.
