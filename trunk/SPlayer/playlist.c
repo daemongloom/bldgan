@@ -5,16 +5,17 @@
 #include "playlist.h"
 #include "mylib.h" 
 #include "langpack.h"
+#include "FM.h"
 
 WSHDR *playlist_lines[TCPL][TClines];  // Массив указателей на имена файлов в пл   Mr. Anderstand: Воплотим мечту в жизнь!
 extern char *Playlists[TCPL];
 
 // Из конфига
-extern const int SHOW_NAMES;
+extern const unsigned int SHOW_NAMES;
 extern const char PLAYLISTS[];
 extern const char PIC_DIR[];                // Для курсора AAA
-extern const int EXT;                       // Расширение по умолчанию
-extern const int soundvolume;               // Громкость
+extern const unsigned int EXT;              // Расширение по умолчанию
+extern const unsigned int soundvolume;      // Громкость
 extern const unsigned int SizeOfFont;       // Шрифт AAA
 extern const unsigned int SCROLL_MULT;      // Скорость листания   перенес в конфиг  AAA
 extern const unsigned int STEP_SCROLL_MULT; // Шаг быстрого листания   AAA
@@ -28,21 +29,22 @@ unsigned short SoundVolume;           // Громкость
 unsigned short SVforToggle = 0;       // Прежняя громкость
 unsigned short PlayingStatus = 0;     // Статус плеера (0 - стоп, 1 - пауза, 2 - играем)   // Было char стало unsigned short! :D   AAA
 short phandle = -1;                   // Что играем
-extern void* pha;
+
 #ifdef OBS
 extern HObj gObj;
+#else
+extern void* pha;
 #endif
 
 int CurrentTrack[TCPL];                 // Текущий трек
 int PlayedTrack[TCPL];                  // Проигрываемый трек   AAA
-int CurrentPL=0;                     // Текущий пл   AAA
-int PlayedPL=0;                      // Пл воспроизведения   AAA
+int CurrentPL=0;                        // Текущий пл   AAA
+int PlayedPL=0;                         // Пл воспроизведения   AAA
 unsigned int TC[TCPL];                  // Количество треков в пл 
-unsigned int ready[TCPL];
+bool ready[TCPL];
 extern const unsigned int LinesInPL_C; // Количество треков (макс)
-unsigned int LinesInPL;
-int PlayTime;
-unsigned short NextPlayedTrack[2];   // № трека и пл в очереди
+//unsigned int LinesInPL;
+unsigned short NextPlayedTrack[2];     // № трека и пл в очереди
 unsigned short ShowNamesNoConst;       // В константе не получается изменять   AAA
 extern const char p_3s[];
 
@@ -71,17 +73,17 @@ unsigned short BRC_w;  //=2;
 */
 // Всякие "мелкие" переменные
 extern unsigned int playmode;
-extern unsigned short copy;
+extern bool copy;
 extern const unsigned int GrafOn;     // 1,если включены эффекты типа скролла   AAA
 extern const unsigned int GrafOn1;    // 1,если включена анимация   AAA
 extern const unsigned int InfoOn;     // 1,если включен показ информации   Vedan
 extern const unsigned int SHOW_POPUP; // 1,если включены попапы   AAA
 extern const unsigned int ALLTRACK;   // 1,если включено отображение всех треков    AAA
 extern const unsigned int SAVE_SETS;  // 1,если включено сохранение настроек   AAA
-unsigned short stop=1;                // 1, если останавливаем листание   AAA
+bool stop=1;                          // 1,если останавливаем листание   AAA
 extern unsigned short Stat_keypressed;
-unsigned short FM_o=0;
-extern bool tm_er;                    // Случился посторонний звук или нет   AAA
+bool FM_o=0;
+extern bool tm_er;                    // 1,если случился посторонний звук или нет   AAA
 short ModeRew;  // Режим перемотки (-1 - назад, +1 - вперед)
 short ModeMove;
 short SpeedMove;
@@ -529,7 +531,7 @@ void PlaySetTrack()
   NextPlayedTrack[1]=NULL;
 }
 
-unsigned short s=0, op=0;
+volatile unsigned short s=0, op=0;
 // Сходим с ума по гламуру :)   AAA
 void Disable_OpenAnim(void)
 {
@@ -615,7 +617,7 @@ void PTtoFirst()
 // Фторопях, неидеально, с небольшими недочетами   AAA
 short p, p1, p3;
 short n, d, v, v1, v2;
-unsigned short i;
+volatile unsigned short i;
 void Disable_PL(void)
 {
     p1=0;
@@ -1074,11 +1076,18 @@ void MoveLineLeft()
 // Возвращает имя файла по полному пути...
 void FullpathToFilename(WSHDR * fnamews, WSHDR * wsFName)
 {
- // char* fname=malloc(256);
- // ws_2str(fnamews,fname,256);
+      int len=wstrlen(fnamews);                     // Сделал так. Старая версия пусть тоже живет как пример   AAA
+      short pos=wstrrchr(fnamews,len,'\\'); 
+      short pos2=wstrrchr(fnamews,len,'.'); 
+      wstrcpybypos(wsFName,fnamews,pos+1,pos2-pos-1);
+/*
   char *fname = malloc(wstrlen(fnamews) * 2 + 1);
   int len;
   ws_2utf8(fnamews, fname, &len, wstrlen(fnamews) * 2 + 1);
+  const char *p=strrchr(fname,'\\')+1;
+  int length=strrchr(fname,'.')-strrchr(fname,'\\')-1;
+  utf8_2ws(wsFName,p,length);
+  mfree(fname);*/
 
      /* const char *p=strrchr(fname,0x1f)+1;
       const char *p2=strrchr(fname,'\\')+1;                         // Фикс для убирания этого странного символа... Теперь русский стал нормально
@@ -1089,13 +1098,9 @@ void FullpathToFilename(WSHDR * fnamews, WSHDR * wsFName)
          int length=strrchr(fname,'.')-strrchr(fname,'\\')-2;
          utf8_2ws(wsFName,p,length);
        }*/
-  const char *p=strrchr(fname,'\\')+1;
-  int length=strrchr(fname,'.')-strrchr(fname,'\\')-1;
-  utf8_2ws(wsFName,p,length);
-  mfree(fname);
 }
 
-// Возвращает имя файла по полному пути...        Теперь быстрее работает. Снова переделал   AAA
+// Возвращает имя файла с расширением. // Теперь быстрее работает. // Снова переделал   AAA
 void FullpathToFile(WSHDR * fnamews, WSHDR * wsFName)
 {
   char *fname = malloc(wstrlen(fnamews) * 2 + 1);
@@ -1140,6 +1145,35 @@ WSHDR * GetTrackByNumber(WSHDR**mass, int number)
 {
   return mass[number];
 }
+/*
+GBSTMR sctm;
+WSHDR* wsfile=NULL;
+short tggl=1;
+short pos=0;
+short wait=0;
+
+void DrwName()
+{
+	if (wsfile && IsGuiOnTop(MAINGUI_ID))
+	{
+          if(!wait)
+          {
+            int len=wstrlen(wsfile);                     // Сделал так. Старая версия пусть тоже живет как пример   AAA
+           // short pos2=wstrrchr(fnamews,len,'.');
+            pos+=tggl;
+            if(pos==len-10||pos==0) {tggl*=-1; wait=10;}
+          }else{
+            wait--;
+          }
+            WSHDR* txt = AllocWS(256);
+            wstrcpybypos(txt,wsfile,pos+1,pos+10);//pos2-pos-1);
+           //  wstrcpybypos(txt,scfile,pos+1,pos2-pos-1);
+            DrawRoundedFrame(2,70,100,70+GetFontYSIZE(SizeOfFont),0,0,1,0,GetPaletteAdrByColorIndex(1));
+	    DrawString(txt,2,70,100,70+GetFontYSIZE(SizeOfFont),SizeOfFont,0,COLOR[0],0);
+	    FreeWS(txt);
+	}
+	GBS_StartTimerProc(&sctm,15,DrwName);
+}*/
 
 // Нет функциям океренной величины!!   AAA
 void PL_Redraw(WSHDR** mass, int* CurLine, int* MarkLine, int* MarkLines, unsigned int* AllLines, int CurList, int MarkList)
@@ -1383,7 +1417,13 @@ char chanel[8],
 	  }
         }
       DrawScrollString(out_ws,my_x+PL_move_L[l],my_y+c-(p1*v2+p3*v1)*v3*v,/*my_x+125*/w-7,my_y+GetFontYSIZE(SizeOfFont)+c-(p1*v2+p3*v1)*v3*v,
-                   scroll_disp+1,SizeOfFont,0,COLOR[0],0);
+                  scroll_disp+1,SizeOfFont,0,COLOR[0],0);
+      
+    /*  wstrcpy(wsfile,out_ws);
+      tggl=1;
+      pos=0;
+      GBS_StartTimerProc(&sctm,20,DrwName);
+      */
     }
       if(s){
         if(s>1) {c+=interval;}
@@ -1536,11 +1576,7 @@ void LoadPlaylists(const char* path) // Для еще одной фичи   AAA
       
       if (!isdir(name, &err))//(de.file_attr&FA_DIRECTORY)
       {
-        int a=de.file_name[strlen(de.file_name)-3];
-        int b=de.file_name[strlen(de.file_name)-2];
-        int c=de.file_name[strlen(de.file_name)-1];
-        if(((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))||
-               ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U')))   // Перерываем форматы   AAA
+        if(IsExt(1, de.file_name))  // Перерываем форматы   AAA
         {
           strcpy(p1,name);
           fix(p1);
@@ -1583,5 +1619,6 @@ void MemoryFree()
   GBS_DelTimer(&tmr_cursor_move);
   GBS_DelTimer(&tmr_pl_move);
   GBS_DelTimer(&tmr_opan);
+ // FreeWS(wsfile);
   FreePlaylist();
 }

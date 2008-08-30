@@ -73,7 +73,7 @@
 #define LG_Show_info             "Показывать информацию"
 #define LG_Show_Popup            "Показывать попапы"
 #define LG_Save_Sets             "Сохранять настройки"
-#define LG_Show_One_Track        "Показывать 1 трек"
+#define LG_Show_All_Track        "Показывать все треки(не один)"
 #define LG_Playmode              "Режим воспр."
 #define LG_Play_all              "Воспр. все"
 #define LG_Repeat_all            "Повторить все"
@@ -107,6 +107,11 @@
 #define LG_Already_Started       "Уже запущен!"
 #define LG_Error_1               "Ошибка 1"
 #define LG_Error_2               "Ошибка 2: Неверно назначена клавиша!"
+#define LP_Spkeys_er             "Ошибка spkeys!"
+#define LGP_PNG_er               " png-файлов отсутствует. Это может замедлить работу!"
+#define LGP_eoPL                 "Плейлист переполнен!"
+#define LGP_Error_cfg_file       "Ошибка cfg-файла!"
+#define LGP_No_cfg_file          "Отсутствует cfg-файл!"
 */
 #endif //RU
 

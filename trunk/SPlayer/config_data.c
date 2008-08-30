@@ -20,60 +20,53 @@ __root const CFG_HDR cfghdr03={CFG_COORDINATES,LG_Idle_coordinates,0,0};
 __root const unsigned int IDLE_X = 5;
 __root const unsigned int IDLE_Y = 120;
 
-__root const CFG_HDR cfghdr04 = {CFG_INT,LG_Auto_Exit_Min,0,2000};
+__root const CFG_HDR cfghdr04 = {CFG_UINT,LG_Auto_Exit_Min,0,2000};
 __root const unsigned int AUTO_EXIT_MIN=0;
 
 //Level 1
 __root const CFG_HDR cfghdr_m11={CFG_LEVEL,LG_Sets,1,0};
 
 __root const CFG_HDR cfghdr12={CFG_CBOX,LG_Show_full_names,0,3};
-__root const int SHOW_NAMES = 2;
+__root const unsigned int SHOW_NAMES = 2;
 __root const CFG_CBOX_ITEM cfgcbox1[3]={"Tags(don't work)","Full","Name"};
 
-__root const CFG_HDR cfghdr13={CFG_CBOX,LG_Show_effects,0,2};
+__root const CFG_HDR cfghdr13={CFG_CHECKBOX,LG_Show_effects,0,2};
 __root const unsigned int GrafOn = 1;
-__root const CFG_CBOX_ITEM cfgcbox2[2]={LG_No,LG_Yes};
 
-__root const CFG_HDR cfghdr14={CFG_CBOX,LG_Show_Anim,0,2};
+__root const CFG_HDR cfghdr14={CFG_CHECKBOX,LG_Show_Anim,0,2};
 __root const unsigned int GrafOn1 = 1;
-__root const CFG_CBOX_ITEM cfgcbox7[2]={LG_No,LG_Yes};
 
-__root const CFG_HDR cfghdr15={CFG_CBOX,LG_Show_info,0,2};  //Показывать информацию или нет - Vedan
+__root const CFG_HDR cfghdr15={CFG_CHECKBOX,LG_Show_info,0,2};  //Показывать информацию или нет - Vedan
 #ifdef X75
 __root const unsigned int InfoOn = 0;
 #else
 __root const unsigned int InfoOn = 1;
 #endif
-__root const CFG_CBOX_ITEM cfgcbox2_0[2]={LG_No,LG_Yes};
 
-__root const CFG_HDR cfghdr16={CFG_CBOX,LG_Show_Popup,0,2};  //Показывать попапы   AAA
+__root const CFG_HDR cfghdr16={CFG_CHECKBOX,LG_Show_Popup,0,2};  //Показывать попапы   AAA
 __root const unsigned int SHOW_POPUP = 1;
-__root const CFG_CBOX_ITEM cfgcbox2_1[2]={LG_No,LG_Yes};
 
-__root const CFG_HDR cfghdr16_0={CFG_CBOX,LG_Save_Sets,0,2};  //Сохранять настройки   AAA
+__root const CFG_HDR cfghdr16_0={CFG_CHECKBOX,LG_Save_Sets,0,2};  //Сохранять настройки   AAA
 __root const unsigned int SAVE_SETS = 1;
-__root const CFG_CBOX_ITEM cfgcbox2_3[2]={LG_No,LG_Yes};
 
-__root const CFG_HDR cfghdr16_1={CFG_CBOX,LG_Show_One_Track,0,2};  // Показывать все/один трек. Сделано хитрожописто,
+__root const CFG_HDR cfghdr16_1={CFG_CHECKBOX,LG_Show_All_Track,0,2};  // Показывать все/один трек. Сделано хитрожописто,
 __root const unsigned int ALLTRACK=1;                              // кто будет менять - подумайте!   AAA
-__root const CFG_CBOX_ITEM cfgcbox2_2[2]={LG_Yes,LG_No};
 
-__root const CFG_HDR cfghdr16_2={CFG_CBOX,LG_LoadKeys,0,2};
+__root const CFG_HDR cfghdr16_2={CFG_CHECKBOX,LG_LoadKeys,0,2};
 __root const unsigned int LOAD_KEYS = 1;
-__root const CFG_CBOX_ITEM cfgcbox6[2]={LG_No,LG_Yes};
 
 __root const CFG_HDR cfghdr17={CFG_CBOX,LG_Playmode,0,4};  // Временно убрал варинг Blind007
-__root const int PlayMode = 0;
+__root const unsigned int PlayMode = 0;
 __root const CFG_CBOX_ITEM cfgcbox3[4]={LG_Play_all,LG_Repeat_all,LG_Random,LG_Repeat_one};
 
 __root const CFG_HDR cfghdr18={CFG_CBOX,LG_Extension_of_playlist,0,2};
-__root const int EXT = 0;
+__root const unsigned int EXT = 0;
 __root const CFG_CBOX_ITEM cfgcbox4[2]={LG_spl,LG_m3u};
 
-__root const CFG_HDR cfghdr19={CFG_INT,LG_Default_volume,0,15};
-__root const int soundvolume=6;
+__root const CFG_HDR cfghdr19={CFG_UINT,LG_Default_volume,0,15};
+__root const unsigned int soundvolume=6;
 
-__root const CFG_HDR cfghdr20 = {CFG_INT,LG_Size_Of_Font,0,20};
+__root const CFG_HDR cfghdr20 = {CFG_UINT,LG_Size_Of_Font,0,20};
 #ifdef NEWSGOLD
 __root const unsigned int SizeOfFont = 11;
 #else
@@ -135,26 +128,26 @@ __root const CFG_HDR cfghdr_m30={CFG_LEVEL,"",0,0};
 // Level 3
 __root const CFG_HDR cfghdr_m31={CFG_LEVEL,LG_Set_Speed,1,0};
 
-__root const CFG_HDR cfghdr32 = {CFG_INT,LG_Speed_Moving,0,30};
+__root const CFG_HDR cfghdr32 = {CFG_UINT,LG_Speed_Moving,0,30};
 #ifdef NEWSGOLD
 __root const unsigned int SCROLL_MULT=2;
 #else
 __root const unsigned int SCROLL_MULT=10;
 #endif
 
-__root const CFG_HDR cfghdr33 = {CFG_INT,LG_Step_Moving,0,30};
+__root const CFG_HDR cfghdr33 = {CFG_UINT,LG_Step_Moving,0,30};
 __root const unsigned int STEP_SCROLL_MULT=1;
 
-__root const CFG_HDR cfghdr34 = {CFG_INT,LG_Speed_Rewind,0,60};
+__root const CFG_HDR cfghdr34 = {CFG_UINT,LG_Speed_Rewind,0,60};
 __root const unsigned int SPEED_REW=20;
 
-__root const CFG_HDR cfghdr35 = {CFG_INT,LG_Step_Rewind,0,60};
+__root const CFG_HDR cfghdr35 = {CFG_UINT,LG_Step_Rewind,0,60};
 __root const unsigned int STEP_REW=1;
 
-__root const CFG_HDR cfghdr36 = {CFG_INT,LG_Speed_Moving_PL,0,40};
+__root const CFG_HDR cfghdr36 = {CFG_UINT,LG_Speed_Moving_PL,0,40};
 __root const unsigned int SPEED_MOVE=10;
 
-__root const CFG_HDR cfghdr37 = {CFG_INT,LG_Speed_Open_Moving,0,40};
+__root const CFG_HDR cfghdr37 = {CFG_UINT,LG_Speed_Open_Moving,0,40};
 __root const unsigned int SPEED_OPEN_MOVE=10;
 
 __root const CFG_HDR cfghdr_m30={CFG_LEVEL,"",0,0};

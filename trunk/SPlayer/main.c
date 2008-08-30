@@ -65,20 +65,22 @@ const char ipc_control_name[]=IPC_CONTROL_NAME;
 const char ipc_editor_name[]=IPC_EDITOR_NAME;
 IPC_REQ gipc;
 
+WSHDR* SPerrs;
+
 extern short ModeRew;
 extern short ModeMove;
 extern short SpeedMove;
-extern unsigned short stop; // 1, если останавливаем листание   AAA
-unsigned short copy=0; // 1, если копируем   AAA
-unsigned short move=0; // 1, если перемещаем   AAA
-unsigned short EditPL=0; // 1, если редактируем   AAA
-unsigned short mode=0; // 1, если длинное нажатие боковой клавиши
-unsigned short KeyLock=0; // 1, если заблокирована;
+extern bool stop; // 1, если останавливаем листание   AAA
+bool copy=0; // 1, если копируем   AAA
+bool move=0; // 1, если перемещаем   AAA
+bool EditPL=0; // 1, если редактируем   AAA
+bool mode=0; // 1, если длинное нажатие боковой клавиши
+bool KeyLock=0; // 1, если заблокирована;
 unsigned short Stat_keypressed = 0; // нажата ли клавиша изменения статуса?
 unsigned short Mode_keypressed = 0; // нажата ли клавиша изменения режима проигрывания?
 unsigned short N_keypressed = 0;
 unsigned short P_keypressed = 0;
-unsigned short IPC_COPY=0;          // Открыли копию или нет?    AAA
+bool IPC_COPY=0;          // Открыли копию или нет?    AAA
 
 ///////////////////////////////////////////////////////////////////////////////
 unsigned short coord[ncoord];
@@ -150,9 +152,9 @@ extern const char DEFAULT_PLAYLIST1[];
 extern const char DEFAULT_PLAYLIST2[];
 extern const unsigned int IDLE_X;
 extern const unsigned int IDLE_Y;
-extern const int SHOW_NAMES;
-extern const int PlayMode;
-extern const int soundvolume;
+extern const unsigned int SHOW_NAMES;
+extern const unsigned int PlayMode;
+extern const unsigned int soundvolume;
 extern const unsigned int SizeOfFont;  // Шрифт   AAA
 extern const unsigned int FnameIPC;    // Отправлять или нет   AAA
 extern const unsigned int AUTO_EXIT_MIN;  // Время до автозакрытия   AAA
@@ -164,9 +166,10 @@ extern const unsigned int SAVE_SETS;
 extern WSHDR *playlist_lines[TCPL][512];
 char *Playlists[TCPL];
 extern short phandle;  // Для определения конца воспр.  AAA
-void* pha;               // Для Obs   AAA
 #ifdef OBS
 HObj gObj=NULL;
+#else
+void* pha;               // Для Obs   AAA
 #endif
 extern unsigned short PlayingStatus;
 extern int CurrentPL;
@@ -185,10 +188,10 @@ const char p_2s[]="%s%s";
 const char p_3s[]="%s%s%s";
 const char p_4s[]="%s%s%s%s";
 #ifndef NO_PNG
-unsigned short pngloadcomp=0;
+bool pngloadcomp=0;
 unsigned short Npng=0;
 #else
-unsigned short pngloadcomp=1;
+bool pngloadcomp=1;
 #endif
 
 GBSTMR offtm;     // Таймер автоотключения   AAA       удаляется при остановке
@@ -544,15 +547,15 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
     {
       StopTMR(1);
      // EXT_REDRAW();
-#ifdef OBS
       WSHDR* sndFName=AllocWS(128);
       const char *p=strrchr(fnamech,'\\')+1;
       str_2ws(sndFName,p,128);
-      
+#ifdef OBS
       unsigned int err=0;
       KillObj();
       WSHDR *ext;
 
+      char *extch;
       int uid;
       short pos;
       int len;
@@ -563,6 +566,13 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
 
       ext=AllocWS(len-pos);
       wstrcpybypos(ext,fname,pos+1,len-pos);
+      // В нижний регистр
+      extch = malloc(wstrlen(ext) * 2 + 1);
+      ws_2utf8(ext, extch, &len, wstrlen(ext) * 2 + 1);
+      strtolower(extch, extch, -1);
+      wsprintf(ext,"%t",extch);
+      mfree(extch);
+      // В нижний регистр
       uid=GetExtUid_ws(ext); 
       FreeWS(ext);
       gObj=Obs_CreateObject(uid,0x34,2,MSG_Report,1,0,&err);
@@ -570,7 +580,7 @@ if(TC[PlayedPL]>0)            // Теперь не рубится при отсутствии загруженного п
       if (err)  goto exit1;
 #ifdef NEWSGOLD
 #ifndef ELKA
-      Obs_SetPurpose(gObj,0x16);
+      Obs_Sound_SetPurpose(gObj,0x16);
 #else
       Obs_Mam_SetPurpose(gObj,0x16);
 #endif
@@ -592,14 +602,16 @@ exit0:
 #else
       PLAYFILE_OPT pfopt;
       WSHDR* sndPath=AllocWS(128);
-      WSHDR* sndFName=AllocWS(128);
       
       char s[128];
       
-      const char *p=strrchr(fnamech,'\\')+1;
-      str_2ws(sndFName,p,128);
-      strncpy(s,fnamech,p-fnamech);
-      s[p-fnamech]='\0';
+    //  short p=wstrrchr(fname,wstrlen(fname),'\\')+1;
+    //  wstrncpy(sndFName,fname,p);
+    //  wstrncpy(sndPath,fname,p-strlen(fname));
+      
+      const char *p1=strrchr(fnamech,'\\')+1;
+      strncpy(s,fnamech,p1-fnamech);
+      s[p1-fnamech]='\0';
       str_2ws(sndPath,s,128);
       zeromem(&pfopt,sizeof(PLAYFILE_OPT));
       pfopt.repeat_num=1;
@@ -772,6 +784,7 @@ void load_skin(char const * fname)              // Извращенец... Такое создать..
           mfree(pp);
           break;
         default:
+          WriteSPerr(SPerr1);
           if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Error_cfg_file]);
           break;
         }
@@ -782,6 +795,7 @@ void load_skin(char const * fname)              // Извращенец... Такое создать..
   }
   else
   {
+    WriteSPerr(SPerr2);
     if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_No_cfg_file]);
   }
 }
@@ -998,6 +1012,29 @@ void Refresh()
   sprintf(cfgname,"%s%s",PIC_DIR,"colour.cfg");
   load_skin(cfgname);
 }
+
+void WriteSPerr(char* err)
+{
+  if(wstrlen(SPerrs)) wsprintf(SPerrs,"%w, %t",SPerrs,err);
+  else {
+    SPerrs=AllocWS(128);
+    wsprintf(SPerrs,"%t %t","Error:",err);
+  }
+}
+
+void ShowLongTXT(unsigned short scr, unsigned short left, unsigned short top, unsigned short w)
+{
+  if(wstrlen(SPerrs))
+  {
+    unsigned short wi=left+Get_WS_width(SPerrs,FONT_SMALL);
+    DrawScrollString(SPerrs,left,top+scr/w*GetFontYSIZE(FONT_SMALL),w,top+(scr/w+1)*GetFontYSIZE(FONT_SMALL),scr+1,FONT_SMALL,0,GetPaletteAdrByColorIndex(2),0);
+    if(wi-scr>w)
+    {
+      scr+=w;
+      ShowLongTXT(scr, left, top, w);
+    }
+  }
+}
 //////////////Автовыход   AAA//////////////
 int AutoExitCounter;
 
@@ -1193,6 +1230,8 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   
     PL_Redraw(playlist_lines[CurrentPL],CurrentTrack,PlayedTrack,0,TC,CurrentPL,PlayedPL);
     CrPopup();
+    ShowLongTXT(0, left, top, w);
+   // if(wstrlen(SPerrs))DrawString(SPerrs,left,top,left+Get_WS_width(SPerrs,FONT_SMALL),top+GetFontYSIZE(FONT_SMALL),FONT_SMALL,2,GetPaletteAdrByColorIndex(3),0);
     }
 #ifndef NO_PNG
     else{
@@ -1247,6 +1286,7 @@ void QuitCallbackProc(int decision)
 
 /* Блок функций. Неоходимо для конфига клавиш. */
 void DoErrKey() {
+  WriteSPerr(SPerr4);
   if(SHOW_POPUP) ShowMSG(1, (int)lgpData[LGP_Error_2]);
 }
 
@@ -1533,6 +1573,7 @@ static void ElfKiller(void)      //Добавил static не знаю зачем, главное - работ
   lgpFreeLangPack();                                   //Очисть память, выделенную под язык - Vedan
   RemoveKeybMsgHook((void *)my_keyhook);               //НАДО!!  AAA . Надо :) DemonGloom
   FreeWS(wl.wfilename);
+  if(SPerrs) FreeWS(SPerrs);
   
   if(!IPC_COPY){
   gipc.name_to=ipc_grantee_name;                       // Это чтобы всех послать :)   AAA
@@ -1976,7 +2017,8 @@ int main(char *exename, char *fname)
   SUBPROC((void*)LoadKeys);
  // SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
   ShowNamesNoConst=SHOW_NAMES;
-  
+ // extern WSHDR* wsfile;
+ // wsfile=AllocWS(256);
   wl.wfilename=AllocWS(128);
   // Если что-то передали в параметре - загружаем...
   if (fname)

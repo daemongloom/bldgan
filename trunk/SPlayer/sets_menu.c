@@ -1,4 +1,5 @@
 #include "../inc/swilib.h"
+#include "../inc/stdbool.h"
 #include "main.h"
 #include "langpack.h"
 #include "mainmenu.h"
@@ -8,7 +9,7 @@
 extern const char PIC_DIR[];
 extern const char EXENAME[];   // SPlayer cfg editor.elf
 char cfgxname[256];
-extern unsigned short EditPL;
+extern bool EditPL;
 /*
 #define MAX_SETS_ITEMS 4
 

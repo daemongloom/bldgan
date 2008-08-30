@@ -151,6 +151,15 @@ static const char * const items1[TOTAL_ITEMS_1] = {
 11       COLOR_PROG_MAIN_FRAME[4];             // Ободок
 */
 
+//>>>>>>>>>>>>>>>>>>>>>>>> SPerrs/Ошибки <<<<<<<<<<<<<<<<<<<<<<<<<<<<//
+// Чтоб проще ламеров гонять   AAA
+//#define SPerr0 "0x00"
+#define SPerr1 "0x01"  // Ошибка определения кфг файла
+#define SPerr2 "0x02"  // Нет кфг файла
+#define SPerr3 "0x03"  // Ошибка конфига клавиш
+#define SPerr4 "0x04"  // Нажата клавиша с ошибочным определением
+//>>>>>>>>>>>>>>>>>>>>>>>> SPerrs/Ошибки <<<<<<<<<<<<<<<<<<<<<<<<<<<<//
+
 #ifdef NEWSGOLD
 #define CBOX_CHECKED 0xE116
 #define CBOX_UNCHECKED 0xE117
@@ -170,6 +179,8 @@ void SendNULL();    // Послать по окончании воспр.   AAA
 void ToDevelop();   // Развернуть   AAA
 
 void Refresh();     // Загрузить конфиги скина   AAA
+
+void WriteSPerr(char* err);
 
 void QuitCallbackProc(int decision);
 
