@@ -119,7 +119,7 @@ void AboutDlg()
   CreateInputTextDialog(&info_desc,&info_about,eq,1,0);
   FreeWS(ews);
   */
-  ShowMSG(0,(int)"(r)\nIlya_ZX\n-Shadow-\nCaptain SISka\nVedan\nGanster and The_Zen\nDIEsel");
+  ShowMSG(0,(int)"(r)\nIlya_ZX\n-Shadow-\nCaptain SISka\nVedan\nGanster and The_Zen\nDIEsel\nShadows");
   char info[128];
   sprintf(info,"SPlayer v%s\n(c): \nAnderstand\nBlind007\nDemonGloom",LG_Version);
   ShowMSG(0,(int)info);

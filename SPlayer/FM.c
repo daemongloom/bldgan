@@ -1,4 +1,5 @@
 #include "../inc/swilib.h"
+#include "../inc/stdbool.h"
 #include "main.h"
 #include "FM.h"
 #include "langpack.h"
@@ -30,13 +31,13 @@ WSHDR* Files[TCFMlines];   // Массив путей к файлам/папкам   AAA
 extern const char PIC_DIR[];
 extern const char MUSIC[];
 //extern char COLOR_BG[4];
-extern const int SHOW_NAMES;
+extern const unsigned int SHOW_NAMES;
 int MarkLines[TCFMlines];  // Массив-маркер для выделения файлов   AAA
 int CurFile=1;       // Текущий элемент   AAA
 unsigned int TCFM=0; // Количество элементов   AAA
 char nowpath[128];
 extern unsigned short ShowNamesNoConst;
-extern unsigned short FM_o;
+extern bool FM_o;
 extern const char p_3s[];
 extern char COLOR[ncolor][4];
 //////////////////////////Переменные//////////////////////////////
@@ -120,6 +121,41 @@ void Sortir(WSHDR** mass)
   FreeWS(buf);
 }
 */
+// Проверяем расширения   AAA
+bool IsExt(short type, char* name)
+{
+  char* sound[5]={"mp3","wav","amr","aac","mid"};
+  char* pls[2]={"spl","m3u"};
+ // char* video[2]={"3gp","mp4"}
+ // char* pict[7]={"jpg","gif","png","bmp","jpeg","jpe","bmx"}
+  const char *p=strrchr(name,'.')+1;
+  char ext[6];
+  int len=strlen(p);
+  strncpy(ext,p,len);
+  ext[len]='\0';
+  strtolower(ext, ext, -1);
+  switch(type)
+  {
+  case 0:
+    for(unsigned int i=0;i<5;i++)
+      if(strcmp(ext,sound[i])==0)return 1;
+    break;
+  case 1:
+    if(strcmp(ext,pls[0])==0)return 1;
+    if(strcmp(ext,pls[1])==0)return 1;
+    break;
+ /* case 2:
+    if(strcmp(ext,video[0])==0)return 1;
+    if(strcmp(ext,video[1])==0)return 1;
+    break;
+  case 3:
+    for(unsigned int i=0;i<7;i++)
+      if(strcmp(ext,pict[i])==0)return 1;
+    break;*/
+  }
+  return 0;
+}
+
 //LoadDaemonList(" 4:\\Doc\\");
 void LoadDaemonList(const char* path, unsigned short re, unsigned short toPL) // Теперь пашет частично   AAA
 {
@@ -142,24 +178,15 @@ void LoadDaemonList(const char* path, unsigned short re, unsigned short toPL) //
       
       if (!isdir(name, &err))//(de.file_attr&FA_DIRECTORY)
       {
-        int a=de.file_name[strlen(de.file_name)-3];
-        int b=de.file_name[strlen(de.file_name)-2];
-        int c=de.file_name[strlen(de.file_name)-1];
-        if(((a=='m'||a=='M')&&(b=='p'||b=='P')&&c=='3')||
-           ((a=='w'||a=='W')&&(b=='a'||b=='A')&&(c=='v'||c=='V'))||
-            ((a=='a'||a=='A')&&(b=='a'||b=='A')&&(c=='c'||c=='C'))||
-             ((a=='m'||a=='M')&&(b=='i'||b=='I')&&(c=='d'||c=='D'))||
-              ((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))||
-               ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U')))   // Перерываем форматы   AAA
-        {
+        if(IsExt(0, de.file_name)||IsExt(1, de.file_name))
+        {   // Перерываем форматы   AAA
           
           strcpy(p1,name);
           fix(p1);
           utf8_2ws(p,p1,256);
           if(toPL==0) {PastFile(p, 0);}
           else {
-            if(((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))||
-               ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U'))){   // Перерываем форматы   AAA
+            if(IsExt(1, de.file_name)){   // Перерываем форматы   AAA
                  LoadPlaylist(name);
                }else{
                  PastLine(p, 0);
@@ -208,11 +235,7 @@ void CopyFName(WSHDR** mlines, int* mark, unsigned int imax)   // Копируем пути 
       {
         LoadDaemonList(path, 1, 1);
       }else{
-        int a=path[strlen(path)-3];
-        int b=path[strlen(path)-2];
-        int c=path[strlen(path)-1];
-        if(((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))||
-           ((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U'))){   // Перерываем форматы   AAA
+        if(IsExt(1, path)){   // Перерываем форматы   AAA
              LoadPlaylist(path);
            }else{
              PastLine(mlines[i], 0);
@@ -309,11 +332,7 @@ static int OnKeyFM(SHOW_FM_GUI *data, GUI_MSG *msg)//горячо любимый онкей
             LoadingDaemonList(p, 0, 0);
             OpenAnim();
           }else{
-            int a=p[strlen(p)-3];
-            int b=p[strlen(p)-2];
-            int c=p[strlen(p)-1];
-            if(!((a=='s'||a=='S')&&(b=='p'||b=='P')&&(c=='l'||c=='L'))&&
-               !((a=='m'||a=='M')&&b=='3'&&(c=='u'||c=='U'))){
+            if(IsExt(0, p)){   // Перерываем форматы   AAA
                  StopAllPlayback();
                  PlayMP3File(Files[CurFile]);
                }

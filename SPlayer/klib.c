@@ -79,7 +79,7 @@ int EnumIni(int local, char *ininame, INIPROC proc)
      fclose(f,&err);
      res=1;
   }
-  else {extern const unsigned int SHOW_POPUP; if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Spkeys_er]);}
+  else {WriteSPerr(SPerr3);extern const unsigned int SHOW_POPUP; if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Spkeys_er]);}
   if(name)mfree(name);
   if(value)mfree(value);
   return res;
