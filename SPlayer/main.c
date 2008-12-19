@@ -1378,15 +1378,22 @@ int OnKey(MAIN_GUI *data, GUI_MSG *msg) //OnKey
 {
   if(IsGuiOnTop(MAINGUI_ID)) {ResetAutoExit();}
   if(Quit_Required)return 1; //Происходит вызов GeneralFunc для тек. GUI -> закрытие GUI
-  if (KeyLock){
-    if ((msg->gbsmsg->msg==LONG_PRESS)&&(msg->gbsmsg->submess=='#')){
-     KbdUnlock();
+  if ((msg->gbsmsg->msg==LONG_PRESS)&&(msg->gbsmsg->submess=='#')){
+    if (KeyLock)
+    {
+      KbdUnlock();
+      if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Keypad_Unlock]);
+    }
+    else
+    {
+      KbdLock();
+      if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Keypad_Lock]);
+    }
      KeyLock=(KeyLock+1)%2;
-     if(SHOW_POPUP) ShowMSG(1,(int)lgpData[LGP_Keypad_Unlock]);
-     REDRAW();}
+     REDRAW();
      return 0;
      }
-  else{
+  else{ if (!(KeyLock)){
 if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
 {
   if (msg->gbsmsg->msg==KEY_UP) {
@@ -1498,6 +1505,7 @@ if(!EditPL)         //  Mr. Anderstand: самому не оч нравится такой вариант...
       break;
     }
     REDRAW();
+  }
   }
   }
   }

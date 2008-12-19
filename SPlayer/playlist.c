@@ -426,7 +426,7 @@ void StartRewind()
   case 1:
     // Если пауза - перематываем :) ...
 #ifndef OBS
-    if (phandle!=-1)return;
+    if (phandle==-1)return;
 #endif
       IsRewind=1;
       DoRewinded();
@@ -434,7 +434,7 @@ void StartRewind()
   case 2:
     // Если играет, ставим паузу и перематываем !! :)
 #ifndef OBS
-    if (phandle!=-1)return;
+    if (phandle==-1)return;
 #endif
       IsRewind=1;
 #ifndef OBS
@@ -505,7 +505,7 @@ void StopAllPlayback()
   Stat_keypressed = 1;
   if(PlayingStatus==0)return;
 #ifndef OBS
-  if (phandle!=-1)return;
+  if (phandle==-1)return;
     PlayMelody_StopPlayback(phandle);
 #else
     Obs_Stop (gObj);
