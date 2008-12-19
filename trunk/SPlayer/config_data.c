@@ -37,10 +37,10 @@ __root const CFG_HDR cfghdr14={CFG_CHECKBOX,LG_Show_Anim,0,2};
 __root const unsigned int GrafOn1 = 1;
 
 __root const CFG_HDR cfghdr15={CFG_CHECKBOX,LG_Show_info,0,2};  //Показывать информацию или нет - Vedan
-#ifdef X75
-__root const unsigned int InfoOn = 0;
-#else
+#ifdef NEWSGOLD
 __root const unsigned int InfoOn = 1;
+#else
+__root const unsigned int InfoOn = 0;
 #endif
 
 __root const CFG_HDR cfghdr16={CFG_CHECKBOX,LG_Show_Popup,0,2};  //Показывать попапы   AAA

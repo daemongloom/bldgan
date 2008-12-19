@@ -1756,7 +1756,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state>4.41A</state>
+          <state>4.42A</state>
         </option>
         <option>
           <name>GeneralMisraRules</name>
@@ -1787,7 +1787,6 @@
         <option>
           <name>CCDefines</name>
           <state>X75</state>
-          <state>OBS</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -2184,7 +2183,7 @@
       <archiveVersion>1</archiveVersion>
       <data>
         <prebuild></prebuild>
-        <postbuild>$PROJ_DIR$\postbuild.bat $TARGET_PATH$ Data\ZBin\SPlayer\SPlayer.elf</postbuild>
+        <postbuild>$PROJ_DIR$\postbuild.bat $TARGET_PATH$ Data\ZBin\SPlayer\SPlayer_SGold.elf</postbuild>
       </data>
     </settings>
     <settings>
@@ -5415,7 +5414,7 @@
           <debug>0</debug>
           <option>
             <name>CCDefines</name>
-            <state></state>
+            <state>X75</state>
           </option>
           <option>
             <name>CCPreprocFile</name>
