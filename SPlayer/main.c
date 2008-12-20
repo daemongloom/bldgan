@@ -1190,11 +1190,7 @@ void OnRedraw(MAIN_GUI *data) // OnRedraw
   }
 #else
     // Громкость
-#ifdef NEWSGOLD
   unsigned short nvol=15;
-#else
-  unsigned short nvol=14;
-#endif
   unsigned short pos=(30-4-2)*GetVolLevel()/nvol+1;
   DrawRoundedFrame(coord[9],coord[10],coord[9]+30,coord[10]+13,4,4,0,GetPaletteAdrByColorIndex(1),COLOR[2]);
   DrawRoundedFrame(coord[9]+pos,coord[10]+13*3/5,coord[9]+4+pos,coord[10]+13*4/5,4,4,0,GetPaletteAdrByColorIndex(0),COLOR[2]);
@@ -2023,7 +2019,7 @@ int main(char *exename, char *fname)
   Refresh();
   lgpInitLangPack(); //Загрузка языка - Vedan
   SUBPROC((void*)LoadKeys);
- // SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
+  SUBPROC((void*)LoadPng); // Загрузка пнг   AAA
   ShowNamesNoConst=SHOW_NAMES;
  // extern WSHDR* wsfile;
  // wsfile=AllocWS(256);
