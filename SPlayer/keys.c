@@ -53,7 +53,7 @@ const KEY_MAP keynames[] = {
  {'9', "9"},
  {'*', "*"},
  {'#', "#"},
- // LOGN_PRESS
+ // LONG_PRESS
  {LEFT_SOFT, "lsoft_lp"},
  {RIGHT_SOFT, "rsoft_lp"},
  {GREEN_BUTTON, "green_lp"},
@@ -147,7 +147,7 @@ void DoKey(int key)
     startkn = 0;
     finishkn = MAX_KEY_DOWN_NUM;
   }
-  for(int cc=startkn;cc<finishkn;cc++)
+  for(int cc=startkn;cc<=finishkn;cc++)
     if(keynames[cc].key==key) {
       if(procmap[cc])procmap[cc]();
       return;
