@@ -477,6 +477,7 @@ void TogglePlayback()
 #ifndef OBS
       if (phandle==-1)return;
       PlayMelody_ResumePlayBack(phandle);
+      PlayMelody_ChangeVolume(phandle,SoundVolume);
 #else
       Obs_Resume (gObj);
 #endif
