@@ -2029,8 +2029,10 @@ int main(char *exename, char *fname)
  // wsfile=AllocWS(256);
   wl.wfilename=AllocWS(128);
   // ≈сли что-то передали в параметре - загружаем...
-  if (fname)
-  {
+  unsigned int err;
+  FSTATS fstats;
+  if (GetFileStats(fname,&fstats,&err)!=-1)     // ≈сли плей-лист существует
+  {    
     LoadingPlaylist(fname);
   }
   if(SAVE_SETS)
@@ -2048,7 +2050,6 @@ int main(char *exename, char *fname)
     load_skin(sfname);
     
   }else{
-    
   playmode = PlayMode;
   SoundVolume = soundvolume;
   if(TC[CurrentPL]==0){ // если плейлист из параметра пустой или нет параметров-> грузим стандарт
