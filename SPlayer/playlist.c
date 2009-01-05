@@ -259,12 +259,12 @@ void ToggleVolume()
   REDRAW();
 }
 
-int random(int max)
+int random(int dummy,int max)
 {
   TDate date;
   TTime time;
   GetDateTime(&date,&time);
-  return((time.hour+time.min*time.sec+time.millisec+date.day+date.month+date.year+time.millisec*time.sec)%max+1);
+  return((dummy*time.sec+time.hour+time.min*time.sec+time.millisec+date.day+date.month+date.year+time.millisec*time.sec)%max+1);
 }
 
 
@@ -274,6 +274,7 @@ void RandTrack()
 {
   if(ready[PlayedPL])
   {
+     extern int tm;
 #ifndef OBS
    if(phandle!=-1)PlayMelody_StopPlayback(phandle);
 #else
@@ -282,7 +283,7 @@ void RandTrack()
    if(NextPlayedTrack[1]){PlaySetTrack();}
    else{int prevtrack=PlayedTrack[PlayedPL];
    while (PlayedTrack[PlayedPL]==prevtrack) 
-   {PlayedTrack[PlayedPL]=random(TC[PlayedPL]);}
+   {PlayedTrack[PlayedPL]=random(tm+prevtrack,TC[PlayedPL]);}
    if(PlayedTrack[PlayedPL]>TC[PlayedPL])PlayedTrack[PlayedPL]=1;
    if (CurrentPL==PlayedPL){
    if (CurrentTrack[CurrentPL]==prevtrack)
